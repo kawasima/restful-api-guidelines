@@ -762,30 +762,42 @@ receiver interested in the history of a resource can use the ordering
 key to recreate a (partially) ordered sequence of events.
 
 [#213]
-== {MUST} Event names must match Zalando naming schema
+== {MUST-SHOULD} Use functional naming schema for event names
 
+To allow for stable APIs in case of technical and organizational changes, all
+names of event types are recommended to follow the
+https://docs.google.com/document/d/1ZSfVkdX_Dwpz22Xl-CFXgxe1u1eY_IfTNdFNMmnGi8c[functional
+naming schema (internal link)] depending on the intended <<219, audience>>
+(see <<220>> for required levels).
 
-All event names must match the following naming schema:
+The schema for event names is defined as follows:
 
 [source,bnf]
 ----
-eventtype-name ::= <functional-domain>.[<functional-component>].<event-name>
+event-name           ::= <functional-domain>.[<functional-component>].<event>
 
-functional-domain ::= [a-z][a-z0-9]* ; name managed by central architecture team
+functional-domain    ::= [a-z][a-z0-9]* ; name managed by architecture team
 
-functional-component ::= [a-z][a-z0-9-]* ; functional name of the component sending the event
+functional-component ::= [a-z][a-z0-9-]* ; functional name of owning component
 
-event-name ::= [a-z][a-z0-9-]* ; free identifer (functional name)
+event-identifier     ::= [a-z][a-z0-9-]* ; free event identifier (functional name)
 ----
 
-`functional-domain` and `functional-component` are also used in hostnames of REST APIs,
-see <<218>>. They must correspond to the functional name
-of the application producing the event and are currated by central architecture team support
-to provide global uniqueness and consistency with global architecture.
+The `functional-domain` and `functional-component` must correspond to the
+functional name of the owning application. The uniqueness of this name
+and its consistency with global architecture is ascertained by the
+https://github.bus.zalan.do/team-architecture/functional-component-registry[registration
+process (internal-link)] for functional components.
 
-*Note:* If an entity of a data change events is also expose as resource via the REST API,
-the event name should be the same as the resource name in the REST API.
- 
+*Note:* If an entity of a data change events is also expose as resource via a
+RESTful API, the event name should be the same as the resource name in the
+RESTful API.
+
+If the functional name schema is not applied, the uniqueness and consistency
+of the event name must be preserved by substituting the `functional-domain`
+against the team name and the `functional-component` against the application
+name.
+
 [#214]
 == {MUST} Prepare for duplicate Events
 
