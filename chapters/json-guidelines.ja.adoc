@@ -1,0 +1,165 @@
+[[json-guidelines]]
+= JSONガイドライン
+
+ZalandoにおいてJSONデータを定義するのに推奨されるガイドラインです。
+JSONとは、ここではhttp://www.rfc-editor.org/rfc/rfc7159.txt[RFC 7159] (which updates
+https://www.ietf.org/rfc/rfc4627.txt[RFC 4627])を指します。
+"application/json"のメディアタイプとAPIで定義されたカスタムのJSONメディアタイプをもちます。
+このガイドラインでは、Zalandoの用語やサービスの用例をもつJSONデータを使って、具体的なケースを示します。
+, the “application/json”
+media type and custom JSON media types defined for APIs. The guidelines
+clarifies some specific cases to allow Zalando JSON data to have an
+idiomatic form across teams and services.
+
+最初のいくつかはプロパティ名についてのガイドラインであり、
+後半は値についてのガイドラインになります。
+
+[#118]
+== {MUST} プロパティ名はASCIIスネークケースでなければならない (キャメルケースは使わない): `^[a-z_][a-z_0-9]*$`
+
+プロパティ名は、ASCII文字列という制限があります。最初の一文字はアルファベットまたはアンダースコアで、
+それに続く文字は、アルファベットまたはアンダースコア、数字のいずれかでなくてはなりません。
+
+(`_links`のようなキーワードのみ、`_`から始まるプロパティ名とすることを推奨します)
+
+理念: 確立された標準は存在しませんが、多くの有名インターネット企業は、スネークケースを好みます。
+GitHub, Stack Exchange, Twitterなど。一方でGoogleやAmazonは、- だけでなくキャメルケースも
+使っています。同じところからくるJSONが一貫したルック・アンド・フィールとなるように設計するのは
+必要不可欠なことです。
+
+[#216]
+== {SHOULD} キーフォーマットに制限がないmapは、`additionalProperties`を使って定義する
+
+ここで「map」は、文字列のキーから他の型へのマッピングを意味します。
+JSONにおいてこれはオブジェクトとして表現されます。キーと値のペアはプロパティ名とプロパティの値によって
+表現されます。
+OpenAPIスキーマにおいては(JSONスキーマにおいても同様)、それらはadditionalPropertiesを使って
+表現すべきとされます。そのようなオフジェクトは他に定義されたプロパティは持ちません。
+
+mapのキーは、命名<<118,ルール 118>>の意味ではプロパティ名とみなしませんので、ドメイン固有のフォーマットに
+したがうようにします。
+ドキュメントにはmapオブジェクトのスキーマの詳細に、これを記述するようにしてください。
+これはそのようなmapの例です。(`transactions`プロパティがそれにあたります)
+
+```yaml
+definitions:
+  Message:
+    description:
+      A message together with translations in several languages.
+    type: object
+    properties:
+      message_key:
+        type: string
+        description: The message key.
+      translations:
+        description:
+          The translations of this message into several languages.
+          The keys are https://tools.ietf.org/html/bcp47[BCP-47 language tags].
+        type: object
+        additionalProperties:
+          type: string
+          description:
+            the translation of this message into the language identified by the key.
+```
+
+実際のJSONオブジェクトは次のようなものです。
+
+```json
+{ "message_key": "color",
+  "translations": {
+    "de": "Farbe",
+    "en-US": "color",
+    "en-GB": "colour",
+    "eo": "koloro",
+    "nl": "kleur"
+  }
+}
+```
+
+[#120]
+== {SHOULD} Arrayの名前は複数形にする
+
+複数の値をもつArrayのプロパティ名は複数形にします。これはオブジェクトの名前は単数形にすべきということも暗に示しています。
+
+[#122]
+== {MUST} Booleanのプロパティはnullであってはなりません
+
+booleanとして設計されたJSONプロパティは、スキーマ上nullであってはなりません。
+booleanはtrueとfalseの2つの値をもった列挙型です。もしnull値をもちたいことがあれば、
+booleanの代わりに列挙型を使うことを強く奨めます。
+例えばaccepted_terms_and_conditionsがtrueまたはfalseをもつとき、
+これはyes/no/unknownの値をもったterms_and_conditionsに置き換えることができます。
+
+[#123]
+== {SHOULD} null値はフィールドごと削除されるべき
+
+共通して使われるSwagger/OpenAPIでは、フィールドがnull値をもつことをサポートしていません。
+(もし必須としてマークされていなければ、フィールドごと消すという意図です)
+
+しかしnull値をもつフィールドをクライアント-サーバ間で送受信することは避けられません。
+またnullが意味のある値となる場合もあります。JSON Merge Patch (https://tools.ietf.org/html/rfc7386[RFC 7382])は、
+プロパティの削除を示すのにnullを使います。
+
+[#124]
+== {SHOULD} 空のArray値はnullにはしない
+
+Arrayが空であることは`[]`として曖昧さなく表現できます。
+
+[#125]
+== {SHOULD} 列挙型はStringとして表現する
+
+Strings are a reasonable target for values that are by design
+enumerations.
+
+[#126]
+== {SHOULD} 日付型のプロパティ値はRFC 3339に準拠する
+
+http://tools.ietf.org/html/rfc3339#section-5.6[RFC 3339]で定義された日付と時刻のフォーマットを使いましょう。
+
+* for "date" use strings matching
+`date-fullyear "-" date-month "-" date-mday`, for example: `2015-05-28`
+* for "date-time" use strings matching `full-date "T" full-time`, for
+example `2015-05-28T14:07:17Z`
+
+Note that the
+https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#data-types[OpenAPI
+format] "date-time" corresponds to "date-time" in the RFC) and
+`2015-05-28` for a date (note that the OpenAPI format "date" corresponds
+to "full-date" in the RFC). Both are specific profiles, a subset of the
+international standard http://en.wikipedia.org/wiki/ISO_8601[ISO 8601].
+
+A zone offset may be used (both, in request and responses) -- this is
+simply defined by the standards. However, we encourage restricting dates
+to UTC and without offsets. For example `2015-05-28T14:07:17Z` rather
+than `2015-05-28T14:07:17+00:00`. From experience we have learned that
+zone offsets are not easy to understand and often not correctly handled.
+Note also that zone offsets are different from local times that might be
+including daylight saving time. Localization of dates should be done by
+the services that provide user interfaces, if required.
+
+When it comes to storage, all dates should be consistently stored in UTC
+without a zone offset. Localization should be done locally by the
+services that provide user interfaces, if required.
+
+Sometimes it can seem data is naturally represented using numerical
+timestamps, but this can introduce interpretation issues with precision
+- for example whether to represent a timestamp as 1460062925,
+1460062925000 or 1460062925.000. Date strings, though more verbose and
+requiring more effort to parse, avoid this ambiguity.
+
+[#127]
+== {MAY} Time durations and intervals could conform to ISO 8601
+
+Schema based JSON properties that are by design durations and intervals
+could be strings formatted as recommended by ISO 8601
+(https://tools.ietf.org/html/rfc3339#appendix-A[Appendix A of RFC 3339
+contains a grammar] for durations).
+
+[#128]
+== {MAY} Standards could be used for Language, Country and Currency
+
+* http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2[ISO 3166-1-alpha2 country]
+* (It's "GB", not "UK", even though "UK" has seen some use at Zalando)
+* https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes[ISO 639-1 language code]
+* https://tools.ietf.org/html/bcp47[BCP-47] (based on ISO 639-1) for language variants
+* http://en.wikipedia.org/wiki/ISO_4217[ISO 4217 currency codes]
