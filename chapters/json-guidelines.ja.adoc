@@ -148,8 +148,9 @@ timestamps, but this can introduce interpretation issues with precision
 requiring more effort to parse, avoid this ambiguity.
 
 [#127]
-== {MAY} Time durations and intervals could conform to ISO 8601
+== {MAY} 期間はISO8601に準拠するTime durations and intervals could conform to ISO 8601
 
+ISO 8601で推奨されているフォーマット
 Schema based JSON properties that are by design durations and intervals
 could be strings formatted as recommended by ISO 8601
 (https://tools.ietf.org/html/rfc3339#appendix-A[Appendix A of RFC 3339

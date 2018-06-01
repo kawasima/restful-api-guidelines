@@ -1,0 +1,210 @@
+[[common-data-types]]
+= 共通のデータ型
+
+Definitions of data objects that are good candidates for wider usage:
+
+[#173]
+== {SHOULD} 共通のお金オブジェクトを使う
+
+以下のような共通のお金構造を使いましょう。
+
+[source,yaml]
+----
+Money:
+  type: object
+  properties:
+    amount:
+      type: number
+      description: Amount expressed as a decimal number of major currency units
+      format: decimal
+      example: 99.95
+    currency:
+      type: string
+      description: 3 letter currency code as defined by ISO-4217
+      format: iso-4217
+      example: EUR
+  required:
+    - amount
+    - currency
+----
+
+金額の10進の値はその通貨での単一の値で表記します。
+小数点の前の数値はメジャーユニットであり、小数点の後ろの数値はマイナーユニットです。
+ビットコインのトランザクションのように、高い精度を要求する業務もあるので、API仕様に
+明記していない限りは、アプリケーションは制限なしの精度を受け取れるように
+準備しておかなければなりません。
+ユーロの正しい表記を例示します。
+
+* `42.20` or `42.2` = 42 Euros, 20 Cent
+* `0.23` = 23 Cent
+* `42.0` or `42` = 42 Euros
+* `1024.42` = 1024 Euros, 42 Cent
+* `1024.4225` = 1024 Euros, 42.25 Cent
+
+特定の言語でこのインタフェースを実装したり計算したりする際には、
+"amount"フィールドを決して`float`や`double`型に変換してはなりません。
+そうしないと精度が失われてしまいます。代わりにJavaの
+https://docs.oracle.com/javase/8/docs/api/java/math/BigDecimal.html[`BigDecimal`]のような正確なフォーマットを使いましょう。
+詳細は http://stackoverflow.com/a/3730040/342852[Stack Overflow]
+
+いくつかのJSONパーサ(例えばNodeJS)は、デフォルトでnumberをfloatに変換してしまいます。
+https://docs.google.com/spreadsheets/d/12wTj-2w39f69XZGwRDrosNc1yWPwQpGgEs_DCt5ODaQ[議論 (internal link)]を経て、私たちは金額のフォーマットに"decimal"を使うことに決めました。
+OpenAPIフォーマットの標準ではないけれど、パーサがnumberをfloatやdoubleに変換してしまうことを避けることができるからです。
+
+[#174]
+== {MUST} 共通のフィールド名やセマンティクスを使う
+
+複数の場所で使われるフィールドの型があります。すべてのAPI実装にわたって一貫性を保つために、
+どんなときでも適用可能な共通のフィールド名とセマンティクスを使わなければなりません。
+
+[[generic-fields]]
+=== Generic Fields
+
+APIに繰り返し出てくるフィールドは以下のようなものです。
+
+* `id`: オブジェクトのID。 IDは数値でなく文字列でなくてはなりません。IDは文書化されているコンテキストの範囲でユニークかつ不変です。一度オブジェクトに付与されたら変更されてはならないし、再利用してもいけません。
+If used, IDs must be opaque strings and
+not numbers. IDs are unique within some documented context, are stable
+and don't change for a given object once assigned, and are never
+recycled cross entities.
+* `xyz_id`: オブジェクトが別のオブジェクトのIDを持つ場合、相手オブジェクト名に`_id`を付与した名前を使いましょう。 (e.g. `customer_number`ではなく`customer_id`; 子ノードから親ノードを参照する場合は、たとえ両方が`Node`型であっても、`parent_node_id`とします)
+* `created`: オブジェクトが作られた日時。`date-time`型でなくてはなりません。
+* `modified`: オブジェクトが更新された日時。`date-time`型でなくてはなりません。
+* `type`: オブジェクトの種類。このフィールドの型はstringとするべきです。 If used, the type of this
+field should be a string. Types allow runtime information on the entity
+provided that otherwise requires examining the Open API file.
+
+Example JSON schema:
+
+[source,json]
+----
+tree_node:
+  type: object
+  properties:
+    id:
+      description: the identifier of this node
+      type: string
+    created:
+      description: when got this node created
+      type: string
+      format: 'date-time'
+    modified:
+      description: when got this node last updated
+      type: string
+      format: 'date-time'
+    type:
+      type: string
+      enum: [ 'LEAF', 'NODE' ]
+    parent_node_id:
+      description: the identifier of the parent node of this node
+      type: string
+  example:
+    id: '123435'
+    created: '2017-04-12T23:20:50.52Z'
+    modified: '2017-04-12T23:20:50.52Z'
+    type: 'LEAF'
+    parent_node_id: '534321'
+----
+
+これらのプロパティはいつも必要というわけではありませんが、これを慣例にしておくことで、
+APIクライアント開発者にとってZalandoリソースの共通理解が容易になるわけです。
+異なる名前が使われたり、APIごとにこれらの型が違ったりすると、API利用者にとっては不便なものになってしまいますからね。
+
+[[address-fields]]
+=== 住所フィールド
+
+住所の構造は国の違いを含む様々な機能、ユースケースに影響します。
+住所に関するすべての属性は、以下で定義された名前とセマンティクスにしたがいます。
+
+[source,yaml]
+----
+addressee:
+  description: a (natural or legal) person that gets addressed
+  type: object
+  required:
+    - first_name
+    - last_name
+    - street
+    - city
+    - zip
+    - country_code
+  properties:
+    salutation:
+      description: |
+        a salutation and/or title used for personal contacts to some
+        addressee; not to be confused with the gender information!
+      type: string
+      example: Mr
+    first_name:
+      description: |
+        given name(s) or first name(s) of a person; may also include the
+        middle names.
+      type: string
+      example: Hans Dieter
+    last_name:
+      description: |
+        family name(s) or surname(s) of a person
+      type: string
+      example: Mustermann
+    business_name:
+      description: |
+        company name of the business organization. Used when a business is
+        the actual addressee; for personal shipments to office addresses, use
+        `care_of` instead.
+      type: string
+      example: Consulting Services GmbH
+  required:
+    - first_name
+    - last_name
+
+address:
+  description:
+    an address of a location/destination
+  type: object
+  properties:
+    care_of:
+      description: |
+        (aka c/o) the person that resides at the address, if different from
+        addressee. E.g. used when sending a personal parcel to the
+        office /someone else's home where the addressee resides temporarily
+      type: string
+      example: Consulting Services GmbH
+    street:
+      description: |
+        the full street address including house number and street name
+      type: string
+      example: Schönhauser Allee 103
+    additional:
+      description: |
+        further details like building name, suite, apartment number, etc.
+      type: string
+      example: 2. Hinterhof rechts
+    city:
+      description: |
+        name of the city / locality
+      type: string
+      example: Berlin
+    zip:
+      description: |
+        zip code or postal code
+      type: string
+      example: 14265
+    country_code:
+      description: |
+        the country code according to
+        [iso-3166-1-alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
+      type: string
+      example: DE
+  required:
+    - street
+    - city
+    - zip
+    - country_code
+----
+
+特定データにおけるフィールドのグルーピングやカーディナリティは、特定のユースケースに基づいています。
+(例えば、宛先をモデル化するときは受取人と住所のフィールドの組み合わせをるけれども、ユーザと住所をモデル化するときは、受取人と住所は別にする、ということです)
+Grouping and cardinality of fields in specific data types may vary based
+on the specific use case (e.g. combining addressee and address fields
+into a single type when modeling an address label vs distinct addressee
+and address types when modeling users and their addresses).

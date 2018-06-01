@@ -1,0 +1,41 @@
+[[api-operation]]
+= API操作
+
+[#192]
+== {MUST} Publish OpenAPI Specification
+
+すべてのサービスアプリケーションは、外に向けたAPIのOpen APIの仕様を公開しなければなりません。
+内部APIは任意ではありますが、APIマネジメント基盤を使うメリットは大きいので、公開しておくに
+こしたことはありません。i.e. APIs marked with the
+*component-internal* <<219, API audience>> group
+
+APIはその**OpenAPI仕様**を、プロビジョニングサービスをデプロイするのに使われる
+**デプロイメント成果物**の中の**/zalando-apis**ディレクトリへコピーすることで公開されます。
+ディレクトリは**自己完結型のYAML**
+**ファイル**だけを置くようにしてください。そこには1つのAPIについて記述します。
+(see
+https://docs.google.com/a/zalando.de/document/d/1WBpRHp1DAtz7Pfjt0QwPuZNR1e70APRqUlCCby3JiOM[internal narrative]
+for more details).
+
+We prefer this deployment artifact-based method over the
+past (now legacy) `.well-known/schema-discovery` service endpoint-based
+publishing process, that we only support for backward compatibility reasons.
+
+Background: In our dynamic and complex service infrastructure, it is important
+to provide API client developers a central place with online access to the API
+specifications of all running applications. As a part of the infrastructure,
+the API publishing process is used to detect API specifications. The findings
+are published in the API Portal - the universal hub for all Zalando APIs.
+
+**Note:** To publish an API, it is still necessary to deploy the artifact
+successful, as we focus the discovery experience on APIs supported by running
+services.
+
+[#193]
+== {SHOULD} API利用状況をモニタリングする
+
+本番環境で使われるAPIのオーナーは、使っているクライアントについて情報を得るために
+APIサービスをモニタリングすべきです。その情報は、例えばAPI変更時にレビューをお願い
+しなきゃいけない相手を特定するのに役立ちます。
+
+ヒント: クライアントを見つけるより良い方法は、OAuthトークンから取り出したclient-idのログを取ることです。
