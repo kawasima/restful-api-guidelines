@@ -125,14 +125,15 @@ a given parameter will return different parts of the specified result
 schema. Explain this in English in the parameter description.
 
 [#158]
-== {SHOULD} Allow Optional Embedding of Sub-Resources
+== {SHOULD} サブリソースの拡張は任意とする Allow Optional Embedding of Sub-Resources
 
-Embedding related resources (also know as _Resource expansion_) is a
-great way to reduce the number of requests. In cases where clients know
-upfront that they need some related resources they can instruct the
-server to prefetch that data eagerly. Whether this is optimized on the
-server, e.g. a database join, or done in a generic way, e.g. an HTTP
-proxy that transparently embeds resources, is up to the implementation.
+関連するリソースを組み込むこと(_リソース展開_として知られる)は、リクエスト数を減らすためには
+すごくよい手段です。
+クライアントが前もって必要な関連リソースを知っている場合は、クライアントからサーバに、
+データをEagarにプリフェッチできるよう指示します。
+これはサーバで最適化されるのか(例えば、データベースのJOIN)、
+一般的な手段(例えば透過的にリソースを差し込むHTTPプロキシ)で実現されるのかは、
+実装次第です。
 
 See <<137>> for naming, e.g. "embed" for steering of embedded
 resource expansion. Please use the
@@ -167,21 +168,20 @@ GET /order/123?embed=(items) HTTP/1.1
 [217]
 == {MUST} サポートされていればキャッシュを使う
 
-If an API is intended to support caching, it must take care to specify
-this ability by defining the caching boundaries i.e. time-to-live and
-cache constraints, by providing the `Cache-Control` and `Vary` headers
-(Please read https://tools.ietf.org/html/rfc7234[RFC-7234] carefully).
+APIがキャッシュをサポートすることが意図されていれば、キャッシュ境界(すなわち、
+`Cache-Control` と `Vary` ヘッダを付加することによって生存期間とキャッシュ制約)
+を定義することによって、これを明記しなければなりません。
+(https://tools.ietf.org/html/rfc7234[RFC-7234] を注意深く読んでください。)
 
-Caching has to take many aspects into account, e.g. general cacheability
-of response information, our guideline to protect endpoints using SSL
-and <<104,OAuth authorization>>, resource update and invalidation rules,
-existence of multiple consumer instances. As a consequence, caching is
-in best case complex, in worst case inefficient. Thus, client side and
-transparent HTTP caching should be avoided for RESTful APIs unless the
-API designer has proven to know better.
+キャッシュは実に多くのことを考慮しなくてはなりません。例えば、レスポンス情報の一般的な
+キャッシュ可能性、SSLや<<104,OAuth>>を使ってエンドポイントを保護するためのガイドライン、
+リソースのアップデートや無効化ルール、複数のコンシューマインスタンスの存在など。
+結果としてキャッシュは、最良の場合「複雑」で、最悪の場合「何の役にも立たない」ものになるでしょう。
+API設計者がよくこれを理解していることが示されない限りは、RESTful APIに関して
+クライアントサイドでのキャッシュや透過的なHTTPキャッシュは避けるべきです。
 
-As default, API providers should set the `Cache-Control: no-cache` header.
+デフォルトでは、APIは`Cache-Control: no-cache`ヘッダをセットすべきです。
 
-**Note:** There is no need to document this default setting, that is
-attached to each response automatically by most frameworks. However, any
-use deviating from this default must be sufficiently documented.
+**注意:** このデフォルトセッティングをドキュメントに書く必要はありません。
+たいていのフレームワークは、レスポンスに自動的に付与するからです。
+しかし、このデフォルトから外れる場合は、しっかりとドキュメント化しなくてはなりません。

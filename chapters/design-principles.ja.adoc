@@ -5,22 +5,17 @@
 == API設計の原則
 
 SOAPインタフェースをもつSOA WebサービスとRESTを比較すると、前者はユースケースに特化した
-操作を中心に据える傾向があり、一方RESTは業務データをどう
-Comparing SOA web service interfacing style of SOAP vs. REST, the former
-tend to be centered around operations that are usually use-case specific
-and specialized. In contrast, REST is centered around business (data)
-entities exposed as resources that are identified via URIs and can be
-manipulated via standardized CRUD-like methods using different
-representations, and hypermedia. RESTful APIs
-tend to be less use-case specific and comes with less rigid client /
-server coupling and are more suitable for an ecosystem of (core) services
-providing a platform of APIs to build diverse new business services.
-We apply the RESTful web service principles to all kind of application
-(micro-) service components, independently from whether they provide
-functionality via the internet or intranet.
+操作を中心に据える傾向があります。一方RESTはビジネス(データ)のエンティティを、URIで識別されるリソースとして
+どう見せるか、標準化されたCRUDのようなメソッドで、異なる表現やハイパーメディアを使ってどう操作されうるかを中心に据えます。
+RESTful APIは、固有のユースケースからは切り離され、クライアント/サーバの結合を疎にする傾向にあります。
+さまざまな新しい業務サービスを構築するために、APIのプラットフォームを提供している(コア)サービスのエコシステムに、
+より適したものとなっていきます。
+私たちは、その機能がインターネットで提供されるのか、イントラネットで提供されるのかに
+かかわらず、すべての種類のアプリケーション、(マイクロ)サービスコンポーネントに、RESTfulウェブサービスの原則を適用します。
 
-* We prefer REST-based APIs with JSON payloads
-* We prefer systems to be truly RESTful
+* 私たちはJSONペイロードをもったRESTベースのAPIを好む
+* 私たちはシステムが、真にRESTfulになることを好む
+
 footnoteref:[fielding-restful,Per definition of R.Fielding REST APIs have to support
 HATEOAS (maturity level 3). Our guidelines do not strongly advocate for
 full REST compliance, but limited hypermedia usage, e.g. for pagination
@@ -58,25 +53,21 @@ Styles and the Design of Network-Based Software Architectures]
 
 
 [[api-as-a-product]]
-== API as a Product
+== 製品としてのAPI
 
-As mentioned above, Zalando is transforming from an online shop into an
-expansive fashion platform comprising a rich set of products following a
-Software as a Platform (SaaP) model for our business partners. As a
-company we want to deliver products to our (internal and external)
-customers which can be consumed like a service.
+前述のとおり、Zalandoは単なるオンラインショップから、価値あるファッションプラットフォームへと
+転換しており、ビジネスパートナーのためにSaaP(プラットフォームとしてのソフトウェア)モデル
+に続く、製品の豊富な集合を提供しています。
+企業として私たちは、これらの製品を(内外問わず)顧客に届けたいのです。
 
-Platform products provide their functionality via (public) APIs; hence,
-the design of our APIs should be based on the API as a Product
-principle:
+プラットフォームとしての製品とは、(公開)APIで提供される機能群です。
+したがってAPIの設計は、製品としての原則に基づくべきなのです。
 
-* Treat your API as product and act like a product owner
-* Put yourself into the place of your customers; be an advocate for
-  their needs
-* Emphasize simplicity, comprehensibility, and usability of APIs to
-make them irresistible for client engineers
-* Actively improve and maintain API consistency over the long term
-* Make use of customer feedback and provide service level support
+* APIを製品として扱い、製品のオーナーのように振る舞う
+* 顧客の立場に身を置き、彼らのニーズの支持者となる
+* 顧客エンジニアにとってAPIがとても魅力的なものになるために、APIのシンプルさ、理解しやすさ、使いやすさを際立たせる
+* 長期にわたって、APIをアクティブに改善し、一貫性を維持していく
+* 顧客のフィードバックを受け付け、サービスと同レベルのサポートを提供する。
 
 Embracing 'API as a Product' facilitates a service ecosystem which can
 be evolved more easily, and used to experiment quickly with new business
@@ -95,46 +86,39 @@ developer experience.
 API as a Product is closely related to our <<100,API First principle>>
 (see next chapter) which is more focused on how we engineer high quality APIs.
 
-
-
 [[api-first]]
 == APIファースト
 
-API First is one of our
-https://github.com/zalando/engineering-principles[engineering
-and architecture principles]. In a nutshell API First requires two
-aspects:
+APIファーストは、私たちの
+https://github.com/zalando/engineering-principles[エンジニアリングとアーキテクチャ原則]
+の1つです。
 
-* define APIs first, before coding its implementation, using a standard specification
-language
-* get early review feedback from peers and client developers
+手短にいうと、APIファーストは2つの観点を要求します。
 
-By defining APIs outside the code, we want to facilitate early review
-feedback and also a development discipline that focus service interface
-design on...
+* 実装する前に標準仕様言語を使って、まずAPIを定義する
+*　同僚やクライアント開発者から、いち早くレビューのフィードバックを得る
 
-* profound understanding of the domain and required functionality
-* generalized business entities / resources, i.e. avoidance of use case
-specific APIs
-* clear separation of WHAT vs. HOW concerns, i.e. abstraction from
-implementation aspects — APIs should be stable even if we replace
-complete service implementation including its underlying technology
-stack
+コードの外にAPIを定義することで、私たちは早いレビューフィードバックを促し、
+サービスインタフェースの設計が、以下に焦点を当てれるような開発の規律にしたいのです。
 
-Moreover, API definitions with standardized specification format also
-facilitate...
+* ドメインと要求機能の深い理解
+* 一般化された業務エンティティ / リソース (つまり、あるユースケース固有のAPIを避ける)
+* WHATとHOWの関心の分離。すなわち、実装の観点から「抽象」をを切り離す。APIはたとえ技術スタックが完全に置き換わったとしても、安定しているべきである。
 
-* single source of truth for the API specification; it is a crucial part
-of a contract between service provider and client users
-* infrastructure tooling for API discovery, API GUIs, API documents,
-automated quality checks
+さらには、標準化された仕様のフォーマットによるAPI定義は、また、
 
-Elements of API First are also this API Guidelines and a standardized
-API review process as to get early review feedback from
-peers and client developers. Peer review is important for us to get high
-quality APIs, to enable architectural and design alignment and to
-supported development of client applications decoupled from service
-provider engineering life cycle.
+* API仕様の拠り所。それはサービスプロバイダとクライアントのユーザの間の重要な契約の1つとなります。
+* APIディスカバリ、API GUI、APIドキュメント、API品質の自動チェックなどのAPI基盤ツール。
+
+APIファーストの要素はまた、このAPIガイドラインと同僚やクライアント開発者から、
+早期にレビューフィードバックを得るための、APIガイドラインと標準化されたAPIレビュープロセスです。
+APIの品質を高め、アーキテクチャと設計の調整を可能にし、サービスプロバイダの開発サイクルに
+クライアントアプリケーションの開発が引きずられないようにするために、私たちにとってピアレビューは重要です。
+
+APIファーストが、私たちの愛する*アジャイル開発の原則とかち合わない*ことは重要なことです。
+サービスアプリケーションは徐々に進化していくように、APIもまた進化していきます。
+もちろんAPI仕様は異なるサイクルで、繰り返し進化を遂げていくでしょうし、そうあるべきですが、
+それらはみな、ドラフトの状態と、_早期の_チームとピアレビューフィードバックから始まるのです。
 
 It is important to learn, that API First is *not in conflict with the
 agile development principles* that we love. Service applications should

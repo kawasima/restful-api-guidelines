@@ -29,11 +29,10 @@ APIファーストは品質に直結する標準を網羅しつつ、軽量な�
 [[conventions-used-in-these-guidelines]]
 == ガイドラインで使われる規約
 
-The requirement level keywords "MUST", "MUST NOT", "REQUIRED", "SHALL",
-"SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and
-"OPTIONAL" used in this document (case insensitive) are to be
-interpreted as described in https://www.ietf.org/rfc/rfc2119.txt[RFC
-2119].
+本文書では要求レベルのキーワドとして、 "MUST", "MUST NOT", "REQUIRED", "SHALL",
+"SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", "OPTIONAL" が
+使われます。
+これは https://www.ietf.org/rfc/rfc2119.txt[RFC 2119]の解釈と同様です。
 
 [[zalando-specific-information]]
 == Zalando specific information

@@ -1,0 +1,100 @@
+[[data-formats]]
+= データフォーマット
+
+[#167]
+== {MUST} 構造化データのエンコードはJSONを使う
+
+構造化データを転送するためにJSONエンコードされたボディのペイロードを使いましょう。
+JSONペイロードは https://tools.ietf.org/html/rfc7159[RFC-7159] にしたがわなければなりません。
+トップレベルの構造としては(可能であれば)、将来拡張可能なように、シリアライズしたオブジェクトとします。
+具体例は<<161>>を見てください。
+
+[#168]
+== {MAY} バイナリデータや別のコンテント表現には、JSONでないメディアタイプを使う
+
+他のメディアタイプは次のようなケースで使われます。
+
+* データがバイナリや構造と関係ないものである。ペイロード構造がパース不要でクライアントがそのまま受け取るものが、このケースにあたります。JPG/PNG/GIFなどのフォーマットの画像ダウンロードがその一例です。
+* JSONバージョン以外のデータフォーマット(例えばPDF/DOC/XMLなど)を提供する。これらはコンテントネゴシエーションによって利用可能になるかもしれません。
+
+[#172]
+== {SHOULD} 標準のメディアタイプとして `application/json` を使う
+
+以前このガイドラインでは、`application/x.zalando.article+json`のようなカスタムのメディアタイプを使ってもよいとしました。
+これは、<<114,media type versioning>>で必要な場合以外では、おすすめしないし避けるべきです。
+かわりに、標準のメディアタイプである `application/json` (または `application/problem+json` <<176>>) を使いましょう。
+
+`x`で始まるカスタムのメディアタイプは、JSONの標準メディアタイプと比較して何のメリットもないばかりか、
+自動化をより難しくしてしいます。
+これはまた https://tools.ietf.org/html/rfc6838#section-3.4[RFC
+6838で使用を抑制されています]。
+
+[#169]
+== {MUST} 標準の日付・時刻フォーマットを使う
+
+[[json-payload]]
+=== JSONペイロード
+
+<<126>> で日付・時刻のフォーマットについて書いています。
+
+[[http-headers]]
+=== HTTPヘッダ
+
+独自のものを含むHTTPヘッダは、http://tools.ietf.org/html/rfc7231#section-7.1.1.1[RFC 7231で定義されている日付フォーマット] を使いましょう。
+
+[#170]
+== {MAY} 国、言語、通貨のコードは標準を使う
+
+国、言語、通貨は次の標準コードを使いましょう。
+
+* https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2[ISO 3166-1-alpha2
+国コード]
+** (“UK”ではなく“GB”を使う。Zalandoでは「UK」というワードが使われているのを見かけるかもしれないが)
+* https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes[ISO 639-1
+言語コード]
+** https://tools.ietf.org/html/bcp47[BCP-47] (based on ISO 639-1) for
+language variants
+* https://en.wikipedia.org/wiki/ISO_4217[ISO 4217 通貨コード]
+
+[#171]
+== {MUST} 数値型と整数型のフォーマットを定義する
+
+APIで`number`または`integer`の型のプロパティを定義するときは、
+クライアントが誤った精度を使って、無意識に値が変わってしまわないように、精度を定義しなければなりません。
+
+[cols="15%,15%,70%",options="header",]
+|=====================================================================
+|型 |フォーマット |値の範囲
+|integer |int32 |integer between pass:[-2<sup>31</sup>] and pass:[2<sup>31</sup>]-1
+|integer |int64 |integer between pass:[-2<sup>63</sup>] and pass:[2<sup>63</sup>]-1
+|integer |bigint |arbitrarily large signed integer number
+|number |float |IEEE 754-2008/ISO 60559:2011 binary64 decimal number
+|number |double |IEEE 754-2008/ISO 60559:2011 binary128 decimal number
+|number |decimal |arbitrarily precise signed decimal number
+|=====================================================================
+
+精度はクライアントとサーバの双方で、もっとも適した言語の型に変換されなければなりません。
+例えば、次の定義においてJavaでは、`Money.amount`は`BigDecimal`に、
+`OrderList.page_size`は`int` または `Integer` に変換されるでしょう。
+
+[source,yaml]
+----
+Money:
+  type: object
+  properties:
+    amount:
+      type: number
+      description: Amount expressed as a decimal number of major currency units
+      format: decimal
+      example: 99.95
+   ...
+
+OrderList:
+  type: object
+  properties:
+    page_size:
+      type: integer
+      description: Number of orders in list
+      format: int32
+      example: 42
+----
