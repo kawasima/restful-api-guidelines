@@ -10,7 +10,7 @@
 あなたは<<api-first, APIファーストの原則>>にしたがわなければなりません。
 
 * 実装を始める前に、<<101, 仕様記述言語としてOpenAPIを使って>>、まずAPI定義を書かなければならない。
-* このガイドラインに沿って一貫性のあるAPIを設計しなければならない。https://zally.zalando.net/[API Linter Service [internal link]]を使うとルールのチェックが自動的におこなえる。
+* このガイドラインに沿って一貫性のあるAPIを設計しなければならない。
 * 同僚やクライアント開発者からのレビューフィードバックを早めに受け取るようにしなければならない。apply our https://github.bus.zalan.do/ApiGuild/ApiReviewProcedure[lightweight API
 review process [internal link]] for all <<219, component external APIs>>
 
@@ -23,9 +23,6 @@ review process [internal link]] for all <<219, component external APIs>>
 API仕様はソースコード管理システムを使って、バージョン管理するべきです。一番良いのはAPIの実装コードを同じやり方にしておくことです。
 
 API実装のデプロイと同じタイミングで、API仕様もデプロイするようにします。そうすることでAPIポータルから探せるようになります。
-You <<192, must / should publish>> the component <<219, external / internal>> API specification
-with the deployment of the implementing service, and, hence, make it discoverable
-for the group via our https://apis.zalando.net/[API Portal [internal link]].
 
 
 [#102]

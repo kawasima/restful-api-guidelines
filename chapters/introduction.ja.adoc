@@ -7,18 +7,11 @@ Zalandoのソフトウェアアーキテクチャは、疎結合なマイクロ�
 デプロイしたり運用したりしています。
 私たちのAPIは、その多くが私たちのシステムが何をするのかを完全に表現しており、
 それゆえに貴重なビジネス資産となっています。
-高品質で長持ちするAPIの設計は、
-
-Zalando’s software architecture centers around decoupled microservices
-that provide functionality via RESTful APIs with a JSON payload. Small
-engineering teams own, deploy and operate these microservices in their
-AWS (team) accounts. Our APIs most purely express what our systems do,
-and are therefore highly valuable business assets. Designing
-high-quality, long-lasting APIs has become even more critical for us
-since we started developing our new open platform strategy, which
-transforms Zalando from an online shop into an expansive fashion
-platform. Our strategy emphasizes developing lots of public APIs for our
-external business partners to use via third-party applications.
+Zalandoがとあるオンラインショップから価値あるファッションプラットフォームへと変貌を
+とげるために、私たちは新しいオープンプラットフォーム戦略の展開をはじめました。
+なので、高品質で長持ちするAPIの設計は、私たちにとってよりクリティカルなものになってきているのです。
+私たちのビジネスパートナーがサードパーティのアプリケーションから使える公開APIをたくさん
+開発することは、私たちの戦略の肝なのです。
 
 私たちは"APIファースト"を、主要なエンジニアリングの原則の1つとして採用しています。
 マイクロサービス開発はコードの外にAPIを定義することから始まり、ピアレビューのフィードバックを
@@ -33,25 +26,6 @@ APIファーストは品質に直結する標準を網羅しつつ、軽量な�
 * APIは一貫したRESTfulなスタイルと文法にしたがう。
 * APIは他のチームのAPI群や私たちのグローバルなアーキテクチャとも一貫性をもつ。
 
-Zalando APIが全部同じ人が設計したように見えるのが理想である。
-
-With this in mind, we’ve adopted “API First” as one of our key
-engineering principles. Microservices development begins with API
-definition outside the code and ideally involves ample peer-review
-feedback to achieve high-quality APIs. API First encompasses a set of
-quality-related standards and fosters a peer review culture including a
-lightweight review procedure. We encourage our teams to follow them to
-ensure that our APIs:
-
-* are easy to understand and learn
-* are general and abstracted from specific implementation and use cases
-* are robust and easy to use
-* have a common look and feel
-* follow a consistent RESTful style and syntax
-* are consistent with other teams’ APIs and our global architecture
-
-Ideally, all Zalando APIs will look like the same author created them.
-
 [[conventions-used-in-these-guidelines]]
 == ガイドラインで使われる規約
 
@@ -64,23 +38,17 @@ interpreted as described in https://www.ietf.org/rfc/rfc2119.txt[RFC
 [[zalando-specific-information]]
 == Zalando specific information
 
-The purpose of our “RESTful API guidelines” is to define standards to
-successfully establish “consistent API look and feel” quality. The
-https://confluence.zalando.net/display/GUL/API+Guild[API Guild [internal
-link]] drafted and owns this document. Teams are responsible to fulfill
-these guidelines during API development and are encouraged to contribute
-to guideline evolution via pull requests.
+私たちの「RESTful API ガイドライン」の目的は、「一貫したAPIのルックアンドフィール」の品質水準を定めることにあります。チームはAPIの開発においては、このガイドラインを守っていく責務がありますし、またプルリクエストを投げてガイドラインを進化させていくことが求められます。
 
-These guidelines will, to some extent, remain work in progress as our
-work evolves, but teams can confidently follow and trust them.
+これらのガイドラインは私たちの仕事が発展していく限り、ずっと「作成中」のステータス
+のままでしょう。しかしチームはこれらにしたがい信頼することが、きっと可能なはずです。
 
-In case guidelines are changing, following rules apply:
+変化を続けるガイドラインに対して、次のルールを適用します。
 
-* existing APIs don't have to be changed, but we recommend it
-* clients of existing APIs have to cope with these APIs based on
-outdated rules
-* new APIs have to respect the current guidelines
+* 既存のAPIは変更する必要がなくても、私たちはそれを推し進めます
+* 既存のAPIのクライアントは、古くなったルールにしたがったAPIに対処しなければならない
+* 新しいAPIは現在のガイドラインを尊重しなければならない
 
-Furthermore you should keep in mind that once an API becomes public
-externally available, it has to be re-reviewed and changed according to
-current guidelines - for sake of overall consistency.
+さらには、いったんAPIが外部に公開されたら、全体の一貫性の維持のために、
+最新のガイドラインにしたがって、再レビューし変化させていかなければ
+ならないことを、肝に銘じておかなければなりません。
