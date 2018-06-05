@@ -1,0 +1,24 @@
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      - image: circleci/ruby:2.4.1-node-browsers
+    steps:
+      - checkout
+      - run:
+          name: install asciidoctor
+          command: gem install asciidoctor coderay
+      - run:
+          name: mkdir
+          command: mkdir ./dist
+      - run:
+          command: asciidoctor -D dist -o index.html index.ja.adoc
+      - run:
+          command: cp -r assets ./dist
+      - run:
+          name: install netlify-cli
+          command: npm install netlify-cli
+      - run:
+          name: deploy to netlify
+          command: node_modules/.bin/netlify deploy -t "$netlify_token"
