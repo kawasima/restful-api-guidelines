@@ -116,39 +116,30 @@ enumerations.
 
 http://tools.ietf.org/html/rfc3339#section-5.6[RFC 3339]で定義された日付と時刻のフォーマットを使いましょう。
 
-* for "date" use strings matching
-`date-fullyear "-" date-month "-" date-mday`, for example: `2015-05-28`
-* for "date-time" use strings matching `full-date "T" full-time`, for
-example `2015-05-28T14:07:17Z`
+* "date"には`年 "-" 月 "-" 日`を使う。例: `2015-05-28`
+* "date-time"には `年-月-日 "T" 時:分:秒`を使う, 例: `2015-05-28T14:07:17Z`
 
-Note that the
 https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#data-types[OpenAPI
-format] "date-time" corresponds to "date-time" in the RFC) and
-`2015-05-28` for a date (note that the OpenAPI format "date" corresponds
-to "full-date" in the RFC). Both are specific profiles, a subset of the
-international standard http://en.wikipedia.org/wiki/ISO_8601[ISO 8601].
+フォーマット] の"date-time"はRFCの"date-time"に相当し、`2015-05-28`のして表されるOpen APIフォーマットの
+"date"は、RFCの"full-date"に相当します。
+どちらもspecific profilesで、国際標準http://en.wikipedia.org/wiki/ISO_8601[ISO 8601] のサブセットです。
 
-A zone offset may be used (both, in request and responses) -- this is
-simply defined by the standards. However, we encourage restricting dates
-to UTC and without offsets. For example `2015-05-28T14:07:17Z` rather
-than `2015-05-28T14:07:17+00:00`. From experience we have learned that
-zone offsets are not easy to understand and often not correctly handled.
-Note also that zone offsets are different from local times that might be
-including daylight saving time. Localization of dates should be done by
-the services that provide user interfaces, if required.
+(リクエストとレスポンスの両方で) ゾーンオフセットが使われる可能性があります。
+これも標準で定義されているものです。
+しかし、私たちは日付に関しては、オフセットなしのUTCを使うよう制限を設けることを
+推奨しています。`2015-05-28T14:07:17+00:00`ではなく、`2015-05-28T14:07:17Z`のように。
+これはゾーンオフセットは理解が難しく、正しく扱えないことがよくあることを経験上学んだので、そうしています。
+ゾーンオフセットはサマータイムを含むローカルタイムとは異なることに注意してください。
+日時のローカライズは、必要ならユーザインタフェースを提供するサービスによってなされるべきです。
+保存するときは、すべての日時データはゾーンオフセットなしのUTCで保存します。
 
-When it comes to storage, all dates should be consistently stored in UTC
-without a zone offset. Localization should be done locally by the
-services that provide user interfaces, if required.
-
-Sometimes it can seem data is naturally represented using numerical
-timestamps, but this can introduce interpretation issues with precision
-- for example whether to represent a timestamp as 1460062925,
-1460062925000 or 1460062925.000. Date strings, though more verbose and
-requiring more effort to parse, avoid this ambiguity.
+時々、数値タイムスタンプで日時を表すデータを見かけますが、
+これは精度に関しての解釈の問題を引き起こします。
+例えば1460062925というタイムスタンプの表現は、1460062925000 なのか 1460062925.000 なのか
+判別できません。日時文字列は冗長でパースが必要ですが、この曖昧さを避けるために必要なことなのです。
 
 [#127]
-== {MAY} 期間はISO8601に準拠するTime durations and intervals could conform to ISO 8601
+== {MAY} 期間(durations and intervals)はISO8601に準拠する
 
 ISO 8601で推奨されているフォーマット
 Schema based JSON properties that are by design durations and intervals
