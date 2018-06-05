@@ -36,7 +36,7 @@ APIの設計者は後方互換性を維持しつつ、でRESTful APIを進化さ
 * サーバサイドのビジネスロジックでバリデーションしなきゃいけないような(複雑な)制約をもつ入力フィールド。バリデーションロジックは、より厳しくなる方向には変更してはいけません。すべての制約はdescriptionに明示します。
 * 入力パラメータとして使われる列挙型の要素は、サーバが古い値も受け付けて正しくハンドリングできる場合のみ減らすことができる。出力パラメータとして使われる列挙型はいつでも減らすことはできる。
 * 出力パラメータとして使われる列挙型は、クライアントがハンドリングできないかもしれないので追加してはならない。入力パラメータとして使われる列挙型はいつでも追加できる。
-* Use <<112,`x-extensible-enum`>>,
+* <<112,`x-extensible-enum`>>を使う。
 if range is used for output parameters and likely to be extended with
 growing functionality. It defines an open list of explicit values and
 clients must be agnostic to new values.

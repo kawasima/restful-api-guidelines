@@ -26,13 +26,13 @@ of web service industry that also use the term for their REST
 approximations — in fact, in today's industry full HATEOAS compliant
 APIs are a very rare exception.]
 
-An important principle for API design and usage is Postel's
-Law, aka http://en.wikipedia.org/wiki/Robustness_principle[The
-Robustness Principle] (see also https://tools.ietf.org/html/rfc1122[RFC 1122]):
+API設計と利用の重要な原則がポステルの法則です。
+またの名を http://en.wikipedia.org/wiki/Robustness_principle[ロバストネス原則]といいます。
+(https://tools.ietf.org/html/rfc1122[RFC 1122] も参照ください)
 
-* Be liberal in what you accept, be conservative in what you send
+* 送信するものに関しては厳密に、受信するものに関しては寛容に
 
-_Readings:_ Some interesting reads on the RESTful API design style and service architecture:
+_Readings:_ RESTful APIの設計スタイルとサービスアーキテクチャについて、ためになる読み物がいくつかあります。
 
 * Book:
 https://www.amazon.de/Irresistible-APIs-Designing-that-developers/dp/1617292559[Irresistable

@@ -248,7 +248,7 @@ number of requests made within a given window for each named entity.
 
 
 [#176]
-== {MUST} Use Problem JSON
+== {MUST} Problem JSONを使う
 
 http://tools.ietf.org/html/rfc7807[RFC 7807] defines a Problem JSON object and
 the media type `application/problem+json`. Operations should return it (together with
@@ -286,9 +286,8 @@ both media types.
 
 
 [#177]
-== {MUST} Do not expose Stack Traces
+== {MUST} スタックトレースを外に見せないようにする
 
-Stack traces contain implementation details that are not part of an API,
-and on which clients should never rely. Moreover, stack traces can leak
-sensitive information that partners and third parties are not allowed to
-receive and may disclose insights about vulnerabilities to attackers.
+スタックトレースには、APIの一部だけでなく、クライアントが依存すべきでない実装の詳細が含まれます。
+さらにはスタックトレースは、パートナーやサードパーティが受け取ってはならない機微な情報を漏らしてしまう
+可能性があるし、攻撃者に脆弱性についてのヒントを与えることにもなりかねません。
