@@ -4,14 +4,12 @@
 [#148]
 == {MUST} HTTPメソッドを正しく使う
 
-標準のHTTPメソッドの意味は次のとおりである。
-Be compliant with the standardized HTTP method semantics summarized as
-follows:
+以下に示すように、標準のHTTPメソッドの意味に沿うようにしましょう。
 
 [[get]]
 === GET
 
-GETリクエストは、単一のリソースの読み込み、またはリソースの集合のクエリのために使用される。
+GETリクエストは、単一のリソースの読み込み、またはリソースの集合のクエリのために使用されます。
 
 * 個々のGETリクエストは、リソースが存在しなければ通常404となる。
 * リソースのコレクションへのGETのリクエストは、(リストが空であれば) 200を、
@@ -24,13 +22,10 @@ GETリクエストは、単一のリソースの読み込み、またはリソ�
 [[get-with-body]]
 === "ボディ付きのGET"
 
-APIはときどきこの問題に直面します。
-API設計者は次の2の選択肢をチェックしなければなりません。
-APIs sometimes face the problem, that they have to provide extensive
-structured request information with GET, that may even conflicts with
-the size limits of clients, load-balancers, and servers. As we require
-APIs to be standard conform (body in GET must be ignored on server
-side), API designers have to check the following two options:
+GETでの構造をもつリクエストは、クライアントやロードバランサ、サーバのサイズ制限に引っかかることがあり、
+APIでもときどきこの問題に直面します。
+私たちはAPIが標準に準拠する(すなわちサーバサイドでGETのボディは無視されなくてはならない)よう要求するので、
+API設計者は次の2つのうち何れかを選択しなければなりません。
 
 1.  URLエンコードされたクエリパラメータ付きのGET:
 クライアント、ゲートウェイ、サーバの通常のサイズ制限を守りつつ

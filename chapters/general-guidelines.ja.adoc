@@ -11,9 +11,7 @@
 
 * 実装を始める前に、<<101, 仕様記述言語としてOpenAPIを使って>>、まずAPI定義を書かなければならない。
 * このガイドラインに沿って一貫性のあるAPIを設計しなければならない。
-* 同僚やクライアント開発者からのレビューフィードバックを早めに受け取るようにしなければならない。apply our https://github.bus.zalan.do/ApiGuild/ApiReviewProcedure[lightweight API
-review process [internal link]] for all <<219, component external APIs>>
-
+* 同僚やクライアント開発者からのレビューフィードバックを早めに受け取るようにしなければならない。
 
 [#101]
 == {MUST} OpenAPIを使ってAPIの仕様を提供する

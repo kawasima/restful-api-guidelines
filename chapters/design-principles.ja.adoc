@@ -16,23 +16,22 @@ RESTful APIは、固有のユースケースからは切り離され、クライ
 * 私たちはJSONペイロードをもったRESTベースのAPIを好む
 * 私たちはシステムが、真にRESTfulになることを好む
 
-footnoteref:[fielding-restful,Per definition of R.Fielding REST APIs have to support
-HATEOAS (maturity level 3). Our guidelines do not strongly advocate for
-full REST compliance, but limited hypermedia usage, e.g. for pagination
-(see <<hypermedia>>).
-However, we still use the term "RESTful API", due to the absence
-of an alternative established term and to keep it like the very majority
-of web service industry that also use the term for their REST
-approximations — in fact, in today's industry full HATEOAS compliant
-APIs are a very rare exception.]
+footnoteref:[fielding-restful,R.Fieldingの定義だと、REST APIはHATEOAS(レベル3)をサポート
+しなくてはなりません。
+私たちのガイドラインは、完全なREST準拠はさほど推奨していません。
+(<<hypermedia>>)で示すような限定的なハイパーメディアの使い方をしています。
 
-An important principle for API design and usage is Postel's
-Law, aka http://en.wikipedia.org/wiki/Robustness_principle[The
-Robustness Principle] (see also https://tools.ietf.org/html/rfc1122[RFC 1122]):
+それでもなお"RESTful API"という言葉を私たちは使います。
+他に確立された用語はないし、Webサービス業界ではRESTっぽいものをそう呼んでいるからです。
+事実、HATEOASへの完全準拠したAPIは非常に数少ないのが現状です。]
 
-* Be liberal in what you accept, be conservative in what you send
+API設計と利用の重要な原則がポステルの原則です。
+http://en.wikipedia.org/wiki/Robustness_principle[ロバストネスの原則]
+としても知られています。(https://tools.ietf.org/html/rfc1122[RFC 1122] も参照ください)
 
-_Readings:_ Some interesting reads on the RESTful API design style and service architecture:
+* 送信するものに関しては厳密に、受信するものに関しては寛容に
+
+_読みましょう:_ RESTful APIの設計スタイルとサービスアーキテクチャについての読み物がいくつかあります。
 
 * Book:
 https://www.amazon.de/Irresistible-APIs-Designing-that-developers/dp/1617292559[Irresistable
@@ -69,22 +68,18 @@ Styles and the Design of Network-Based Software Architectures]
 * 長期にわたって、APIをアクティブに改善し、一貫性を維持していく
 * 顧客のフィードバックを受け付け、サービスと同レベルのサポートを提供する。
 
-Embracing 'API as a Product' facilitates a service ecosystem which can
-be evolved more easily, and used to experiment quickly with new business
-ideas by recombining core capabilities.
-It makes the difference between agile, innovative product service
-business built on a platform of APIs and ordinary enterprise integration business
-where APIs are provided as "appendix" of existing products to support system integration
-and optimised for local server-side realization.
+「製品としてのAPI」を掲げることで、サービスのエコシステムはより進化がしやすくなり、
+コア機能を組み合わせることによって、新しいビジネスアイデアを早く試すことができるようになります。
 
-Understand the concrete use cases of your customers and carefully check
-the trade-offs of your API design variants with a product mindset. Avoid short-term
-implementation optimizations at the expense of unnecessary client side
-obligations, and have a high attention on API quality and client
-developer experience.
+APIプラットフォーム上に構築されたイノベーティブな製品サービスと、
+オマケとしてAPIが提供されている通常の企業情報システムとでは、
+システム統合をサポートしたり、ローカルに最適化されたサーバサイドを実現するところで違いが出てきます。
 
-API as a Product is closely related to our <<100,API First principle>>
-(see next chapter) which is more focused on how we engineer high quality APIs.
+顧客の具体的なユースケースを理解し、製品として考えAPIの設計のズレとのトレードオフをチェックしましょう。
+クライアント側に不要な負担を強いるような、実装の早すぎる最適化を避け、APIの品質とクライアント開発者の使い勝手に最大限の関心をもちましょう。
+
+製品としてのAPIは、(次章で示す)<<100,APIファーストの原則>>と非常に近い関係にあります。
+APIファーストは高品質なAPIを、どうエンジニアリングしていくかによりフォーカスしたものです。
 
 [[api-first]]
 == APIファースト
@@ -96,7 +91,7 @@ https://github.com/zalando/engineering-principles[エンジニアリングとア
 手短にいうと、APIファーストは2つの観点を要求します。
 
 * 実装する前に標準仕様言語を使って、まずAPIを定義する
-*　同僚やクライアント開発者から、いち早くレビューのフィードバックを得る
+* 同僚やクライアント開発者から、いち早くレビューのフィードバックを得る
 
 コードの外にAPIを定義することで、私たちは早いレビューフィードバックを促し、
 サービスインタフェースの設計が、以下に焦点を当てれるような開発の規律にしたいのです。
@@ -115,27 +110,20 @@ APIファーストの要素はまた、このAPIガイドラインと同僚や�
 APIの品質を高め、アーキテクチャと設計の調整を可能にし、サービスプロバイダの開発サイクルに
 クライアントアプリケーションの開発が引きずられないようにするために、私たちにとってピアレビューは重要です。
 
-APIファーストが、私たちの愛する*アジャイル開発の原則とかち合わない*ことは重要なことです。
+APIファーストが、私たちの愛する *アジャイル開発の原則と反するものではない* ことは重要なことです。
 サービスアプリケーションは徐々に進化していくように、APIもまた進化していきます。
 もちろんAPI仕様は異なるサイクルで、繰り返し進化を遂げていくでしょうし、そうあるべきですが、
-それらはみな、ドラフトの状態と、_早期の_チームとピアレビューフィードバックから始まるのです。
+それらはみな、ドラフトの状態と、 _早期の_ チームレビューおよびピアレビューフィードバックから始まるのです。
+APIが変更されると、実装上の懸念と自動化テストのフィードバックからメリットを得ることもあります。
+開発のライフサイクルにおいて、生産的な機能がまだない間も、クライアントと変更の調整を続ける限り
+破壊的変更を伴いながらAPIを進化させていくことができます。
 
-It is important to learn, that API First is *not in conflict with the
-agile development principles* that we love. Service applications should
-evolve incrementally — and so its APIs. Of course, our API specification
-will and should evolve iteratively in different cycles; however, each
-starting with draft status and _early_ team and peer review feedback.
-API may change and profit from implementation concerns and automated
-testing feedback. API evolution during development life cycle may
-include breaking changes for not yet productive features and as long as
-we have aligned the changes with the clients. Hence, API First does
-_not_ mean that you must have 100% domain and requirement understanding
-and can never produce code before you have defined the complete API and
-get it confirmed by peer review. On the other hand, API First obviously
-is in conflict with the bad practice of publishing API definition and
-asking for peer review after the service integration or even the service
-productive operation has started. It is crucial to request and get early
-feedback — as early as possible, but not before the API changes are
-comprehensive with focus to the next evolution step and have a certain
-quality (including API Guideline compliance), already confirmed via team
-internal reviews.
+したがってAPIファーストは、要求とドメインについて100パーセント理解し、完全なAPIを
+定義し、ピアレビューでその確信が得られるまで、コードを書いてはいけない、ということを
+意味するもの _ではありません_ 。
+一方、APIファーストがサービス統合または本番運用開始の後に、API定義の公開したりピアレビューしたりする
+バッドプラクティスと衝突があることも明らかです。
+
+早く、できるだけ早くフィートバックを得ることは重要ですが、その前にAPI変更が次の進化のステップへ
+の足がかりであることを認識し、既にチーム内レビューで確立された(APIガイドライン遵守を含む)一定水準の品質を、
+保つこともまた重要です。

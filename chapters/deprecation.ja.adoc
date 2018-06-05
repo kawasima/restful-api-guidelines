@@ -1,74 +1,70 @@
 [[deprecation]]
 = 廃止予定
 
-Sometimes it is necessary to phase out an API endpoint (or version), for instance,
-if a field is no longer supported in the result or a whole business functionality
-behind an endpoint has to be shut down. There are many other reasons as well.
-As long as these endpoints are still used by consumers these are breaking
-changes and not allowed. Deprecation rules have to be applied to make sure that
-necessary consumer changes are aligned and deprecated endpoints are not used
-before API changes are deployed.
+APIエンドポイント(または、そのバージョン)を、廃止する必要が出てくることもあるでしょう。
+例えば、もはやサポートされていないフィールドや、業務機能ごと停止したいエンドポイントなど、様々な理由が
+あることでしょう。
+これらのエンドポイントは、利用者に使われている限りは、破壊的変更は許されません。
+利用者にとって必要な変更を整理し、廃止予定のエンドポイントが、
+APIの変更がデプロイされる前に使われないようにするため、「廃止予定ルール」を適用します。
 
 [#185]
-== {MUST} Obtain Approval of Clients
+== {MUST} クライアントの承認を得る
 
-Before shutting down an API (or version of an API) the producer must
-make sure, that all clients have given their consent to shut down the
-endpoint. Producers should help consumers to migrate to a potential new
-endpoint (i.e. by providing a migration manual). After all clients are
-migrated, the producer may shut down the deprecated API.
+API(またはAPIのバージョン)を停止する前に、すべてのクライアントに、
+そのエンドポイントを停止してもよいという同意をとらなければなりません。
+(移行マニュアルを提供するなどして) 新しいエンドポイントへ移行の手助けをしてください。
+すべてのクライアントが移行が完了したら、廃止予定のAPIを停止できます。
 
 [#186]
-== {MUST} External Partners Must Agree on Deprecation Timespan
+== {MUST} 外部パートナーは廃止までの猶予期間に同意をしなければならない
 
-If the API is consumed by any external partner, the producer must define
-a reasonable timespan that the API will be maintained after the producer
-has announced deprecation. The external partner (client) must agree to
-this minimum after-deprecation-lifespan before he starts using the API.
+もし外部パートナーによってAPIが使われていたら、廃止予定をアナウンスしたあとAPIの
+現実的な移行猶予期間を定義しなければなりません。
+外部パートナーはAPIを使い始める前に、この最小の移行猶予期間に同意しなければなりません。
 
 [#187]
-== {MUST} Reflect Deprecation in API Definition
+== {MUST} API定義に廃止予定を反映する
 
-API deprecation must be part of the OpenAPI definition. If a method on a
-path, a whole path or even a whole API endpoint (multiple paths) should
-be deprecated, the producers must set `deprecated=true` on each method /
-path element that will be deprecated (OpenAPI 2.0 only allows you to
-define deprecation on this level). If deprecation should happen on a
-more fine grained level (i.e. query parameter, payload etc.), the
-producer should set `deprecated=true` on the affected method / path
-element and add further explanation to the `description` section.
+APIの廃止予定は、OpenAPI定義に含まれなくてはなりません。
+とあるメソッド、パス全体、(複数のパス含む)APIエンドポイントまるごと、いずれにしても
+それらを廃止予定とするならば、メソッド/パスエレメントそれぞれに`deprecated=true`を
+設定しなければなりません。
+(OpenAPI 2.0ではこのレベルでしか廃止予定は定義できません)
+もし廃止予定が(クエリパラメータ、ペイロードなど)より詳細なレベルで必要であれば、
+影響するメソッド/パスエレメントに`deprecated=true`を設定したうえで、
+`description`に説明書きを加えます。
 
-If `deprecated` is set to `true`, the producer must describe what
-clients should use instead and when the API will be shut down in the
-`description` section of the API definition.
+`deprecated`に`true`が設定されたら、クライアントが代わりに使うべきものや
+APIがいつ廃止されるのかを、API定義の`description`に記述しなければなりません。
 
 [#188]
-== {MUST} Monitor Usage of Deprecated APIs
+== {MUST} 廃止予定APIの利用状況をモニタリングする
 
-Owners of APIs used in production must monitor usage of deprecated APIs
-until the API can be shut down in order to align deprecation and avoid
-uncontrolled breaking effects. See also the <<193>>.
+本番環境で使われるAPIのオーナーは、APIが廃止予定を調整し、コントロールできない
+破壊的影響を避けるため、APIが廃止されるまで、廃止予定APIの利用状況をモニタリングしなくてはなりません。
+<<193>>も参照ください。
 
 [#189]
-== {SHOULD} Add a Warning Header to Responses
+== {SHOULD} レスポンスに警告ヘッダを付ける
 
-During deprecation phase, the producer should add a `Warning` header
-(see https://tools.ietf.org/html/rfc7234#section-5.5[RFC 7234 - Warning
-header]) field. When adding the `Warning` header, the `warn-code` must
-be `299` and the `warn-text` should be in form of _"The
-path/operation/parameter/... \{name} is deprecated and will be removed
-by \{date}. Please see \{link} for details."_ with a link to a
-documentation describing why the API is no longer supported in the
-current form and what clients should do about it. Adding the `Warning`
-header is not sufficient to gain client consent to shut down an API.
+廃止予定フェーズの間、`Warning` ヘッダを付けましょう。
+(https://tools.ietf.org/html/rfc7234#section-5.5[RFC 7234 - Warning
+header] をみてください)。
+`Warning`が付いていたら、`warn-code`は`299`を指定し、`warn-text`は
+_"The path/operation/parameter/... \{name} is deprecated and will be removed
+by \{date}. Please see \{link} for details."_ の形式にしましょう。
+link先は、なぜAPIがもはやサポートされないかと、クライアントがすべきことを記述した
+ドキュメントにします。
+`Warning`ヘッダを付加しても、クライアントに対しAPI停止の同意を得たとはいえません。
 
 [#190]
-== {SHOULD} Add Monitoring for Warning Header
+== {SHOULD} 警告ヘッダのモニタリングを追加する Add Monitoring for Warning Header
 
-Clients should monitor the `Warning` header in HTTP responses to see if
-an API will be deprecated in future.
+クライアントはHTTPレスポンスの`Warning`ヘッダをモニタリングし、
+APIが将来廃止されることがあるかどうかを注視してください。
 
 [#191]
-== {MUST} Not Start Using Deprecated APIs
+== {MUST} 廃止予定APIは新規に利用し始めてはならない。
 
-Clients must not start using deprecated parts of an API.
+クライアントは、廃止予定のものを利用し始めてはなりません。
