@@ -33,13 +33,13 @@ requested resource representation is delivered with the body.
 indicates the media type of the body content.
 
 [#133]
-== {MAY} Use Standardized Headers
+== {MAY} 標準のヘッダを使う
 
-Use http://en.wikipedia.org/wiki/List_of_HTTP_header_fields[this list]
-and mention its support in your OpenAPI definition.
+http://en.wikipedia.org/wiki/List_of_HTTP_header_fields[このリスト]
+を使い、OpenAPI定義にサポートするヘッダを記述します。
 
 [#179]
-== {MAY} Use Content-Location Header
+== {MAY} Content-Location ヘッダを使う
 
 The Content-Location header is _optional_ and can be used in successful
 write operations (PUT, POST or PATCH) or read operations (GET, HEAD) to
@@ -76,7 +76,7 @@ Content-Location: /products/123/images?format=raw
 ----
 
 [#180]
-== {SHOULD} Use Location Header instead of Content-Location Header
+== {SHOULD} Content-Locationの代わりにLocationヘッダを使う
 
 As the correct usage of Content-Location with respect to semantics and
 caching is difficult, we _discourage_ the use of Content-Location. In

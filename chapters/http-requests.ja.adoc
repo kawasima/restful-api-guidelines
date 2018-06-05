@@ -1,75 +1,83 @@
 [[http-requests]]
-= HTTP Requests
+= HTTPリクエスト
 
 [#148]
-== {MUST} Use HTTP Methods Correctly
+== {MUST} HTTPメソッドを正しく使う
 
+標準のHTTPメソッドの意味は次のとおりである。
 Be compliant with the standardized HTTP method semantics summarized as
 follows:
 
 [[get]]
 === GET
 
-GET requests are used to read a single resource or query set of
-resources.
+GETリクエストは、単一のリソースの読み込み、またはリソースの集合のクエリのために使用される。
 
-* GET requests for individual resources will usually generate a 404 if
-the resource does not exist
-* GET requests for collection resources may return either 200 (if the
-listing is empty) or 404 (if the list is missing)
-* GET requests must NOT have request body payload
+* 個々のGETリクエストは、リソースが存在しなければ通常404となる。
+* リソースのコレクションへのGETのリクエストは、(リストが空であれば) 200を、
+(リスト自体が存在しなければ) 404が返る。
+* GETリクエストはボディのペイロードをもってはいけない。
 
-*Note:* GET requests on collection resources should provide a sufficient
-filter mechanism as well as <<pagination>>.
+*注意:* リソースのコレクションへのGETリクエスト、<<pagination>>だけでなく、
+十分なフィルタメカニズムを提供するべきです。
 
 [[get-with-body]]
-=== "GET with Body"
+=== "ボディ付きのGET"
 
+APIはときどきこの問題に直面します。
+API設計者は次の2の選択肢をチェックしなければなりません。
 APIs sometimes face the problem, that they have to provide extensive
 structured request information with GET, that may even conflicts with
 the size limits of clients, load-balancers, and servers. As we require
 APIs to be standard conform (body in GET must be ignored on server
 side), API designers have to check the following two options:
 
-1.  GET with URL encoded query parameters: when it is possible to encode
-the request information in query parameters, respecting the usual size
-limits of clients, gateways, and servers, this should be the first
-choice. The request information can either be provided distributed to
-multiple query parameters or a single structured URL encoded string.
-2.  POST with body content: when a GET with URL encoded query parameters
-is not possible, a POST with body content must be used. In this case the
-endpoint must be documented with the hint `GET with    body` to
-transport the GET semantic of this call.
+1.  URLエンコードされたクエリパラメータ付きのGET:
+クライアント、ゲートウェイ、サーバの通常のサイズ制限を守りつつ
+クエリパラメータにリクエスト情報をエンコードできるのであれば、
+これが第1の選択肢です。リクエスト情報は、複数のクエリパラメータ分散してもたせてもよいし、
+単一のパラメータにURLエンコードしてもたせてもかまいません。
+2.  ボディコンテンツ付きのPOST: URLエンコードされたクエリパラメータ付きのGETが
+どうしても制限に引っかかる場合は、ボディコンテンツ付きのPOSTを使わねばなりません。
+この場合、エンドポイントは`GET with body`ヒントを必ずドキュメントに付けて、
+GETの意味での呼び出しであることを伝えなければなりません。
 
-*Note:* It is no option to encode the lengthy structured request
-information in header parameters. From a conceptual point of view, the
-semantic of an operation should always be expressed by resource name and
-query parameters, i.e. what goes into the URL. Request headers are
-reserved for general context information, e.g. FlowIDs. In addition,
-size limits on query parameters and headers are not reliable and depend
-on clients, gateways, server, and actual settings. Thus, switching to
-headers does not solve the original problem.
+*注意:* ヘッダに構造化されたリクエスト情報をエンコードすることは選択肢にはなりません。
+コンセプト上の観点から、常にリソース名とクエリパラメータ(つまりURLになるもの)で
+操作の意味を表さなくてはなりません。
+リクエストヘッダは、例えばFlowIDのような、一般的な文脈情報のために予約されています。
+おまけにクエリパラメータとヘッダのサイズ上限には、これで決まりというものはなく、
+クライアント、ゲートウェイ、サーバの設定に依存したものです。
+だから、ヘッダに切り替えたからといって何も問題は解決しないのです。
 
 [[put]]
 === PUT
+
+PUTのリクエストは、リソース*全体*の作成、更新に使われます。
+単一のリソース、リソースのコレクション両方が対象です。このPUTの意味は、
+»_、URLが表すリソースを、このオブジェクトで既存のリソースと置き換えてください_« として表現がしっくりきます。
 
 PUT requests are used to create or update *entire* resources - single or
 collection resources. The semantic is best described as »_please put the
 enclosed representation at the resource mentioned by the URL, replacing
 any existing resource._«.
 
-* PUT requests are usually applied to single resources, and not to
-collection resources, as this would imply replacing the entire
-collection
-* PUT requests are usually robust against non-existence of resources by
-implicitly creating before updating
-* on successful PUT requests, the server will *replace the entire
+* PUTリクエストは通常はコレクションでなく単一リソースに適用されるものです。
+コレクションに対するPUTは、その全体を置き換えることを暗に意味するからです。
+* PUTリクエストは更新前に暗黙的にリソースの作成をおこなうことによって、
+存在しないリソースに対しても問題を起こしません。
+* PUTリクエストが成功したことは、サーバがペイロードに**
+on successful PUT requests, the server will *replace the entire
 resource* addressed by the URL with the representation passed in the
 payload (subsequent reads will deliver the same payload)
 * successful PUT requests will usually generate 200 or 204 (if the
 resource was updated - with or without actual content returned), and 201
 (if the resource was created)
 
+*注意:* PUTリクエストと関連したリソースIDは、クライアントが保持し、URLパスセグメントで受け渡しします。
+同一のリソースに2度PUTしても、
+もしPUTがリソースの作成に適用されたら、リソースIDとしてはURLのみが許可されるべきです。
+もしURIが利用できない場合は、POSTが優先されるべきです。
 *Note:* Resource IDs with respect to PUT requests are maintained by the
 client and passed as a URL path segment. Putting the same resource twice
 is required to be idempotent and to result in the same single resource
@@ -77,14 +85,22 @@ instance. If PUT is applied for creating a resource, only URIs should be
 allowed as resource IDs. If URIs are not available POST should be
 preferred.
 
+PUTを使うときに意図せず同時更新してしまうことを防ぐため、<<182,`ETag` と `If-(None-)Match`>>ヘッダの
+組み合わせで、コンフリクトを表明し変更を失わないようにするために、サーバに厳密な要求を送るようにしましょう。
+<<optimistic-locking>>セクションでもこのアプローチの代替案を記述しています。
+
 To prevent unnoticed concurrent updates when using PUT, the combination
 of <<182,`ETag` and `If-(None-)Match`>> headers should be considered to signal the server
-stricter demands to expose conflicts and prevent lost updates. The section <<optimistic-locking>> also describes some 
-alternatives to this approach. 
+stricter demands to expose conflicts and prevent lost updates. The section <<optimistic-locking>> also describes some
+alternatives to this approach.
 
 [[post]]
 === POST
 
+POSTは慣例的には、リソースのコレクションのエンドポイントに、単一のリソースを作成するのに使われますが、
+単一リソースエンドポイントに別の。
+コレクションのエンドポイントは、»_URLによって識別されるリソースのコレクションにオブジェクト追加してください_«。
+単一のエンドポイントは、»_URLによって識別されるリソースのコレクションににオブジェクト実行してください_«。
 POST requests are idiomatically used to create single resources on a
 collection resource endpoint, but other semantics on single resources
 endpoint are equally possible. The semantic for collection endpoints is
@@ -93,19 +109,18 @@ collection resource identified by the URL_«. The semantic for single
 resource endpoints is best described as »_please execute the given well
 specified request on the collection resource identified by the URL_«.
 
-* POST request should only be applied to collection resources, and
+* POSTリクエストはリソースのコレクションだけに適用されるべきである。通常単一リソースに対しては、
+これは未定義の意味をもつ。
+POST request should only be applied to collection resources, and
 normally not on single resource, as this has an undefined semantic
-* on successful POST requests, the server will create one or multiple
-new resources and provide their URI/URLs in the response
-* successful POST requests will usually generate 200 (if resources have
-been updated), 201 (if resources have been created), and 202 (if the
-request was accepted but has not been finished yet)
+* POSTリクエストが成功したら、サーバは1つまたは複数のリソースを作成し、そのURI/URLをレスポンスとして返す。
+* POSTリクエストは成功したら、ふつうは(リソースがアプデートされたら) 200を、(リソースが作成されたら) 201を、
+(リクエストは受け付けたが、まだ完了していないのであれば) 202を返す。
 
-*More generally:* POST should be used for scenarios that cannot be
-covered by the other methods sufficiently. For instance, GET with
-complex (e.g. SQL like structured) query that needs to be passed as
-request body payload because of the URL-length constraint. In such
-cases, make sure to document the fact that POST is used as a workaround.
+*より一般的に:* POSTは、他のHTTPメソッドだと十分でないシナリオのためにも使われるべきである。
+例えば複雑なGET、URL長の制約を超えるので、リクエストボディのペイロードとして渡さざるを得ない
+(SQLのような構造化)クエリがそれにあたります。
+そのような場合は、POSTがワークアラウンドとして使われていることをドキュメントに明記しましょう。
 
 *Note:* Resource IDs with respect to POST requests are created and
 maintained by server and returned with response payload. Posting the
@@ -182,40 +197,33 @@ cannot be found) or 410 (if the resource was already deleted before)
 [[head]]
 === HEAD
 
-HEAD requests are used to retrieve the header information of single
-resources and resource collections.
+HEADリクエストは、単一のリソースまたはリソースのコレクションについてのヘッダ情報だけを取得するのに使われます。
 
-* HEAD has exactly the same semantics as GET, but returns headers only,
-no body.
+* HEADはGETと正確に同じ意味を持ちますが、ボディは返されず、ヘッダのみが返されます。
 
 [[options]]
 === OPTIONS
 
-OPTIONS are used to inspect the available operations (HTTP methods) of a
-given endpoint.
+OPTIONSリクエストは、与えられたエンドポイントの利用可能な操作(HTTPメソッド)が何かを調べるのに使われます。
 
-* OPTIONS requests usually either return a comma separated list of
-methods (provided by an `Allow:`-Header) or as a structured list of link
-templates
+* OPTIONSは通常、利用可能なメソッドをカンマ繋ぎにしたものを(`Allow:`-ヘッダで)返すか、
+リンクテンプレートのリストとして返されます。
 
-*Note:* OPTIONS is rarely implemented, though it could be used to
-self-describe the full functionality of a resource.
+*注意:* OPTIONSを実装することはあまりありません。
 
 [#149]
-== {MUST} Fulfill Safeness and Idempotency Properties
+== {MUST} メソッド毎の安全性と冪等性を満たす
 
-An operation can be...
+HTTPメソッドには以下の性質の有無に違いがあります。
 
-* idempotent, i.e. operation will have the same effect on the server's state if executed
-once or multiple times (note: this does not necessarily mean returning
-the same response or status code)
-* safe, i.e. must not have side effects such as state changes
+* 冪等性。すなわち、何度実行されてもサーバの状態は同じ影響しか与えないこと。(注意: これは同じレスポンスまたはステータスコードを返す必要はありません)
+* 安全性。すなわち状態変化のような副作用がないこと。
 
-Method implementations must fulfill the following basic properties:
+メソッドの実装は、次の基本的な性質が満たされなければなりません。
 
 [cols=",,",options="header",]
 |=============================
-|HTTP method |safe |idempotent
+|HTTPメソッド |安全性 |冪等性
 |OPTIONS |Yes |Yes
 |HEAD |Yes |Yes
 |GET |Yes |Yes
@@ -225,31 +233,24 @@ Method implementations must fulfill the following basic properties:
 |PATCH |No |No
 |=============================
 
-Please see also https://goo.gl/vhwh8a[Best Practices [internal link]]
-for further hints on how to support the different HTTP methods on
-resources.
-
 [#154]
-== {SHOULD} Explicitly define the Collection Format of Query Parameters
+== {SHOULD} クエリパラメータのコレクションフォーマットは明示的に定義する
 
-There are different ways of supplying a set of values as a query
-parameter. One particular type should be selected and stated explicitly
-in the API definition. The OpenAPI property
-http://swagger.io/specification/[`collectionFormat`] is used to
-specify the format of the query parameter.
+クエリパラメータで値の集合を渡すには、いくつかの方法があります。
+どれか1つを選択し、API定義に明示します。
+OpenAPIプロパティの http://swagger.io/specification/[`collectionFormat`]
+は、クエリパラメータのフォーマットを指定するのに使われます。
 
-Only the `csv` or `multi` formats should be used for multi-value query
-parameters as described below.
+複数値をもつクエリパラメータには、`csv` または `multi` いずれかのフォーマットを使うべきです。
 
 [,cols="15%,25%,60%",options="header",]
 |=======================================================================
 |Collection Format |Description |Example
-|`csv` |Comma separated values |`?parameter=value1,value2,value3`
+|`csv` |カンマで分割された値 |`?parameter=value1,value2,value3`
 
-|`multi` |Multiple parameter instances
+|`multi` |複数パラメータのインスタンス
 |`?parameter=value1&parameter=value2&parameter=value3`
 |=======================================================================
 
-When choosing the collection format, take into account the tool support,
-the escaping of special characters and the maximal URL length.
-
+コレクションフォーマットを選択する際には、ツールのサポート、特殊文字のエスケープ、URLの最大長
+を超えないかに注意してください。

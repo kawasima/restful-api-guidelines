@@ -1,8 +1,8 @@
 [[api-operation]]
-= API操作
+= APIの運用
 
 [#192]
-== {MUST} Publish OpenAPI Specification
+== {MUST} OpenAPI仕様を公開する
 
 すべてのサービスアプリケーションは、外に向けたAPIのOpen APIの仕様を公開しなければなりません。
 内部APIは任意ではありますが、APIマネジメント基盤を使うメリットは大きいので、公開しておくに
@@ -21,15 +21,11 @@ We prefer this deployment artifact-based method over the
 past (now legacy) `.well-known/schema-discovery` service endpoint-based
 publishing process, that we only support for backward compatibility reasons.
 
-Background: In our dynamic and complex service infrastructure, it is important
-to provide API client developers a central place with online access to the API
-specifications of all running applications. As a part of the infrastructure,
-the API publishing process is used to detect API specifications. The findings
-are published in the API Portal - the universal hub for all Zalando APIs.
+背景: 動的で複雑な私たちのインフラでは、APIクライアント開発者に、動いているアプリケーションすべての
+API仕様を、オンラインからアクセス出来るような場所を提供することが重要です。
+インフラの一部として、API公開のプロセスはAPI仕様を探し出すのに使われます。
 
-**Note:** To publish an API, it is still necessary to deploy the artifact
-successful, as we focus the discovery experience on APIs supported by running
-services.
+**注意:** APIを公開するためには、デプロイが成功していることが前提になります。
 
 [#193]
 == {SHOULD} API利用状況をモニタリングする
