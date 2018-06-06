@@ -16,11 +16,11 @@
 :MAY: pass:[<span class="may-keyword"><strong>May:</strong></span>]
 
 = Zalando RESTful API と イベントスキーマのガイドライン
-Zalando SE
+Zalando SE (翻訳: kawasima)
 
 image::assets/api-zalando-small.jpg[API Guild Logo]
 
-Other formats: link:zalando-guidelines.pdf[PDF], link:zalando-guidelines.epub[EPUB3]
+別の形式: link:zalando-guidelines.pdf[PDF], link:zalando-guidelines.epub[EPUB3] (Comming soon)
 
 toc::[]
 

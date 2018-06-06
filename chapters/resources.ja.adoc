@@ -114,7 +114,7 @@ have low id volume but widespread steering functionality.
 したがって、UUIDはformatプロパティで修飾してはいけません。
 
 ヒント: よくランダムUUIDが使われます。
-https://tools.ietf.org/html/rfc4122[RFC 4122]のUUID バージョン4をみてください。
+https://tools.ietf.org/html/rfc4122[RFC 4122] のUUID バージョン4をみてください。
 UUID バージョン1は、タイムスタンプを元に作るけれども、生成順にソートはできない仕様です。
 https://github.com/alizain/ulid[ULID] (Universally Unique
 Lexicographically Sortable Identifier) はこの欠点をなくすように作られています。
@@ -148,25 +148,14 @@ APIはトップレベルのリソースとして用意するべきです。
 ----
 
 [#146]
-== {SHOULD} Limit number of Resource types
+== {SHOULD} リソースの型の上限を定める
 
 サービスの開発・メンテナンスを続けていくためには、「機能分割」や「関心の分離」の設計原則にしたがい、
 同一のAPI定義に異なる業務機能群を混ぜ込まないようにするべきです。
 実際にAPIをつうじて機能提供されるリソースの種類は、その数に上限をもうけたほうがよいでしょう。
 
-
-To keep maintenance and service evolution manageable, we should follow
-"functional segmentation" and "separation of concern" design principles
-and do not mix different business functionalities in same API
-definition. In practice this means that the number of resource types
-exposed via an API should be limited. In this context a resource type is
-defined as a set of highly related resources such as a collection, its
-members and any direct sub-resources.
-
-例えばリソースは1つの
-For example, the resources below would be counted as three resource
-types, one for customers, one for the addresses, and one for the
-customers' related addresses:
+リソースの型はコレクションのような関連するリソース、そのメンバ、サブリソースの集合として定義されます。
+例えば、下記のリソース群はカスタマ、住所、カスタマの住所の3つのリソース型として数えられます。
 
 [source,http]
 ----
@@ -179,21 +168,14 @@ customers' related addresses:
 /addresses/{addr}
 ----
 
-* 追加の識別子なしでカスタマと1対1の関係をもつので、`/customers`リソースの一部として`/customers/{id}/preferences`を考えます。
-* `/customers`と`/customers/{id}/addresses`とは、
-Note that:
+注意:
 
-* We consider `/customers/{id}/preferences` part of the `/customers`
-resource type because it has a one-to-one relation to the customer
-without an additional identifier.
-* We consider `/customers` and `/customers/{id}/addresses` as separate
-resource types because `/customers/{id}/addresses/{addr}` also exists
-with an additional identifier for the address.
-* We consider `/addresses` and `/customers/{id}/addresses` as separate
-resource types because there's no reliable way to be sure they are the
-same.
+* `/customers/{id}/preferences` は、追加の識別子なしでカスタマと1対1の関係をもつので、 `/customers` リソースの一部としてみなします。
+* `/customers` と `/customers/{id}/addresses` とは、`/customers/{id}/addresses/{addr}` が存在し住所の識別子を追加でもつので、別々のリソース型とみなします。
+* `/addresses` と `/customers/{id}/addresses` は、
+それらが同一のものであると確信もって言えるすべがないので、別々のリソース型とみなします。
 
-この定義があれば、経験的にリソースのタイプは4〜8より多くなることはないと思います。
+この定義にしたがうと、経験的にリソースのタイプは4〜8より多くなることはないと思います。
 より多くのリソースを必要とする複雑な業務ドメインでは例外があるかもしれませんが、
 その際はAPIを分類することによって、サブドメインに分割できないかをまず検討するべきです。
 
@@ -203,10 +185,10 @@ same.
 [#147]
 == {SHOULD} サブリソースのレベルの深さを制限する
 
-There are main resources (with root url paths) and sub-resources (or
-“nested” resources with non-root urls paths). Use sub-resources if their
-life cycle is (loosely) coupled to the main resource, i.e. the main
-resource works as collection resource of the subresource entities. You
-should use <= 3 sub-resource (nesting) levels -- more levels increase
-API complexity and url path length. (Remember, some popular web browsers
-do not support URLs of more than 2000 characters)
+(ルートからのURLパスをもつ)メインリソースと(非ルートのURLで表される)サブリソースが
+存在します。対象のリソースのライフサイクルが、メインリソースと(疎に)結びついていれば、
+サブリソースを使います。つまりメインリソースは、サブリソースエンティティの
+コレクションリソースの役割を担います。
+サブリソースの(ネストした)レベルは3以下にすべきです。
+それ以上になるとAPIの複雑性は増し、URLパスも長くなりすぎてしまうからです。
+(ふつうのWebブラウザは2000文字以上のURLをサポートしないことを忘れずに)

@@ -5,16 +5,15 @@
 == {MUST} APIメタ情報を含める
 API仕様はAPI管理のための、次のOpenAPIメタ情報を含まなければならない。
 
-- `#/info/title` as (unique) identifying name of the API
-- `#/info/version` to distinguish API specifications versions following
-  <<116, semantic rules>>
-- `#/info/description` containing a proper description of the API
-- `#/info/contact/{name,url,email}` containing the responsible team
+- `#/info/title` : APIの(一意の)識別できる名前
+- `#/info/version` : API仕様のバージョン。 <<116, セマンティックルール>> にしたがう。
+- `#/info/description` : APIの説明
+- `#/info/contact/{name,url,email}` : 担当のチームの情報
 
-Following OpenAPI extension properties *must* be provided in addition:
+OpenAPIの拡張プロパティにしたがい、以下も *定義しなければなりません* 。
 
-- `#/info/x-api-id` unique identifier of the API (<<215, see rule 215>>)
-- `#/info/x-audience` intended target audience of the API (<<219, see rule 219>>)
+- `#/info/x-api-id` : APIの一意の識別子 (<<215, 215 ルール参照>>)
+- `#/info/x-audience` : intended target audience of the API (<<219, 219 ルール参照>>)
 
 
 [#116]
@@ -26,27 +25,19 @@ http://semver.org/spec/v2.0.0.html[セマンティックバージョン 2.0]の
 ルール`1`から`8`までと`11`に準拠することを期待します。
 それは<MAJOR>.<MINOR>.<PATCH>の形式で、次のような意味を与えます。
 
-* 非互換なAPIの変更をしたら、**MAJOR**バージョンをあげる。
-* 後方互換性を保ちつつ、新規機能を追加したら、**MINOR**バージョンをあげる。
-* 機能に影響のない後方互換性を保ったバグフィクスや表記上の修正をしたら**PATCH**バージョンをあげる。
+* 非互換なAPIの変更をしたら、 **MAJOR** バージョンをあげる。
+* 後方互換性を保ちつつ、新規機能を追加したら、 **MINOR** バージョンをあげる。
+* 機能に影響のない後方互換性を保ったバグフィクスや表記上の修正をしたら **PATCH** バージョンをあげる。
 
-*Additional Notes:*
+*追加の注意:*
 
 * *プレリリース* バージョン(http://semver.org#spec-item-9[rule 9]) と
 *ビルドメタデータ* (http://semver.org#spec-item-10[rule 10]) は、
 APIバージョン情報に使ってはいけない
 * パッチバージョンはtypoの修正になどに役立つけれども、API設計者が、
-それをバージョンをあげるかどうかは自由である
+それでバージョンをあげるかどうかは自由である
 * API設計者はAPIバージョン `0.y.z` は、初期API設計のために使うべきである
 (http://semver.org/#spec-item-4[rule 4])
-
-* *Pre-release* versions (http://semver.org#spec-item-9[rule 9]) and
-*build metadata* (http://semver.org#spec-item-10[rule 10]) must not
-be used in API version information.
-* While patch versions are useful for fixing typos etc, API designers
-are free to decide whether they increment it or not.
-* API designers should consider to use API version `0.y.z`
-(http://semver.org/#spec-item-4[rule 4]) for initial API design.
 
 例:
 
@@ -85,10 +76,8 @@ API識別子は、Open API仕様の`info`-ブロックで定義します。
     sequence of API specifications.
 ----
 
-
-It is responsibility of the API owner to ensure that the application of the
-API identifier together with the semantic API <<116,version>> reflect the
-expected API history.
+セマンティックAPI <<116,バージョン>> と一緒にAPI識別子のアプリケーションが、APIの履歴を
+期待どおりに反映していることを保証するのは、APIオーナーの責務です。
 
 自分で管理するURNを使って、可読性のあるAPI識別子を使うのはよいことではありますが、
 APIの進化の過程で、API設計者がAPI識別子を変更したくなる衝動がきっと出てくるので、
@@ -111,7 +100,7 @@ https://docs.google.com/document/d/1lRXcTZbZMnFeTVCaazitSWxSdKXGWkOUn99Gr-huNXg[
 
 
 [#219]
-== {MUST} APIオーディエンスを提供する Provide API Audience
+== {MUST} APIオーディエンスを提供する
 
 それぞれのAPIはAPIの利用が想定されている対象オーディエンスで分類されなければなりません。
 それごとに見つけやすさ、変わりやすさ、設計とドキュメントの品質、権限付与などAPIの異なる標準を

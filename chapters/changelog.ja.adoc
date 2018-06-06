@@ -1,14 +1,13 @@
 [[appendix-changelog]]
 [appendix]
-= Changelog
+= 変更履歴
 
-This change log only contains major changes made after October 2016.
+この変更履歴は2016年10月以降の主要な変更のみ記載しています。
 
-Non-major changes are editorial-only changes or minor changes of existing guidelines, e.g. adding new error code.
-Major changes are changes that come with additional obligations, or even change an existing guideline obligation.
-The latter changes are additionally labeled with "Rule Change" here.
-
-To see a list of all changes, please have a look at the https://github.com/zalando/restful-api-guidelines/commits/master[commit list in Github].
+主要でない変更とは、表記上のみの修正や既存のガイドラインの軽微な修正(新しいエラーコードの追加など)です。
+主要な変更は、追加のルールにともなう変更、または既存のガイドラインのルール変更です。
+後者の変更点を「ルールの変更点」というラベルを付けてまとめました。
+すべての変更を知りたくば, https://github.com/zalando/restful-api-guidelines/commits/master[Githubのコミット] を参照ください。
 
 [[rule-changes]]
 == Rule Changes
@@ -37,4 +36,3 @@ part.
 * `2016-12-04:` Changed OAuth flow example from implicit to password in <<security>>.
 * `2016-10-13:` <<172>>
 * `2016-10-10:` Introduced the changelog. From now on all rule changes on API guidelines will be recorded here.
-

@@ -2,14 +2,9 @@
 = JSONガイドライン
 
 ZalandoにおいてJSONデータを定義するのに推奨されるガイドラインです。
-JSONとは、ここではhttp://www.rfc-editor.org/rfc/rfc7159.txt[RFC 7159] (which updates
-https://www.ietf.org/rfc/rfc4627.txt[RFC 4627])を指します。
+JSONとは、ここでは http://www.rfc-editor.org/rfc/rfc7159.txt[RFC 7159] ( https://www.ietf.org/rfc/rfc4627.txt[RFC 4627] のアップデート)を指します。
 "application/json"のメディアタイプとAPIで定義されたカスタムのJSONメディアタイプをもちます。
 このガイドラインでは、Zalandoの用語やサービスの用例をもつJSONデータを使って、具体的なケースを示します。
-, the “application/json”
-media type and custom JSON media types defined for APIs. The guidelines
-clarifies some specific cases to allow Zalando JSON data to have an
-idiomatic form across teams and services.
 
 最初のいくつかはプロパティ名についてのガイドラインであり、
 後半は値についてのガイドラインになります。
@@ -148,10 +143,12 @@ could be strings formatted as recommended by ISO 8601
 contains a grammar] for durations).
 
 [#128]
-== {MAY} Standards could be used for Language, Country and Currency
+== {MAY} 標準の言語、国、通貨コードを使う
 
-* http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2[ISO 3166-1-alpha2 country]
-* (It's "GB", not "UK", even though "UK" has seen some use at Zalando)
-* https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes[ISO 639-1 language code]
+* http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2[ISO 3166-1-alpha2 国コード]
+* (Zalandoでは"UK"という表記も見かけるかもしれないが、"UK"ではなく"GB"を使う)
+* https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes[ISO 639-1 言語コード]
 * https://tools.ietf.org/html/bcp47[BCP-47] (based on ISO 639-1) for language variants
-* http://en.wikipedia.org/wiki/ISO_4217[ISO 4217 currency codes]
+* http://en.wikipedia.org/wiki/ISO_4217[ISO 4217 通貨コード]
+
+上記で定義されているものを使いましょう。

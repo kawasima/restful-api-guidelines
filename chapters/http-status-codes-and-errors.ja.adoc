@@ -1,25 +1,21 @@
 [[http-status-codes-and-errors]]
 = HTTPステータスコードとエラー
 
-
 [#151]
-== {MUST} Specify Success and Error Responses
+== {MUST} 成功とエラーレスポンスを規定する
 
-APIs should define the functional, business view and abstract from
-implementation aspects. Success and error responses are a vital part to
-define how an API is used correctly.
+APIは機能、業務の観点で定義され、実装の観点からは切り離され抽象化しなければなりません。
+成功と失敗のレスポンスは、APIが正しく使われるために必要不可欠な部分です。
 
-Therefore, you must define **all** success and service specific error responses in your API specification.
-Both are part of the interface definition and
-provide important information for service clients to handle standard as well
-as exceptional situations.
+だからAPI仕様においては、**すべての**成功とサービス固有のエラーレスポンスを定義しなければなりません。
+両者ともインタフェース定義の一部であり、サービスクライアントが標準だけでなく例外も、
+正しく扱うための重要な情報を提供するものです。
 
-
-**Hint:** In most cases it is not useful to document all technical errors,
-especially if they are not under control of the service provider.
-Thus unless a response code conveys application-specific functional semantics or is used
-in a none standard way that requires additional explanation, multiple error
-response specifications can be combined using the following pattern:
+**ヒント:** たいていの場合、すべての技術的なエラー、特にサービスプロバイダに制御されないようなものを、
+ドキュメント化するのは役に立ちません。
+レスポンスコードがアプリケーション固有の機能の意味を伝えないか、または
+追加の説明を必要とするような標準でない使われ方をする限りは、
+複数のエラーレスポンス仕様は、次のパターンを用いて組み合わせることができます。
 
 [source,yaml]
 ----
@@ -39,140 +35,134 @@ service client and provider performance.
 
 
 [#150]
-== {MUST} Use Standard HTTP Status Codes
+== {MUST} 標準のHTTPステータスコードを使う
 
-You must only use standardized HTTP status codes and consistently with
-their intended semantics. You must not invent new HTTP status codes.
+標準のHTTPステータスコードのみを使い、その意味に沿うように一貫性をもった設計をしなければなりません。
+どうかHTTPステータスコードを新たに発明しないようにしてください。
 
-RFC standards define ~60 different HTTP status codes with specific semantics
-(mainly https://tools.ietf.org/html/rfc7231#section-6[RFC7231] and
-https://tools.ietf.org/html/rfc6585[RFC-6585]) — and there are upcoming
-new ones, e.g.
+RFCの標準では ~60 の異なるHTTPステータスコードと同時にその意味も定義されていてます。
+(主に https://tools.ietf.org/html/rfc7231#section-6[RFC7231] と
+https://tools.ietf.org/html/rfc6585[RFC-6585])
+— そして
 https://tools.ietf.org/html/draft-tbray-http-legally-restricted-status-05[draft
-legally-restricted-status]. See overview on all error codes on
-https://en.wikipedia.org/wiki/List_of_HTTP_status_codes[Wikipedia] or
-via https://httpstatuses.com/) also inculding 'unofficial codes', e.g. used
-by popular web servers like Nginx.
+legally-restricted-status]
+のように新しいものもあります。
+すべてのエラーコードは
+https://en.wikipedia.org/wiki/List_of_HTTP_status_codes[Wikipedia]
+か https://httpstatuses.com/ で '非公式なコード'(NginxのようなWebサーバで使われるもの)を含んだものを
+見ることができます。
 
-Below we listed the most commonly used and best understood HTTP status codes
-(consistent with RFC standard). You may use HTTP status codes not listed here,
-but in this case you must provide clear documentation in the API definition.
-As long as there is no need to use codes not listed here, you
-should not describe HTTP status codes to avoid risk of inconsistent definitions and
-reduced readability due to overload with common sense information.
-
+以下によく共通で使う(RFC標準と整合性ある)HTTPステータスコードを、理解の助けになるよう一覧にしました。
+ここに載ってないHTTPステータスコードを使っても良いですが、
+その場合、API定義に明示しなくてはなりません。
+ここに載ってるコードを使う限りは、そうする必要はありません。
+一貫性のない定義をしてしまうリスクは低いし、常識をドキュメントに書きすぎると可読性が下がるからです。
 
 [[success-codes]]
-=== Success Codes
+=== 成功コード
 
 [cols="10%,70%,20%",options="header",]
 |=======================================================================
 |Code |Meaning |Methods
-|200 |OK - this is the standard success response |All
+|200 |OK - 標準の成功レスポンス |All
 
-|201 |Created - Returned on successful entity creation. You are free to
-return either an empty response or the created resource in conjunction
-with the Location header. (More details found in the
-<<common-headers>>.) _Always_ set the Location header. |POST, PUT
+|201 |Created - エンティティが正常に作成されたこととを示す。空のレスポンス
+でも作成されたリソースを返してもよい。がそのリソースのURLをLocationヘッダにセットする。
+(より詳細は <<common-headers>> 参照)
+_常に_ Locationヘッダをセットすること。 |POST, PUT
 
-|202 |Accepted - The request was successful and will be processed
-asynchronously. |POST, PUT, DELETE, PATCH
+|202 |Accepted - リクエストは成功し非同期で処理されている。
+|POST, PUT, DELETE, PATCH
 
-|204 |No content - There is no response body |PUT, DELETE, PATCH
+|204 |No content - レスポンスボディがない。 |PUT, DELETE, PATCH
 
-|207 |Multi-Status - The response body contains multiple status
-informations for different parts of a batch/bulk request. See
-<<152>>. |POST
+|207 |Multi-Status - バッチ/バルクリクエストで、レスポンスボディは複数の
+ステータスを含んでいる。<<152>> 参照
+|POST
 |=======================================================================
 
 [[redirection-codes]]
-=== Redirection Codes
+=== リダイレクトのコード
 
 [cols="10%,70%,20%",options="header",]
 |=======================================================================
 |Code |Meaning |Methods
-|301 |Moved Permanently - This and all future requests should be
-directed to the given URI. |All
+|301 |Moved Permanently - 以後のリクエストはすべて与えられたURIに直接送るようにすべき。
+|All
 
-|303 |See Other - The response to the request can be found under another
-URI using a GET method. |PATCH, POST, PUT, DELETE
+|303 |See Other - GETメソッドを使って別のURIへリクエストを送ってくれ。
+|PATCH, POST, PUT, DELETE
 
-|304 |Not Modified - resource has not been modified since the date or
-version passed via request headers If-Modified-Since or If-None-Match.
+|304 |Not Modified - If-Modified-Since や If-None-Match ヘッダで送られた
+日付やバージョンから、リソースは何も変更されていない。
 |GET
 |=======================================================================
 
 [[client-side-error-codes]]
-=== Client Side Error Codes
+=== クライアントサイドのエラーコード
 
 [cols="10%,70%,20%",options="header",]
 |=======================================================================
 |Code |Meaning |Methods
-|400 |Bad request - generic / unknown error.
-Should also be delivered in case of input payload fails business logic validation. |All
-
-|401 |Unauthorized - the users must log in (this often means
-“Unauthenticated”) |All
-
-|403 |Forbidden - the user is not authorized to use this resource |All
-
-|404 |Not found - the resource is not found |All
-
-|405 |Method Not Allowed - the method is not supported, see OPTIONS |All
-
-|406 |Not Acceptable - resource can only generate content not acceptable
-according to the Accept headers sent in the request |All
-
-|408 |Request timeout - the server times out waiting for the resource
+|400 |Bad request - 一般的な / 未知のエラー。入力のペイロードが業務ロジックバリデーションで
+エラーになったときにも送出される。
 |All
 
-|409 |Conflict - request cannot be completed due to conflict, e.g. when
-two clients try to create the same resource or if there are concurrent,
-conflicting updates |POST, PUT, DELETE, PATCH
+|401 |Unauthorized - ユーザはログインしなければならない。(“Unauthenticated”の意) |All
 
-|410 |Gone - resource does not exist any longer, e.g. when accessing a
-resource that has intentionally been deleted |All
+|403 |Forbidden - ユーザはこのリソースのアクセス権限がない。|All
 
-|412 |Precondition Failed - returned for conditional requests, e.g.
-If-Match if the condition failed. Used for optimistic locking. |PUT,
-DELETE, PATCH
+|404 |Not found - リソースが見つからない。 |All
 
-|415 |Unsupported Media Type - e.g. clients sends request body without
+|405 |Method Not Allowed - メソッドがサポートされていない。OPTIONSで調べることができる。 |All
+
+|406 |Not Acceptable - リクエストで送られたAcceptヘッダにしたがったレスポンスを返すことができない。
+|All
+
+|408 |Request timeout - リソース待ちでサーバがタイムアウトした。
+|All
+
+|409 |Conflict - リクエストは競合が発生したために完遂できなかった。例えば2つのクライアントが同じリソースを作成しようとしたり、同時に整合性の保てない更新要求が発生するようなケース。
+|POST, PUT, DELETE, PATCH
+
+|410 |Gone - リソースがもう存在しない。例えば、意図して削除されたリソースにアクセスしたケース。|All
+
+|412 |Precondition Failed - 条件に合わないリクエストがされた。例えばIf-Matchを満たさないケース。
+楽観ロックで使われる。
+|PUT, DELETE, PATCH
+
+|415 |Unsupported Media Type - 例えばクライアントがContent-Typeなしでリクエストボディを送っていたケース
 content type |POST, PUT, DELETE, PATCH
 
-|423 |Locked - Pessimistic locking, e.g. processing states |PUT, DELETE,
+|423 |Locked - 悲観ロック。例えば、処理中。 |PUT, DELETE,
 PATCH
 
-|428 |Precondition Required - server requires the request to be
-conditional (e.g. to make sure that the “lost update problem” is
-avoided). |All
+|428 |Precondition Required - サーバは条件付きリクエストを要求する。(e.g. to make sure that the “lost update problem” is avoided). |All
 
-|429 |Too many requests - the client does not consider rate limiting and
-sent too many requests. See <<153>>. |All
+|429 |Too many requests - クライアントが大量のリクエストを送ってきた。 <<153>> 参照。 |All
 |=======================================================================
 
 [[server-side-error-codes]]
-=== Server Side Error Codes:
+=== サーバサイドのエラーコード
 
 [cols="10%,70%,20%",options="header",]
 |=======================================================================
 |Code |Meaning |Methods
-|500 |Internal Server Error - a generic error indication for an
-unexpected server execution problem (here, client retry may be sensible)
+|500 |Internal Server Error - サーバで予期しないエラーが起きたことを示す。(クライアントのリトライは単純には行えない可能性があります)
 |All
 
-|501 |Not Implemented - server cannot fulfill the request (usually
-implies future availability, e.g. new feature). |All
+|501 |Not Implemented - サーバはリクエストを実行できない (暗に将来実行可能になることを指す)。
+|All
 
-|503 |Service Unavailable - server is (temporarily) not available (e.g.
-due to overload) -- client retry may be sensible. |All
+|503 |Service Unavailable - サーバが(一時的に)利用できない (つまり高負荷のため)
+ -- クライアントのリトライは単純には行えない可能性があります
+|All
 |=======================================================================
 
 [#220]
-== {MUST} Use Most Specific HTTP Status Codes
+== {MUST} もっとも状況にあったHTTPステータスコードを使う
 
-You must use the most specific HTTP status code when returning information
-about your request processing status or error situations.
+処理結果やエラー状況を返すとき、もっとも適したHTTPステータスコードを使わねばなりません。
 
 [#152]
 == {MUST} Use Code 207 for Batch or Bulk Requests
@@ -205,15 +195,17 @@ resources created or updated together in one request. With respect to
 response processing this distinction normally does not matter.
 
 [#153]
-== {MUST} Use Code 429 with Headers for Rate Limits
+== {MUST} レート制限のヘッダには429を使う Use Code 429 with Headers for Rate Limits
 
-APIs that wish to manage the request rate of clients must use the
-http://tools.ietf.org/html/rfc6585['429 Too Many Requests'] response
-code if the client exceeded the request rate and therefore the request
-can't be fulfilled. Such responses must also contain header information
-providing further details to the client. There are two approaches a
-service can take for header information:
+クライアントのリクエストレートをコントロールしたいAPIは、
+http://tools.ietf.org/html/rfc6585['429 Too Many Requests']レスポンス
+コードを使います。
+もしクライアントがリクエストレートを越えたら、リクエストは実行されなくなります。
+そのようなレスポンスは、クライアントにそのような追加の情報を知らせるために、
+ヘッダをセットしなくてはなりません。その手段は次の2つがあります。
 
+* https://tools.ietf.org/html/rfc7231#section-7.1.3['Retry-After'] ヘッダを
+返す。
 * Return a
 https://tools.ietf.org/html/rfc7231#section-7.1.3['Retry-After'] header
 indicating how long the client ought to wait before making a follow-up
@@ -250,16 +242,17 @@ number of requests made within a given window for each named entity.
 [#176]
 == {MUST} Problem JSONを使う
 
-http://tools.ietf.org/html/rfc7807[RFC 7807] defines a Problem JSON object and
-the media type `application/problem+json`. Operations should return it (together with
-a suitable status code) when any problem occurred during processing and
-you can give more details than the status code itself can supply,
-whether it be caused by the client or the server (i.e. both for 4xx or
-5xx error codes).
+http://tools.ietf.org/html/rfc7807[RFC 7807] でProblem JSONオブジェクトと、
+`application/problem+json` メディアタイプが定義されています。
+処理中に発生したどんな問題も(適切なステータスコードとともに)これを使い、
+クライアントサイドのエラー(4xx)か、サーバサイドのエラー(5xx)かに関わらず、
+ステータスコードよりも詳細な情報を返すべきです。
 
-The Open API schema definition of the Problem JSON object can be found
-https://zalando.github.io/problem/schema.yaml[on github]. You can
-reference it by using:
+Problem JSONオブジェクトのOpenAPIスキーマ定義は、
+https://zalando.github.io/problem/schema.yaml[GitHub上]
+にあります。
+
+これを使って以下のように定義できます。
 
 [source,yaml]
 ----
@@ -270,20 +263,17 @@ responses:
       $ref: 'https://zalando.github.io/problem/schema.yaml#/Problem'
 ----
 
-You may define custom problem types as extension of the Problem JSON object
-if your API need to return specific additional error detail information.
+もしAPIが追加のエラー詳細情報を返す必要があれば、
+Problem JSONの拡張としてカスタムの型を定義することもできます。
 
-
-**Hint** for backward compatibility:
-A previous version of this guideline (before the publication of
-http://tools.ietf.org/html/rfc7807[RFC 7807]
-and the registration of the media type) told to return
-custom variant of the media type `application/x.problem+json`.
-Servers for APIs defined before this change should pay attention to the
-`Accept` header sent by the client and set the `Content-Type` header of
-the problem response correspondingly. Clients of such APIs should accept
-both media types.
-
+**ヒント** (後方互換性のために):
+このガイドラインの以前のバージョンでは(http://tools.ietf.org/html/rfc7807[RFC 7807] が
+公開される前だったので)、
+`application/x.problem+json` のメディアタイプを返すようにしていました。
+この変更前に定義されたAPIサーバは、
+クライアントが送る`Accept`ヘッダとエラーレスポンスの`Content-Type`ヘッダの
+対応に注意しなければなりません。
+またそのようなAPIのクライアントは、両方のメディアタイプを受け付け可能でなければなりません。
 
 [#177]
 == {MUST} スタックトレースを外に見せないようにする

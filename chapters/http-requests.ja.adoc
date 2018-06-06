@@ -93,21 +93,13 @@ alternatives to this approach.
 === POST
 
 POSTは慣例的には、リソースのコレクションのエンドポイントに、単一のリソースを作成するのに使われますが、
-単一リソースエンドポイントに別の。
-コレクションのエンドポイントは、»_URLによって識別されるリソースのコレクションにオブジェクト追加してください_«。
-単一のエンドポイントは、»_URLによって識別されるリソースのコレクションににオブジェクト実行してください_«。
-POST requests are idiomatically used to create single resources on a
-collection resource endpoint, but other semantics on single resources
-endpoint are equally possible. The semantic for collection endpoints is
-best described as »_please add the enclosed representation to the
-collection resource identified by the URL_«. The semantic for single
-resource endpoints is best described as »_please execute the given well
-specified request on the collection resource identified by the URL_«.
+単一リソースエンドポイントでも他のものと同じように使えます。
+
+コレクションのエンドポイントは、»_URLによって識別されるリソースのコレクションにオブジェクトを追加してください_« 、
+単一のエンドポイントは、»_URLによって識別されるリソースのコレクションに対してリクエストを実行してください_« という意味になる。
 
 * POSTリクエストはリソースのコレクションだけに適用されるべきである。通常単一リソースに対しては、
 これは未定義の意味をもつ。
-POST request should only be applied to collection resources, and
-normally not on single resource, as this has an undefined semantic
 * POSTリクエストが成功したら、サーバは1つまたは複数のリソースを作成し、そのURI/URLをレスポンスとして返す。
 * POSTリクエストは成功したら、ふつうは(リソースがアプデートされたら) 200を、(リソースが作成されたら) 201を、
 (リクエストは受け付けたが、まだ完了していないのであれば) 202を返す。
@@ -117,12 +109,11 @@ normally not on single resource, as this has an undefined semantic
 (SQLのような構造化)クエリがそれにあたります。
 そのような場合は、POSTがワークアラウンドとして使われていることをドキュメントに明記しましょう。
 
-*Note:* Resource IDs with respect to POST requests are created and
-maintained by server and returned with response payload. Posting the
-same resource twice is by itself *not* required to be idempotent and may
-result in multiple resource instances. Anyhow, if external URIs are
-present that can be used to identify duplicate requests, it is best
-practice to implement POST in an idempotent way.
+*注意:* POSTリクエストと関連したリソースIDは、サーバで作成・管理され、レスポンスのペイロードで
+クライアントに返されます。
+同じリソースを2回POSTすると、POSTには冪等性は必須ではないので、複数リソースインスタンスが
+作られてしまうかもしれません。
+もし重複したリクエストを識別するのに使える外部URIが存在すれば、冪等にPOSTを実装するベストプラクティスとなります。
 
 [[patch]]
 === PATCH

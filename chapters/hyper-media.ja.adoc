@@ -4,65 +4,53 @@
 [#162]
 == {MUST} REST成熟モデル2を使う
 
-We strive for a good implementation of
+私たちは
 http://martinfowler.com/articles/richardsonMaturityModel.html#level2[REST
-Maturity Level 2] as it enables us to build resource-oriented APIs that
-make full use of HTTP verbs and status codes. You can see this expressed
-by many rules throughout these guidelines, e.g.:
+成熟度レベル2] のイケてる実装を目指します。
+そうすることでHTTP動詞とステータスコードをフル活用した、リソース指向APIを構築できるようになるからです。
+これらのガイドラインを通じて、これは多くのルールによって表現されています。
 
 * <<138>>
 * <<141>>
 * <<148>>
 * <<150>>
 
-Although this is not HATEOAS, it should not prevent you from designing
-proper link relationships in your APIs as stated in rules below.
+これはHATEOASではありませんが、以下に示すルールで記述されるように、
+APIに正しいリンク関連を設計することにとらわれるべきではありません。
 
 [#163]
 == {MAY} REST成熟モデル3を使う - HATEOAS
 
-We do not generally recommend to implement
+私たちは基本的には、
 http://martinfowler.com/articles/richardsonMaturityModel.html#level3[REST
-Maturity Level 3]. HATEOAS comes with additional API complexity without
-real value in our SOA context where client and server interact via REST
-APIs and provide complex business functions as part of our e-commerce
-SaaS platform.
+成熟レベル3] を実装すことはおすすめしません。
+HATEOASは、クライアントとサーバのREST APIを通じたやりとりしたり、
+私たちのeコマースのSaaSプラットフォームの一部として複雑な業務機能を提供したりする、
+私たちのSOA文脈においては、価値のない複雑さをAPIにもたらします。
 
-Our major concerns regarding the promised advantages of HATEOAS (see
-also
-https://www.infoq.com/news/2014/03/rest-at-odds-with-web-apis[RESTistential
-Crisis over Hypermedia APIs],
-https://jeffknupp.com/blog/2014/06/03/why-i-hate-hateoas/[Why I Hate
-HATEOAS] and others for a detailed discussion):
+私たち主な関心は、HATEOASのもたらす利点にあります。
+(詳細な議論は https://www.infoq.com/news/2014/03/rest-at-odds-with-web-apis[RESTistential
+Crisis over Hypermedia APIs] や https://jeffknupp.com/blog/2014/06/03/why-i-hate-hateoas/[Why I Hate HATEOAS] 、を参照ください)
 
-* We follow the <<100,API First principle>>
-with APIs explicitly defined outside the code with
-standard specification language. HATEOAS does not really add value for
-SOA client engineers in terms of API self-descriptiveness: a client
-engineer finds necessary links and usage description (depending on
-resource state) in the API reference definition anyway.
-* Generic HATEOAS clients which need no prior knowledge about APIs and explore
-API capabilities based on hypermedia information provided, is a theoretical
-concept that we haven't seen working in practice and does not fit to our
-SOA set-up. The OpenAPI description format (and tooling based on
-OpenAPI) doesn't provide sufficient support for HATEOAS either.
-* In practice relevant HATEOAS approximations (e.g. following specifications
-like HAL or JSON API) support API navigation by abstracting from URL
-endpoint and HTTP method aspects via link types. So, Hypermedia does not
-prevent clients from required manual changes when domain model changes
-over time.
-* Hypermedia make sense for humans, less for SOA machine
-clients. We would expect use cases where it may provide value more
-likely in the frontend and human facing service domain.
-* Hypermedia does not prevent API clients to implement shortcuts and directly
-target resources without 'discovering' them.
+* 私たちは標準仕様言語でコード外に明示的にAPIを定義して、<<100,APIファーストの原則>>にしたがいます。
+HATEOASはSOAクライアントエンジニアにとって、APIの自己記述性にはあまり価値を感じません:
+クライアントエンジニアは、APIリファレンス定義に、(リソースの状態に依存した)必要なリンクや使い方の記述を見ることができるのですから。
+* 一般的なHATEOASクライアントは、APIについての前提知識を必要とせず、与えられたハイパーメディア情報に
+基づいたAPIの機能を探すことができるものですが、これは理論的な概念で、
+私たちは実際に動いてるのを見たことがないし、私たちのSOA機構にフィットしません。
+またOpenAPIの記述フォーマット(とそのツール)は、HATEOASのサポートも十分ではありません。
+* 実際、HATEOASに似た(HALやJSON APIのような)仕様も、URLエンドポイントやHTTPメソッドの性質から
+情報を取り出すことによって、APIナビゲーションをサポートします。
+したがってハイパーメディアはドメインモデルが徐々に変化していくときには、
+結局クライアントは手動での変更が余儀なくされるのです。
+* ハイパーメディアは人間にとっては意味のあるものですが、SOAクライアントにとってはそうでもありません。
+私たちは、SOAクライアントがサービスドメイン境界にいるフロントエンドや人間に価値を届けることができる
+ユースケースを想定しているのです。
+* ハイパーメディアは、APIクライアントが'discovering'を使わずに、ショートカットを実装したり、
+直接対象のリソースをターゲットにすることを防げません。
 
-However, we do not forbid HATEOAS; you could use it, if you checked its
-limitations and still see clear value for your usage scenario that
-justifies its additional complexity. If you use HATEOAS please share
-experience and present your findings in the
-https://confluence.zalando.net/display/GUL/API+Guild[API Guild [internal
-link]].
+しかし、私たちはHATEOASを禁止するわけではありません。
+その制限を理解し、複雑さを代償としてもより価値のある利用シーンがあるのであれば、HATEOASを使ってもかまいません。
 
 [#217]
 == {MUST} 絶対URIを使う

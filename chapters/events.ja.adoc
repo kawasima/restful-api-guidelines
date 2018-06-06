@@ -1,18 +1,16 @@
 [[events]]
-= Events
+= イベント
 
 Zalandoのアーキテクチャは疎結合なマイクロサービス中心で作られているので、
 私たちは非同期なイベント駆動のアプローチを好みます。
-このセクションのガイドラインは
-Zalando’s architecture centers around decoupled microservices and in
-that context we favour asynchronous event driven approaches. The
-guidelines in this section focus on how to design and publish events
-intended to be shared for others to consume.
+このセクションのガイドラインは、イベントの設計と送信の仕方にフォーカスしたものになります。
 
-*Events, Event Types and Categories.*
+*イベント、イベントの型および分類*
 
-Events are defined using an item called an _Event Type_. The Event Type
-allows events to have their structure declared with a schema by
+Eventは、_Event Type_と呼ぶ項目を使って定義します。
+Events are defined using an item called an .
+イベント型は送信者によるスキーマと
+The Event Type allows events to have their structure declared with a schema by
 producers and understood by consumers. An Event Type declares standard
 information, such as a name, an owning application (and by implication,
 an owning team), a schema defining the event's custom data, and a
@@ -763,29 +761,25 @@ receiver interested in the history of a resource can use the ordering
 key to recreate a (partially) ordered sequence of events.
 
 [#213]
-== {MUST} Follow conventions for Event Type names
+== {MUST} イベントの型名の規約にしたがう
 
-Event types can follow these naming conventions (each convention has its
-own should, must or could conformance level) -
+イベントの型はこれらの命名規約にしたがいましょう。
 
-* Event type names must be url-safe. This is because the event type
-names may appear in URLs published by other systems and APIs.
-* Event type names should be lowercase words and numbers, using hyphens,
-underscores or periods as separators.
+* イベントの名前はURLセールでなくてはならない。これはイベント型名が、他のシステムや
+APIでURLとして使われる可能性があるため。
+* イベント型名は、小文字と数字のみからなり、ハイフン、アンダースコアまたはピリオドを
+セパレータとして使うことができる。
 
 [#214]
-== {MUST} Prepare for duplicate Events
+== {MUST} 重複したイベントPrepare for duplicate Events
 
-Event consumers must be able to process duplicate events.
+イベントの受け手は、重複したイベントを正しく処理できなくてはなりません。
 
-Most message brokers and data streaming systems offer “at-least-once”
-delivery. That is, one particular event is delivered to the consumers
-one or more times. Other circumstances can also cause duplicate events.
+大抵のメッセージブローカとデータストリーミングシステムは、"at-least-once"配信をサポートしています。
+これはある特定のイベントが、必ず1回以上は受け手に届くことを保証するものです。
+別の状況でも、重複したイベントが発生する可能性があります。
 
-For example, these situations occur if the publisher sends an event and
-doesn't receive the acknowledgment (e.g. due to a network issue). In
-this case, the publisher will try to send the same event again. This
-leads to two identical events in the event bus which have to be
-processed by the consumers. Similar conditions can appear on consumer
-side: an event has been processed successfully, but the consumer fails
-to confirm the processing.
+例えば、イベントの送信者が(ネットワークの問題によって) 受け手に届かなかったような
+状況で発生します。この場合、送信者は同じイベントの再送を試みます。
+こうしてイベントバスに受信者が処理すべき同一のイベントが2つ存在することになります。
+同じ状態は受信者側でも起こります: イベントは正しく処理したが、その処理が確認出来ない場合です。
