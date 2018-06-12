@@ -16,7 +16,7 @@
 [#101]
 == {MUST} OpenAPIを使ってAPIの仕様を提供する
 
-私たちはhttp://swagger.io/specification/[OpenAPI](以前はSwaggerと呼ばれていたもの)を、API定義の標準として使っています。APIの設計者はAPI仕様ファイルを、可読性向上のため*YAML*を使って書きます。私たちのツールがOpenAPI 3.0をサポートするまでは、*OpenAPI 2.0*を使うようにしてください。
+私たちは http://swagger.io/specification/[OpenAPI] (以前はSwaggerと呼ばれていたもの)を、API定義の標準として使っています。APIの設計者はAPI仕様ファイルを、可読性向上のため*YAML*を使って書きます。私たちのツールがOpenAPI 3.0をサポートするまでは、*OpenAPI 2.0*を使うようにしてください。
 
 API仕様はソースコード管理システムを使って、バージョン管理するべきです。一番良いのはAPIの実装コードを同じやり方にしておくことです。
 

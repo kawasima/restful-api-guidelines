@@ -21,50 +21,49 @@ securityDefinitions:
       fulfillment-order-service.write: Access right needed to write to the fulfillment order service.
 ----
 
-The example defines OAuth2 with client credentials flow as security standard used
-for authentication when accessing endpoints; additionally, there are two
-API access rights defined via the scopes section for later endpoint
-authorization usage - please see next section.
+上記例はセキュリティ標準として、エンドポイントへのアクセスを認証するのに
+クライアント認証フローのOAuth2を使った際の定義です。
+さらに、スコープセクションを使って2つのAPIアクセス権を定義しています。
+エンドポイントの権限の使い方は後述します。次のセクションを参照ください。
 
-It makes little sense specifying the flow to retrieve OAuth tokens in
-the `securityDefinitions` section, as API endpoints should not care, how
-OAuth tokens were created. Unfortunately the `flow` field is mandatory
-and cannot be omitted. API endpoints should always set `flow: application`
-and ignore this information.
+`securityDefinitions` でOAuthトークンを取得するフローを指定するのは、ほとんど意味がありません。
+APIエンドポイントは、どうOAuthトークンが生成されようが気にする必要はありません。
+不幸にも `flow` フィールドは必須であり、消すことはできません。
+APIエンドポイントは、常に `flow: application` を設定し、
+この情報は無視するべきです。
 
 [#105]
 == {MUST} アクセス権限を定義し割り当てる (スコープ)
 
-Every API needs to define access rights, called scopes here, and every
-endpoint needs to have at least one scope assigned. Scopes are defined
-by name and description per API specification, as shown in the previous
-section. Please refer to the following rules when creating scope names:
+すべてのAPIはアクセス権(ここではスコープと呼ぶ) を定義する必要があります。
+そして、すべてのAPIエンドポイントには、少なくとも1つのスコープを割り当てる必要があります。
+前セクションで示したように、スコープはAPI仕様ごとに名前とその説明によって定義します。
+スコープ名を決めるとき、次のルールを参照するようにしてください。
 
 [source,bnf]
 ----
-<api-scope> ::= <api-standard-scope> |            -- should be sufficient for majority of use cases
-                <api-resource-specific-scope> |   -- for special security access differentiation use cases
-                <api-pseudo-scope>                -- used to explicitly indicate that access is not restricted
+<api-scope> ::= <api-standard-scope> |            -- 大部分のユースケースでこれを使うべき
+                <api-resource-specific-scope> |   -- 異なるユースケースへの特別なセキュリティアクセスのため
+                <api-pseudo-scope>                -- アクセスが制限されないことを明示的に指し示すのに使う
 
 <api-standard-scope>          ::= <application-id>.<access-type>
 <api-resource-specific-scope> ::= <application-id>.<resource-id>.<access-type>
 <api-pseudo-scope>            ::= uid
 
-<application-id> ::= <as defined via STUPS>
-<access-type>    ::= read | write           -- might be extended in future
-<resource-id>    ::= <free identifier following application-id syntax>
+<application-id> ::= <STUPSで定義さたもの>
+<access-type>    ::= read | write           -- 将来拡張されるかもしれない
+<resource-id>    ::= <application-id 文法にしたがう自由な識別子>
 ----
 
-APIs should stick to standard scopes by default -- for the majority of
-use cases, restricting access to specific APIs (with read vs. write
-differentiation) is sufficient for controlling access for client types
-like merchant or retailer business partners, customers or operational
-staff. We want to avoid too many, fine grained scopes increasing
-governance complexity without real value add. In some situations, where
-the API serves different types of resources for different owners,
-resource specific scopes may make sense.
+APIはデフォルトでは標準のスコープを使うべきです。大概のユースケースでは、(read と write
+違いで)特定のAPIへのアクセスを制限することは、荷主か小売か、カスタマか運用スタッフか、といった
+クライアントの種類によってアクセスを制御するのに十分なものです。
+私たちはスコープが多く、細かくなりすぎないようにしたいと考えています。
+それはなんら付加価値を産まず複雑さだけが増していくからです。
+ただ、APIが異なるオーナーには異なるリソースを返すような状況下では、
+リソース固有のスコープは意味があるかもしれません。
 
-Some examples for standard and resource-specific scopes:
+標準とリソース固有のスコープの例を以下に示します。
 
 [cols="25%,20%,20%,35%",options="header",]
 |=======================================================================
@@ -79,11 +78,8 @@ Some examples for standard and resource-specific scopes:
 |`sales-order.shipment_order.read`
 |=======================================================================
 
-After scopes names are defined and the scope is declared in the security
-definition at the top of an API specification, it should be assigned to
-each API operation by specifying a
-https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#securityRequirementObject[`security`
-requirement] like this:
+スコープ名を定義し、スコープをAPI仕様の先頭でセキュリティ定義として宣言したら、
+https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#securityRequirementObject[`セキュリティ` 要求] を記述して、以下のように各API操作に割り当てます。
 
 [source,yaml]
 ----
@@ -96,10 +92,9 @@ paths:
           - sales-order-service.sales_order.read
 ----
 
-In very rare cases a whole API or some selected endpoints may not
-require specific access control. However, to make this explicit you
-should assign the `uid` pseudo access right scope in this case. It is
-the user id and always available as OAuth2 default scope.
+非常にレアケースですが、API全体または、その内いくつかのエンドポイントが、特定のアクセス制御を必要としない
+ことがあります。しかし、この場合も `uid` の疑似アクセス権スコープを明示的に割り当てるようにすべきです。
+これはユーザIDで、OAuth2のデフォルトスコープとして常に利用できます。
 
 [source,yaml]
 ----
@@ -113,5 +108,5 @@ paths:
           - uid
 ----
 
-Hint: you need not explicitly define the "Authorization" header; it is a
-standard header so to say implicitly defined via the security section.
+ヒント: "Authorization" ヘッダを明示的に定義する必要はありません。
+セキュリティセクションが定義されていれば、暗黙的にそれは標準ヘッダとなるからです。

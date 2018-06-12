@@ -101,13 +101,9 @@ to use names for product attributes, instead of UUIDs
 * レガシーなIDの後方互換サポートと競合するかもしれない
 
 UUIDはID生成がボトルネックとなるようなときまで避けるべきです。
-代わりに、例えば(IDリソースへのPOSTとエンティティリソースへの冪等なPUT)。
-
-Instead, for instance, server side support with id generation can be
-preferred (POST on id resource, followed by idempotent PUT on entity
-resource). Usage of UUIDs is especially discouraged as primary keys of
-master and configuration data, like brand-ids or attribute-ids which
-have low id volume but widespread steering functionality.
+代わりに、例えばIDリソースへのPOSTしてID生成してから、エンティティリソースへの冪等なPUTをする
+ようにできます。
+特にUUIDをマスタデータや設定データの主キーといて使うことは控えましょう。
 
 どんな場合も、IDには数値型よりも文字列型を常に使うべきです。
 これはIDの体系が進化していくときに、自由度が高くなるからです。

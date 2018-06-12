@@ -1,16 +1,16 @@
 [[appendix-references]]
 [appendix]
-= References
+= リファレンス
 
-This section collects links to documents to which we refer, and base our guidelines on.
+私たちが参考にし、ガイドラインのベースにした文書へのリンク集です。
 
 [[openapi-specification]]
-== OpenAPI Specification
+== OpenAPI 仕様
 
 * https://github.com/OAI/OpenAPI-Specification/[OpenAPI Specification]
 
 [[publications-specifications-and-standards]]
-== Publications, specifications and standards
+== 標準仕様
 
 * https://tools.ietf.org/html/rfc3339[RFC 3339: Date and Time on the Internet: Timestamps]
 * https://tools.ietf.org/html/rfc5988[RFC 5988: Web Linking]
@@ -25,20 +25,18 @@ This section collects links to documents to which we refer, and base our guideli
 * https://tools.ietf.org/html/bcp47[BCP 47: Tags for Identifying Languages]
 
 [[dissertations]]
-== Dissertations
+== 論文
 
 * http://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm[Roy Thomas Fielding - Architectural Styles and the Design of Network-Based Software Architectures]. This is the text which defines what REST is.
 
 [[books]]
-== Books
+== 書籍
 
 * http://www.amazon.de/REST-Practice-Hypermedia-Systems-Architecture/dp/0596805829[REST in Practice: Hypermedia and Systems Architecture]
 * https://leanpub.com/build-apis-you-wont-hate[Build APIs You Won't Hate]
 * http://www.infoq.com/minibooks/emag-web-api[InfoQ eBook - Web APIs: From Start to Finish]
 
 [[blogs]]
-== Blogs
+== ブログ
 
 * http://restful-api-design.readthedocs.org/en/latest/[Lessons-learned blog: Thoughts on RESTful API Design]
-
-

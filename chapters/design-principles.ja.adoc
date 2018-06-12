@@ -15,12 +15,10 @@ RESTful APIは、固有のユースケースからは切り離され、クライ
 
 * 私たちはJSONペイロードをもったRESTベースのAPIを好む
 * 私たちはシステムが、真にRESTfulになることを好む
-
 footnoteref:[fielding-restful,R.Fieldingの定義だと、REST APIはHATEOAS(レベル3)をサポート
 しなくてはなりません。
 私たちのガイドラインは、完全なREST準拠はさほど推奨していません。
 (<<hypermedia>>)で示すような限定的なハイパーメディアの使い方をしています。
-
 それでもなお"RESTful API"という言葉を私たちは使います。
 他に確立された用語はないし、Webサービス業界ではRESTっぽいものをそう呼んでいるからです。
 事実、HATEOASへの完全準拠したAPIは非常に数少ないのが現状です。]

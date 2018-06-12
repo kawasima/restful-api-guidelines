@@ -28,15 +28,15 @@ API(またはAPIのバージョン)を停止する前に、すべてのクライ
 
 APIの廃止予定は、OpenAPI定義に含まれなくてはなりません。
 とあるメソッド、パス全体、(複数のパス含む)APIエンドポイントまるごと、いずれにしても
-それらを廃止予定とするならば、メソッド/パスエレメントそれぞれに`deprecated=true`を
+それらを廃止予定とするならば、メソッド/パスエレメントそれぞれに `deprecated=true` を
 設定しなければなりません。
 (OpenAPI 2.0ではこのレベルでしか廃止予定は定義できません)
 もし廃止予定が(クエリパラメータ、ペイロードなど)より詳細なレベルで必要であれば、
-影響するメソッド/パスエレメントに`deprecated=true`を設定したうえで、
-`description`に説明書きを加えます。
+影響するメソッド/パスエレメントに `deprecated=true` を設定したうえで、
+`description` に説明書きを加えます。
 
-`deprecated`に`true`が設定されたら、クライアントが代わりに使うべきものや
-APIがいつ廃止されるのかを、API定義の`description`に記述しなければなりません。
+`deprecated` に `true` が設定されたら、クライアントが代わりに使うべきものや
+APIがいつ廃止されるのかを、API定義の `description` に記述しなければなりません。
 
 [#188]
 == {MUST} 廃止予定APIの利用状況をモニタリングする
@@ -48,10 +48,10 @@ APIがいつ廃止されるのかを、API定義の`description`に記述しな�
 [#189]
 == {SHOULD} レスポンスに警告ヘッダを付ける
 
-廃止予定フェーズの間、`Warning` ヘッダを付けましょう。
+廃止予定フェーズの間、 `Warning` ヘッダを付けましょう。
 (https://tools.ietf.org/html/rfc7234#section-5.5[RFC 7234 - Warning
 header] をみてください)。
-`Warning`が付いていたら、`warn-code`は`299`を指定し、`warn-text`は
+`Warning` が付いていたら、 `warn-code` は `299` を指定し、 `warn-text` は
 _"The path/operation/parameter/... \{name} is deprecated and will be removed
 by \{date}. Please see \{link} for details."_ の形式にしましょう。
 link先は、なぜAPIがもはやサポートされないかと、クライアントがすべきことを記述した
@@ -59,9 +59,9 @@ link先は、なぜAPIがもはやサポートされないかと、クライア�
 `Warning`ヘッダを付加しても、クライアントに対しAPI停止の同意を得たとはいえません。
 
 [#190]
-== {SHOULD} 警告ヘッダのモニタリングを追加する Add Monitoring for Warning Header
+== {SHOULD} 警告ヘッダのモニタリングを追加する
 
-クライアントはHTTPレスポンスの`Warning`ヘッダをモニタリングし、
+クライアントはHTTPレスポンスの `Warning` ヘッダをモニタリングし、
 APIが将来廃止されることがあるかどうかを注視してください。
 
 [#191]

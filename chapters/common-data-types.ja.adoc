@@ -1,7 +1,7 @@
 [[common-data-types]]
 = 共通のデータ型
 
-Definitions of data objects that are good candidates for wider usage:
+広く利用されるデータオブジェクトの定義です。
 
 [#173]
 == {SHOULD} 共通のお金オブジェクトを使う
@@ -58,23 +58,18 @@ OpenAPIフォーマットの標準ではないけれど、パーサがnumberをf
 どんなときでも適用可能な共通のフィールド名とセマンティクスを使わなければなりません。
 
 [[generic-fields]]
-=== Generic Fields
+=== 一般的なフィールド
 
 APIに繰り返し出てくるフィールドは以下のようなものです。
 
 * `id`: オブジェクトのID。 IDは数値でなく文字列でなくてはなりません。IDは文書化されているコンテキストの範囲でユニークかつ不変です。一度オブジェクトに付与されたら変更されてはならないし、再利用してもいけません。
-If used, IDs must be opaque strings and
-not numbers. IDs are unique within some documented context, are stable
-and don't change for a given object once assigned, and are never
-recycled cross entities.
 * `xyz_id`: オブジェクトが別のオブジェクトのIDを持つ場合、相手オブジェクト名に`_id`を付与した名前を使いましょう。 (e.g. `customer_number`ではなく`customer_id`; 子ノードから親ノードを参照する場合は、たとえ両方が`Node`型であっても、`parent_node_id`とします)
 * `created`: オブジェクトが作られた日時。`date-time`型でなくてはなりません。
 * `modified`: オブジェクトが更新された日時。`date-time`型でなくてはなりません。
-* `type`: オブジェクトの種類。このフィールドの型はstringとするべきです。 If used, the type of this
-field should be a string. Types allow runtime information on the entity
-provided that otherwise requires examining the Open API file.
+* `type`: オブジェクトの種類。このフィールドの型はstringとするべきです。
+typeはエンティティについてのランタイム情報を与えます。
 
-Example JSON schema:
+JSONスキーマの例:
 
 [source,json]
 ----
@@ -82,21 +77,21 @@ tree_node:
   type: object
   properties:
     id:
-      description: the identifier of this node
+      description: このノードの識別子
       type: string
     created:
-      description: when got this node created
+      description: このノードがいつ作られたか
       type: string
       format: 'date-time'
     modified:
-      description: when got this node last updated
+      description: このノードが最後に更新されたのはいつか
       type: string
       format: 'date-time'
     type:
       type: string
       enum: [ 'LEAF', 'NODE' ]
     parent_node_id:
-      description: the identifier of the parent node of this node
+      description: このノードの親ノードの識別子
       type: string
   example:
     id: '123435'
@@ -202,9 +197,5 @@ address:
     - country_code
 ----
 
-特定データにおけるフィールドのグルーピングやカーディナリティは、特定のユースケースに基づいています。
+特定データ型におけるフィールドのグルーピングやカーディナリティは、特定のユースケースに基づいています。
 (例えば、宛先をモデル化するときは受取人と住所のフィールドの組み合わせをるけれども、ユーザと住所をモデル化するときは、受取人と住所は別にする、ということです)
-Grouping and cardinality of fields in specific data types may vary based
-on the specific use case (e.g. combining addressee and address fields
-into a single type when modeling an address label vs distinct addressee
-and address types when modeling users and their addresses).

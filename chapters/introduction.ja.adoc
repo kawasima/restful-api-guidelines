@@ -35,7 +35,7 @@ APIファーストは品質に直結する標準を網羅しつつ、軽量な�
 これは https://www.ietf.org/rfc/rfc2119.txt[RFC 2119]の解釈と同様です。
 
 [[zalando-specific-information]]
-== Zalando specific information
+== Zalando固有の情報
 
 私たちの「RESTful API ガイドライン」の目的は、「一貫したAPIのルックアンドフィール」の品質水準を定めることにあります。チームはAPIの開発においては、このガイドラインを守っていく責務がありますし、またプルリクエストを投げてガイドラインを進化させていくことが求められます。
 
