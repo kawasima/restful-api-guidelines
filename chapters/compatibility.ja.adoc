@@ -36,10 +36,8 @@ APIの設計者は後方互換性を維持しつつ、でRESTful APIを進化さ
 * サーバサイドのビジネスロジックでバリデーションしなきゃいけないような(複雑な)制約をもつ入力フィールド。バリデーションロジックは、より厳しくなる方向には変更してはいけません。すべての制約はdescriptionに明示します。
 * 入力パラメータとして使われる列挙型の要素は、サーバが古い値も受け付けて正しくハンドリングできる場合のみ減らすことができる。出力パラメータとして使われる列挙型はいつでも減らすことはできる。
 * 出力パラメータとして使われる列挙型は、クライアントがハンドリングできないかもしれないので追加してはならない。入力パラメータとして使われる列挙型はいつでも追加できる。
-* <<112,`x-extensible-enum`>>を使う。
-if range is used for output parameters and likely to be extended with
-growing functionality. It defines an open list of explicit values and
-clients must be agnostic to new values.
+* 出力パラメータととして使用され将来の拡張も考えておきたい場合は、<<112,`x-extensible-enum`>>を使う。
+明示的に値を上限なしリストと定義し、クライアントは新しい値には依存しない設計をしなければならない。
 * URLを変更するときはリダイレクションをサポートする
 (https://en.wikipedia.org/wiki/HTTP_301[301 Moved Permanently]).
 
@@ -110,27 +108,27 @@ JSONオブジェクトは属性を追加することによって、互換性を�
 == {MUST} Open APIの定義をデフォルトで拡張に対してオープンであるかのうように扱う
 
 Open API 2.0仕様では、オブジェクトのデフォルト拡張についてはあまり仕様化されておらず、
-拡張に関しては`additionalProperties`のように、JSONスキーマキーワードを再定義したものになっています。
+拡張に関しては `additionalProperties` のように、JSONスキーマキーワードを再定義したものになっています。
 私たちの互換性ガイドライン全般にしたがうと、Open APIオブジェクト定義は、JSONスキーマの
 http://json-schema.org/latest/json-schema-validation.html#rfc.section.5.18[Section
 5.18 "additionalProperties"] のようにデフォルトで拡張に対してオープンであるとみなすことができます。
 
 Open API 2.0に関していえば、
-これは`additionalProperties`宣言が、オブジェクト定義を拡張可能にする必要がないことを意味します。
+これは `additionalProperties` 宣言が、オブジェクト定義を拡張可能にする必要がないことを意味します。
 
-* データを受け取るAPIクライアントが、`additionalProperties`宣言が無いからといって、
+* データを受け取るAPIクライアントが、 `additionalProperties` 宣言が無いからといって、
 拡張がされないものと仮定してはならないし、サーバから送られてきた処理できないフィールドは
 無視しなくてはならない。そうすることで、APIサーバはデータフォーマットを拡張していけるようになる。
 * APIサーバが予期しないデータを受け取るときは、ちょっと事情が異なる。フィールドを無視する代わりに
 クライアントにこれらのフィールドが保存されなかったことを通知するために、
-サーバは定義されていないフィールドを含むリクエストを拒否＿してもよい＿。
+サーバは定義されていないフィールドを含むリクエストを拒否 ＿してもよい＿。
 API設計者はPUT/POST/PATCHリクエストについて、予期しないフィールドをどう扱うか、
 ドキュメントに明記しなければならない。
 
-APIフォーマットは`additionalProperties`をfalseと宣言してはなりません。将来的にオブジェクトが拡張されるのを防ぐためです。
+APIフォーマットは `additionalProperties` をfalseと宣言してはなりません。将来的にオブジェクトが拡張されるのを防ぐためです。
 
 このガイドラインはデフォルトの拡張可能性に焦点を当てているのであって、
-ある状況下では単なる値として`additionalProperties`を使うことを否定はしていません。
+ある状況下では単なる値として `additionalProperties` を使うことを否定はしていません。
 
 [#112]
 == {SHOULD} 列挙型の代わりに、上限なしの値リスト(x-extenible-enum)を使う
@@ -144,7 +142,7 @@ APIフォーマットは`additionalProperties`をfalseと宣言してはなり�
 1. 例えば値のリストが外部のツールやインタフェースに依存しないなど、APIが列挙型の値を完全に制御できる
 2. 将来の機能を考慮可能、不可能に関わらず完全な値リストである
 
-上限なしの値リストを特定するために、次のように`x-extensible-enum`のマーカーを使います。
+上限なしの値リストを特定するために、次のように `x-extensible-enum` のマーカーを使います。
 
 [source,yaml]
 ----
@@ -183,8 +181,7 @@ APIバージョニングを避けられないのであれば、(URIバージョ�
 メディアタイプバージョニング: バージョン情報とメディアタイプは、Content-TypeのHTTPヘッダで与えられます。
 例えば application/x.zalando.cart+json;version=2 のように。
 非互換な変更があるときは、リソースに新しいメディアタイプバージョンがふられます。
-新しいバージョンを生成するために(To generate the new
-representation version,)、コンシューマとプロデューサはContent-TypeとAcceptのHTTPヘッダを使って
+新しいバージョンを生成するために、コンシューマとプロデューサはContent-TypeとAcceptのHTTPヘッダを使って
 コンテントネゴシエーションできるのです。
 注意: このバージョニングはURIやメソッドには適用できません。リクエストおよびレスポンスのコンテントスキーマにのみ適用可能です。
 

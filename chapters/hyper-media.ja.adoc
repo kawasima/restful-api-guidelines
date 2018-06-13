@@ -55,29 +55,28 @@ HATEOASはSOAクライアントエンジニアにとって、APIの自己記述�
 [#217]
 == {MUST} 絶対URIを使う
 
-Links to other resource must always use full, absolute URI.
+他のリソースへのリンクは、絶対URIでなくてはなりません。
 
-*Motivation*: Exposing any form of relative URI (no matter if the relative
-URI uses an absolute or relative path) introduces avoidable client side
-complexity. It also requires clarity on the base URI, which might not be given
-when using features like embedding subresources. The primary advantage
-of non-absolute URI is reduction of the payload size, which is better
-achievable by following the recommendation to use <<156,gzip compression>>
+*動機*: 相対URI (相対URLが絶対パスを使おうが相対パスを使おうが) の形式を露出させると、
+クライアントサイドでは複雑性の混入を避けることができません。
+埋め込みサブリソースのような機能を使うときは、絶対URIが与えられないとすれば、
+ベースURIを明確にする必要があります。
+絶対URIを使わないことの利点は、ペイロードサイズを小さくできること程度ですが、
+それならば <<156,GZip圧縮>>を使った方がよいでしょう。
 
 [#164]
 == {MUST} 共通のハイパーテキストコントロールを使う
 
-When embedding links to other resources into representations you must
-use the common hypertext control object. It contains at least one
-attribute:
+他のリソースへのリンクを埋め込むとき、共通のハイパーテキストコントロールオブジェクトを
+使わなくてはなりません。ハイパーテキストコントロールオブジェクトには、少なくとも1つの属性が含まれます。
 
-* `href`: The URI of the resource the hypertext control is linking to.
-All our API are using HTTP(s) as URI scheme.
+* `href`: ハイパーテキストコントロールがリンクしているリソースのURI。
+私たちのすべてのAPIは、URIスキームとして HTTP(s) を使っている。
 
-In API that contain any hypertext controls, the attribute name `href` is
-reserved for usage within hypertext controls.
+どんなハイパーテキストコントロールを含むAPIにおいても、
+属性名 `href` はハイパーテキストコントロールの範囲内での使用用途で予約語となります。
 
-The schema for hypertext controls can be derived from this model:
+ハイパーテキストコントロールのスキーマは、以下のモデルから導き出されます。
 
 [source,yaml]
 ----
@@ -92,25 +91,22 @@ HttpLink:
   required: [ "href" ]
 ----
 
-The name of an attribute holding such a `HttpLink` object specifies the
-relation between the object that contains the link and the linked
-resource. Implementations should use names from the
-http://www.iana.org/assignments/link-relations/link-relations.xhtml[IANA
-Link Relation Registry] whenever appropriate. As IANA link relation
-names use hyphen-case notation, while this guide enforces snake_case
-notation for attribute names, hyphens in IANA names have to be replaced
-with underscores (e.g. the IANA link relation type `version-history`
-would become the attribute `version_history`)
+`HttpLink` のようなオブジェクトをもつ属性の名前は、リンクとリンク先のリソースを含む
+オブジェクトとの関係を明記します。
+実装は http://www.iana.org/assignments/link-relations/link-relations.xhtml[IANA
+Link Relation Registry] から適切なものを選んで、その名前を使うべきです。
+このガイドでは属性名にはスネークケースが使われていますが、
+IANAのリンクリレーション名は、ハイフンケース表記が使われています。IANA名のハイフンは、
+アンダースコアに変換しなければなりません。
+(例えば、IANAリンクリレーションタイプ `version-history` は属性 `version_history` になります)
 
-Specific link objects may extend the basic link type with additional
-attributes, to give additional information related to the linked
-resource or the relationship between the source resource and the linked
-one.
+特定のリンクオフジェクトは、リンクに加えて、
+リンク先のリソースに関する追加情報や、リンク元のリソースとリンク先のリソースの関係など、
+その他の属性を含ませることができます。
 
-E.g. a service providing "Person" resources could model a person who is
-married with some other person with a hypertext control that contains
-attributes which describe the other person (`id`, `name`) but also the
-relationship "spouse" between the two persons (`since`):
+例えば、"Person" リソースを提供するサービスは、他の誰かと結婚していることを、
+その結婚相手の (`id`, `name`) だけでなく、いつから配偶者関係にあるかを示す (`since`)
+などを含んだハイパーテキストコントロールでモデル化します。
 
 [source,json]
 ----
@@ -126,28 +122,26 @@ relationship "spouse" between the two persons (`since`):
 }
 ----
 
-Hypertext controls are allowed anywhere within a JSON model. While this
-specification would allow
-http://stateless.co/hal_specification.html[HAL], we actually don't
-recommend/enforce the usage of HAL anymore as the structural separation
-of meta-data and data creates more harm than value to the
-understandability and usability of an API.
+ハイパーテキストコントロールは、JSONモデルの範囲ではどこでも使えます。
+この仕様においては http://stateless.co/hal_specification.html[HAL] が
+使用可能ですが、APIの理解しやすさや使いやすさがもたらす価値よりも、
+メタデータとデータの構造的な分離の有害さが上回るため、私たちはHALはおすすめいないし使いません。
 
 [#165]
-== {SHOULD} Use Simple Hypertext Controls for Pagination and Self-References
+== {SHOULD} ページネーションや自己参照にシンプルなハイパーテキストコントロールを使う
 
-Hypertext controls for pagination inside collections and self-references
-should use a simple URI value in combination with their corresponding
-http://www.iana.org/assignments/link-relations/link-relations.xml[link
-relations] (`next`, `prev`, `first`, `last`, `self`) instead of the
-extensible common hypertext control
+コレクション内でのページネーションや自己参照のためのハイパーテキストコントロールは、
+拡張共通ハイパーテキストコントロールを使うよりも、
+http://www.iana.org/assignments/link-relations/link-relations.xml[リンクリレーション]
+で定義されている (`next`, `prev`, `first`, `last`, `self`)
+組合せたシンプルなURIを使うべきです。
 
-See <<pagination>> for information how to best represent paginateable collections.
+ページネーション可能なコレクションの一番よい表現方法は、 <<pagination>> を見てください。
 
 [#166]
-== {MUST} Not Use Link Headers with JSON entities
+== {MUST} JSONエンティティと一緒にはLinkヘッダは使わない
 
-We don't allow the use of the
-http://tools.ietf.org/html/rfc5988#section-5[`Link` Header defined by
-RFC 5988] in conjunction with JSON media types. We prefer links directly
-embedded in JSON payloads to the uncommon link header syntax.
+私たちは
+http://tools.ietf.org/html/rfc5988#section-5[RFC 5988 で定義された `Link` ヘッダ] は、
+JSONメディアタイプとは同時に使わないようにしています。
+JSONペイロードに直接組み込まれたリンクを、共通化されていないリンクヘッダの文法よりも優先します。

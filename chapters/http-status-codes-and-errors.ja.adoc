@@ -27,11 +27,10 @@ responses:
       $ref: 'https://zalando.github.io/problem/schema.yaml#/Problem'
 ----
 
-API designers should also think about a **troubleshooting board** as part of the
-associated online API documentation. It provides information and handling
-guidance on application-specific errors and is referenced via links from the
-API specification. This can reduce service support tasks and contribute to
-service client and provider performance.
+API設計者は関連するオンラインAPIドキュメントの一部として、
+** トラブルシューティングボード ** について考えなければなりません。
+API固有のエラーについての情報とハンドリングの指針を提供し、API仕様からリンクを通じて参照されるものにもなります。
+これはサービスのサポート業務を減らし、サービス利用者、提供者双方の業績に貢献します。
 
 
 [#150]
@@ -165,37 +164,34 @@ PATCH
 処理結果やエラー状況を返すとき、もっとも適したHTTPステータスコードを使わねばなりません。
 
 [#152]
-== {MUST} Use Code 207 for Batch or Bulk Requests
+== {MUST} バッチリクエストやバルクリクエストには 207 を使う
 
-Some APIs are required to provide either _batch_ or _bulk_ requests
-using POST for performance reasons, i.e. for communication and
-processing efficiency. In this case services may be in need to signal
-multiple response codes for each part of an batch or bulk request. As
-HTTP does not provide proper guidance for handling batch/bulk requests
-and responses, we herewith define the following approach:
+APIには性能上の理由から、つまり通信と処理を効率化する目的で、POSTを使った _バッチ_ または _バルク_ リクエストを
+提供する必要があります。
+この場合、サービスはバッチまたはバルクリクエストの各パートに対応した複数のレスポンスコードを
+通知する必要があるかもしれません。
+HTTPはバッチ/バルクリクエストとレスポンスの扱いに関して、指針を示していないので、
+私たちは次のようなアプローチを定義します。
 
-* A batch or bulk request *always* has to respond with HTTP status code
-*207*, unless it encounters a generic or unexpected failure before
-looking at individual parts.
-* A batch or bulk response with status code 207 *always* returns a
-multi-status object containing sufficient status and/or monitoring
-information for each part of the batch or bulk request.
-* A batch or bulk request may result in a status code 400/500, only if
-the service encounters a failure before looking at individual parts or,
-if an unanticipated failure occurs.
+* バッチ/バルクリクエストには、 *常に* ステータスコード *207* を返さなければならない。
+ただし個々のパートを処理する前にエラーが発生した場合はその限りではない。
+* バッチ/バルクレスポンスは、 *常に* バッチ/バルクリクエストの各パートに関する十分なステータスと
+モニタリング情報を含む、複数状態をもつオブジェクトを、ステータスコード207とともに返す。
+* バッチ/バルクリクエストは、もしサービスが個々のパートを処理する前にエラーが発生したり、
+予期しないエラーが発生した場合は、400/500のステータスコードを返すかもしれない。
 
-The before rules apply _even in the case_ that processing of all
-individual part _fail_ or each part is executed _asynchronously_! They
-are intended to allow clients to act on batch and bulk responses by
-inspecting the individual results in a consistent way.
+すべてのパートで処理が _失敗_ したり、各パートが _非同期に_ 実行される _場合においても_
+このルールが適用されます!
+一貫した方法で、クライアントがバッチ/バルクリクエストの個々の結果を精査しなくてはならない
+ことを意図しています。
 
-*Note*: while a _batch_ defines a collection of requests triggering
-independent processes, a _bulk_ defines a collection of independent
-resources created or updated together in one request. With respect to
-response processing this distinction normally does not matter.
+*注意*: _バッチ_ とは独立した処理を起動するリクエストの集合であり、
+_バルク_ とは1つのリクエストで独立した作成または更新用リソースの集合である、
+と定義しています。処理結果のレスポンスに関していえば、この違いはあまり重要では
+ありません。
 
 [#153]
-== {MUST} レート制限のヘッダには429を使う Use Code 429 with Headers for Rate Limits
+== {MUST} レート制限のヘッダには429を使う
 
 クライアントのリクエストレートをコントロールしたいAPIは、
 http://tools.ietf.org/html/rfc6585['429 Too Many Requests']レスポンス
@@ -204,39 +200,27 @@ http://tools.ietf.org/html/rfc6585['429 Too Many Requests']レスポンス
 そのようなレスポンスは、クライアントにそのような追加の情報を知らせるために、
 ヘッダをセットしなくてはなりません。その手段は次の2つがあります。
 
-* https://tools.ietf.org/html/rfc7231#section-7.1.3['Retry-After'] ヘッダを
-返す。
-* Return a
-https://tools.ietf.org/html/rfc7231#section-7.1.3['Retry-After'] header
-indicating how long the client ought to wait before making a follow-up
-request. The Retry-After header can contain a HTTP date value to retry
-after or the number of seconds to delay. Either is acceptable but APIs
-should prefer to use a delay in seconds.
-* Return a trio of 'X-RateLimit' headers. These headers (described
-below) allow a server to express a service level in the form of a number
-of allowing requests within a given window of time and when the window
-is reset.
+* クライアントが次のリクエストを送るまで、どれくらい待てばよいかを支持するための、https://tools.ietf.org/html/rfc7231#section-7.1.3['Retry-After'] ヘッダを返す。
+Retry-Afterヘッダはリトライできるようになる日時をHTTP dateで表現したものか、
+遅延秒数の何れかを含みます。どちらも許容されますが、APIではは遅延秒数を使うのを
+優先します。
+* 'X-RateLimit' ヘッダトリオを返す。サーバは(後述する)これらのヘッダを使って、与えられたタイムウィンドウ内で
+許容されるリクエストの数や、ウィンドウがいつリセットされるかの形式で、サービスレベルを表現します。
 
-The 'X-RateLimit' headers are:
+'X-RateLimit' ヘッダには、以下のようなものがあります。
 
-* `X-RateLimit-Limit`: The maximum number of requests that the client is
-allowed to make in this window.
-* `X-RateLimit-Remaining`: The number of requests allowed in the current
-window.
-* `X-RateLimit-Reset`: The relative time in seconds when the rate limit
-window will be reset.
+* `X-RateLimit-Limit`: クライアントがこのウィンドウ内で最大リクエストできる数
+* `X-RateLimit-Remaining`: 現在のウィンドウでリクエストできる残数
+* `X-RateLimit-Reset`: レート制限ウィンドウがリセットされるまでの秒数
 
-The reason to allow both approaches is that APIs can have different
-needs. Retry-After is often sufficient for general load handling and
-request throttling scenarios and notably, does not strictly require the
-concept of a calling entity such as a tenant or named account. In turn
-this allows resource owners to minimise the amount of state they have to
-carry with respect to client requests. The 'X-RateLimit' headers are
-suitable for scenarios where clients are associated with pre-existing
-account or tenancy structures. 'X-RateLimit' headers are generally
-returned on every request and not just on a 429, which implies the
-service implementing the API is carrying sufficient state to track the
-number of requests made within a given window for each named entity.
+両方のアプローチを認めている理由は、APIごとに異なるニーズが存在するからです。
+Retry-After は一般的な負荷やリクエストのスロットリングに関しては十分なものですが、
+テナントや指定取引先のような対象毎にスロットを用意する場合においては適していません。
+これによって、リソースオーナーはクライアントのリクエストに関して、管理しなくてはならない状態の数を最小化できるようになります。
+一方、'X-RateLimit'ヘッダは、クライアントが既存の取引先やテナント毎にシナリオを用意するのに適しています。
+'X-RateLimit' ヘッダは一般的に429のときだけでなく、すべてのリクエストに対して付与されます。
+これはそのAPIを実装したサービス与えられたウィンドウで、各スロット対象毎にリクエストの数を
+追跡できる能力があることを暗に示しています。
 
 
 [#176]

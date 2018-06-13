@@ -48,46 +48,27 @@ GETの意味での呼び出しであることを伝えなければなりませ�
 [[put]]
 === PUT
 
-PUTのリクエストは、リソース*全体*の作成、更新に使われます。
-単一のリソース、リソースのコレクション両方が対象です。このPUTの意味は、
-»_、URLが表すリソースを、このオブジェクトで既存のリソースと置き換えてください_« として表現がしっくりきます。
-
-PUT requests are used to create or update *entire* resources - single or
-collection resources. The semantic is best described as »_please put the
-enclosed representation at the resource mentioned by the URL, replacing
-any existing resource._«.
+PUTのリクエストは、リソース *全体* の作成、更新に使われます。
+単一のリソース、リソースのコレクション両方が対象です。PUTリクエストは、
+»_URLが表すリソースを、このオブジェクトで既存のリソースと置き換えてください_«
+という意味になります。
 
 * PUTリクエストは通常はコレクションでなく単一リソースに適用されるものです。
 コレクションに対するPUTは、その全体を置き換えることを暗に意味するからです。
 * PUTリクエストは更新前に暗黙的にリソースの作成をおこなうことによって、
 存在しないリソースに対しても問題を起こしません。
-* PUTリクエストが成功したことは、サーバがペイロードに**
-on successful PUT requests, the server will *replace the entire
-resource* addressed by the URL with the representation passed in the
-payload (subsequent reads will deliver the same payload)
-* successful PUT requests will usually generate 200 or 204 (if the
-resource was updated - with or without actual content returned), and 201
-(if the resource was created)
+* PUTリクエストが成功したら、URLによって表現されるリソース *全体* が更新されるだろう (後続の読み取りにも同じペイロードが返される)。
+* PUTリクエストが成功したら、(更新オブジェクトを返すならば) 200を (何も返さないならば) 204を、
+(リソースが新規に生成された場合は) 201をステータスコードとして返す。
 
 *注意:* PUTリクエストと関連したリソースIDは、クライアントが保持し、URLパスセグメントで受け渡しします。
-同一のリソースに2度PUTしても、
-もしPUTがリソースの作成に適用されたら、リソースIDとしてはURLのみが許可されるべきです。
+同一のリソースに2度PUTしても、冪等である必要があり同じ結果を返さなくてはなりません。
+もしPUTがリソースの作成に適用されたら、リソースIDとしてはURIのみが許可されるべきです。
 もしURIが利用できない場合は、POSTが優先されるべきです。
-*Note:* Resource IDs with respect to PUT requests are maintained by the
-client and passed as a URL path segment. Putting the same resource twice
-is required to be idempotent and to result in the same single resource
-instance. If PUT is applied for creating a resource, only URIs should be
-allowed as resource IDs. If URIs are not available POST should be
-preferred.
 
 PUTを使うときに意図せず同時更新してしまうことを防ぐため、<<182,`ETag` と `If-(None-)Match`>>ヘッダの
 組み合わせで、コンフリクトを表明し変更を失わないようにするために、サーバに厳密な要求を送るようにしましょう。
 <<optimistic-locking>>セクションでもこのアプローチの代替案を記述しています。
-
-To prevent unnoticed concurrent updates when using PUT, the combination
-of <<182,`ETag` and `If-(None-)Match`>> headers should be considered to signal the server
-stricter demands to expose conflicts and prevent lost updates. The section <<optimistic-locking>> also describes some
-alternatives to this approach.
 
 [[post]]
 === POST
@@ -118,67 +99,60 @@ POSTは慣例的には、リソースのコレクションのエンドポイン�
 [[patch]]
 === PATCH
 
-PATCH request are only used for partial update of single resources, i.e.
-where only a specific subset of resource fields should be replaced. The
-semantic is best described as »_please change the resource identified by
-the URL according to my change request_«. The semantic of the change
-request is not defined in the HTTP standard and must be described in the
-API specification by using suitable media types.
+PATCHリクエストは、単一リソースの部分更新にのみ使われます。つまりリソースフィールドの
+特定のサブセットのみが置き換わります。
+そのリクエストは、
+»_この変更リクエストに対応するURLで特定されるリソースを変更してください_«
+という意味になります。
+変更リクエストの意味は、HTTP標準では定義されていないので、適したメディアタイプを使い
+API仕様に記述しなければなりません。
 
-* PATCH requests are usually applied to single resources, and not on
-collection resources, as this would imply patching on the entire
-collection
+* PATCHリクエストは、通常単一リソースに適用される。コレクションリソースに対するPATCHは、
+コレクションまるごとパッチ更新することを暗に示しているので、あまり使われない。
+* PATCHリクエストはリソースインスタンスが存在しないものに対しては、
 * PATCH requests are usually not robust against non-existence of
 resource instances
-* on successful PATCH requests, the server will update parts of the
-resource addressed by the URL as defined by the change request in the
-payload
-* successful PATCH requests will usually generate 200 or 204 (if
-resources have been updated
-* with or without updated content returned)
+* PATCHリクエストが成功したら、ペイロード中の変更リクエストに定義されているとおりに、
+サーバはURLによって指し示されたリソースを更新するだろう。
+* PATCHリクエストが成功したら通常、(更新されたコンテンツを含むならば) 200 を (何も返さないならば) 204のステータスコードを返します。
 
-*Note:* since implementing PATCH correctly is a bit tricky, we strongly
-suggest to choose one and only one of the following patterns per
-endpoint, unless forced by a <<106,backwards compatible change>>.
-In preference order:
+*注意:* PATCHを正しく実装するのは些かトリッキーなので、
+<<106,後方互換性ある変更>> がされる限り、
+私たちはエンドポイントにつき次のパターンのどれか1つを選択するよう強く推奨します。
+好ましい順に並べると:
 
-1.  use PUT with complete objects to update a resource as long as
-feasible (i.e. do not use PATCH at all).
-2.  use PATCH with partial objects to only update parts of a resource,
-whenever possible. (This is basically
-https://tools.ietf.org/html/rfc7396[JSON Merge Patch], a specialized
-media type `application/merge-patch+json` that is a partial resource
-representation.)
-3.  use PATCH with http://tools.ietf.org/html/rfc6902[JSON Patch], a
-specialized media type `application/json-patch+json` that includes
-instructions on how to change the resource.
-4.  use POST (with a proper description of what is happening) instead of
-PATCH if the request does not modify the resource in a way defined by
-the semantics of the media type.
+1.  リソースの更新にはオブジェクトまるごと全体を渡すPUTを使う (つまりPATCHを一切使わない)
+2.  リソースの一部を更新するためだけに、部分的なオブジェクトでPATCHを使う (これは
+https://tools.ietf.org/html/rfc7396[JSON Merge Patch]
+であり、部分的なリソース表現であることを示すために `application/merge-patch+json`
+のメディアタイプを使う)
+3.  http://tools.ietf.org/html/rfc6902[JSON Patch] で規定されたPATCHを使う。
+専用のメディアタイプ `application/json-patch+json` は、リソース変更の方法を
+指示していることを表す。
+4.  メディアタイプで定義された手段で、リクエストがリソースを変更しない場合は、
+PATCHの代わりに (何が起きたかの正しい記述がされた) POSTを使う。
 
-In practice https://tools.ietf.org/html/rfc7396[JSON Merge Patch]
-quickly turns out to be too limited, especially when trying to update
-single objects in large collections (as part of the resource). In this
-cases http://tools.ietf.org/html/rfc6902[JSON Patch] can shown its full
-power while still showing readable patch requests
-(see also http://erosb.github.io/post/json-patch-vs-merge-patch[JSON patch vs. merge]).
+特に https://tools.ietf.org/html/rfc7396[JSON Merge Patch] は、
+特に(リソースの一部として) 巨大なコレクションの中の1つのオブジェクトを更新しようとすると、
+すぐに限界を感じることでしょう。
+この場合、 http://tools.ietf.org/html/rfc6902[JSON Patch] が可読性のあるPATCHリクエストである限りは有効な手段です。
+(http://erosb.github.io/post/json-patch-vs-merge-patch[JSON patch vs. merge] をみてください)。
 
-To prevent unnoticed concurrent updates when using PATCH, the
-combination of <<182,`ETag`and `If-Match`>> headers should be considered to
-signal the server stricter demands to expose conflicts and prevent lost updates.
+PATHを使うとき、気付かずに同時更新してしまうのを防ぐために、
+<<182,`ETag` と `If-Match`>>ヘッダを組み合わせて、コンフリクトを避け、
+変更内容がロストしないようにすることを検討してください。
 
 [#delete]
 === DELETE
 
-DELETE request are used to delete resources. The semantic is best
-described as »_please delete the resource identified by the URL_«.
+DELETEリクエストはリソースの削除に使われ、
+»_URLによって特定されるリソースを削除してください_«
+ということを意味します。
 
-* DELETE requests are usually applied to single resources, not on
-collection resources, as this would imply deleting the entire collection
-* successful DELETE request will usually generate 200 (if the deleted
-resource is returned) or 204 (if no content is returned)
-* failed DELETE request will usually generate 404 (if the resource
-cannot be found) or 410 (if the resource was already deleted before)
+* DELETEリクエストは、通常単一リソースに適用される。コレクションリソースに対するDELETEは、
+コレクションまるごと削除することを暗に示しているので、あまり使われない。
+* DELETEリクエストが成功したら通常、(削除されたリソースを返すならば) 200を、(何も返さないならば) 204のステータスコードを使う。
+* DELETEリクエストが失敗したら通常、(リソースが見つからない場合は) 404を、(リソースが既に削除済みならば) 410のステータスコードを使う。
 
 [[head]]
 === HEAD

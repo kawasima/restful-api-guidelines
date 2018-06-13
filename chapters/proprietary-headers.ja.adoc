@@ -64,25 +64,24 @@ HTTPヘッダフィールド名は、大文字・小文字を区別しないこ�
 |X-Frontend-Type |String |消費者接点のアプリケーション(Consumer facing applications; CFAs)
 は、モバイルアプリやブラウザアプリのような異なるフロントエンドのアプリケーションを通じて、
 カスタマにビジネスエクスペリエンスを提供する。
-Info should be
-passed-through as generic aspect -- there are diverse concerns, e.g.
-pushing mobiles with specific coupons, that make use of it. Current
-range is mobile-app, browser, facebook-app, chat-app |mobile-app
+例えば特定のクーポンをモバイルにプッシュし使わせるような。
+現在、mobile-app, browser, facebook-app, chat-app が使える。
+|mobile-app
 
-|X-Device-Type |String |There are also use cases for steering customer
-experience (incl. features and content) depending on device type. Via
-this header info should be passed-through as generic aspect. Current
-range is smartphone, tablet, desktop, other |tablet
+|X-Device-Type |String |デバイスの種類に依存した (機能やコンテンツを含む) カスタマエクスペリエンスを
+提供するようなユースケースがある。
+このヘッダ情報がその観点で使われるべきである。現在は、smartphone, tablet, desktop, otherが使える。
+|tablet
 
-|X-Device-OS |String |On top of device type above, we even want to
-differ between device platform, e.g. smartphone Android vs. iOS. Via
-this header info should be passed-through as generic aspect. Current
-range is iOS, Android, Windows, Linux, MacOS |Android
+|X-Device-OS |String |前述のデバイス種類の上で、デバイスプラットフォーム、例えば
+AndroidかiOSかといったようなその違いをハンドリングしたい場合は、これを使う。
+現在はiOS, Android, Windows, Linux, MacOSが使える。
+|Android
 
-|X-App-Domain |Integer |The app domain (i.e. shop channel context) of
-the request. Note, app-domain is a legacy concept that will be replaced
-in new platform by combinations of main CFA concerns like retailer,
-sales channel, country |16
+|X-App-Domain |Integer |リクエストのアプリケーションドメイン。
+app-domainはレガシーな概念で、新しいプラットフォームでは小売、販売チャネル、国のような
+CFAの主要な関心事の組合せに置き換わるだろう。
+|16
 |=======================================================================
 
 *例外:* このガイドラインの唯一の例外は、 <<153>> の定義として使われる hop-by-hopの

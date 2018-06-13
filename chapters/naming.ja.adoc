@@ -41,11 +41,11 @@ Disposition-Notification-Options
 Original-Message-ID
 ----
 
-See also: http://tools.ietf.org/html/rfc7230#page-22[HTTP Headers are
-case-insensitive (RFC 7230)].
+参考: http://tools.ietf.org/html/rfc7230#page-22[HTTPヘッダは大文字・小文字を区別しない (RFC 7230)]
 
-See <<common-headers>> and <<proprietary-headers>> sections for more guidance
-on HTTP headers.
+
+<<common-headers>> と <<proprietary-headers>> の章に、HTTPヘッダに関する
+ガイダンスがもう少しあるので参照ください。
 
 [#134]
 == {MUST} リソース名は複数形にする

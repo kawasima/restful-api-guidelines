@@ -166,7 +166,3 @@ info:
   version: 1.2.4
   <...>
 ----
-
-オーディエンスグループに関する詳細とより多くの情報は、
-https://docs.google.com/document/d/1ff9b6oIa6dyQRyaj36-jmFdtCjWlngnGMsligR4RMIY[
-APIオーディエンス物語]にあります

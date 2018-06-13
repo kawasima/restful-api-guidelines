@@ -40,21 +40,21 @@ mapのキーは、命名<<118,ルール 118>>の意味ではプロパティ名�
 definitions:
   Message:
     description:
-      A message together with translations in several languages.
+      いくつかの言語に翻訳したメッセージ
     type: object
     properties:
       message_key:
         type: string
-        description: The message key.
+        description: メッセージのキー
       translations:
         description:
-          The translations of this message into several languages.
-          The keys are https://tools.ietf.org/html/bcp47[BCP-47 language tags].
+          このメッセージをいくつかの言語に翻訳したもの。
+          キーは https://tools.ietf.org/html/bcp47[BCP-47 言語タグ] である。
         type: object
         additionalProperties:
           type: string
           description:
-            the translation of this message into the language identified by the key.
+            キーによって識別された言語に、このメッセージを翻訳したもの
 ```
 
 実際のJSONオブジェクトは次のようなものです。
@@ -98,13 +98,12 @@ booleanの代わりに列挙型を使うことを強く奨めます。
 [#124]
 == {SHOULD} 空のArray値はnullにはしない
 
-Arrayが空であることは`[]`として曖昧さなく表現できます。
+Arrayが空であることは `[]` として曖昧さなく表現できます。
 
 [#125]
 == {SHOULD} 列挙型はStringとして表現する
 
-Strings are a reasonable target for values that are by design
-enumerations.
+Stringは列挙型で設計された値を表現するには妥当な型です。
 
 [#126]
 == {SHOULD} 日付型のプロパティ値はRFC 3339に準拠する
@@ -135,13 +134,10 @@ https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#data-ty
 判別できません。日時文字列は冗長でパースが必要ですが、この曖昧さを避けるために必要なことなのです。
 
 [#127]
-== {MAY} 期間(durations and intervals)はISO8601に準拠する
+== {MAY} 期間(duration)と時間間隔(interval)はISO8601に準拠する
 
-ISO 8601で推奨されているフォーマット
-Schema based JSON properties that are by design durations and intervals
-could be strings formatted as recommended by ISO 8601
-(https://tools.ietf.org/html/rfc3339#appendix-A[Appendix A of RFC 3339
-contains a grammar] for durations).
+期間と時間間隔の設計は、ISO 8601で推奨されている形式の文字列を使います。
+(期間については https://tools.ietf.org/html/rfc3339#appendix-A[付録A RFC 3339に文法が含まれます] )
 
 [#128]
 == {MAY} 標準の言語、国、通貨コードを使う

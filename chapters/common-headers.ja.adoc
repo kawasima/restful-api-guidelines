@@ -113,31 +113,34 @@ https://tools.ietf.org/html/rfc7240[RFC7240]
 [#182]
 == {MAY} If-Match/If-None-MatchヘッダともにEtagを使う
 
-When creating or updating resources it may be necessary to expose
-conflicts and to prevent the 'lost update' or 'initially created' problem.
-Following https://tools.ietf.org/html/rfc7232[RFC 7232 "HTTP: Conditional Requests"]
-this can be best accomplished by using the
-https://tools.ietf.org/html/rfc7232#section-2.3[`ETag`] header together
-with the https://tools.ietf.org/html/rfc7232#section-3.1[`If-Match`] or
-https://tools.ietf.org/html/rfc7232#section-3.2[`If-None-Match`] conditional header. The
-contents of an `ETag: <entity-tag>` header is either (a) a hash of the
-response body, (b) a hash of the last modified field of the entity, or
-(c) a version number or identifier of the entity version.
+リソースが作成、更新されるときは、コンフリクトの発生を検知し、'更新データのロスト'や
+'重複して作成される'問題を防ぐ必要があります。
+https://tools.ietf.org/html/rfc7232[RFC 7232 "HTTP: Conditional Requests"]
+にしたがい、
+https://tools.ietf.org/html/rfc7232#section-2.3[`ETag`]
+ヘッダを
+https://tools.ietf.org/html/rfc7232#section-3.1[`If-Match`]
+または
+https://tools.ietf.org/html/rfc7232#section-3.2[`If-None-Match`]
+の条件ヘッダとともに使うことで、それが出来るようになります。
+`ETag: <entity-tag>` ヘッダの内容は、(a) レスポンスボディのハッシュ値か、
+(b) エンティティの最終更新日時フィールドのハッシュ値、(c) エンティティのバージョンの
+番号または識別子の何れかにします。
 
-To expose conflicts between concurrent update operations via PUT, POST,
-or PATCH, the `If-Match: <entity-tag>` header can be used to force the
-server to check whether the version of the updated entity is conforming
-to the requested `<entity-tag>`. If no matching entity is found, the
-operation is supposed a to respond with status code 412 - precondition
-failed.
+PUT, POST, PATCHの同時更新操作でコンフリクトが発生したことを検出するために、
+サーバは `If-Match: <entity-tag>` ヘッダがあれば、更新エンティティのバージョンが、
+リクエストの `<entity-tag>` と一致しているかをチェックしなければなりません。
+もし一致するエンティティがなければ、412 - precondition failed のステータスコードを
+返すようにします。
 
-Beside other use cases, the `If-None-Match:` header with parameter `*`
-can be used in a similar way to expose conflicts in resource creation.
-If any matching entity is found, the operation is supposed a to respond
-with status code 412 - precondition failed.
+他のユースケース、
+リソース生成時にコンフリクトを検出する方法としては、
+`If-None-Match:` ヘッダに `*` のパラメータを使います。
+もしエンティティにマッチするものがあれば、既に同じリソースが作成されていることを
+示すので、412 - precondition failed のステータスコードを返します。
 
-The `ETag`, `If-Match`, and `If-None-Match` headers can be defined as
-follows in the API definition:
+`ETag`, `If-Match`, `If-None-Match` ヘッダは、API定義においては次のように
+定義されます。
 
 [source,yaml]
 ----

@@ -13,12 +13,10 @@
 キーベース — ページネーション: 単一のキー要素で最初のページエントリを特定する
 (https://developers.facebook.com/docs/graph-api/using-graph-api/v2.4#paging[Facebookのガイド]も見てください)
 
-The technical conception of pagination should also consider user
-experience related issues. As mentioned in this
-https://www.smashingmagazine.com/2016/03/pagination-infinite-scrolling-load-more-buttons/[article],
-jumping to a specific page is far less used than navigation via
-next/previous page links. This favours cursor-based over offset-based
-pagination.
+ページネーションの技術的概念は、問題がユーザエクスペリエンスと結びついていることも考慮しなければなりません。
+この https://www.smashingmagazine.com/2016/03/pagination-infinite-scrolling-load-more-buttons/[記事] で述べられているとおり、
+特定のページへのジャンプは、「前へ」「次へ」のページリンクよりもかなり使われることはありません。
+それがオフセットベースのページネーションよりも、カーソルベースのページネーションを指向したい理由です。
 
 [#160]
 == {SHOULD} Offsetベースのページネーションを避け、カーソルベースのページネーションを使う
@@ -33,21 +31,15 @@ pagination.
 ** オフセットベースのページネーションはカーソルベースよりもよく知られており、フレームワークがサポートしていたり、APIクライアントで簡単に使えたりする
 * ユースケース: とあるページへジャンプする
 ** (100ページ中の51ページのように) 特定のページにジャンプするようなユースケースは、カーソルベースでは実現できない
-* Variability of data may lead to anomalies in result pages
-** Offset-based pagination may create duplicates or lead to missing
-entries if rows are inserted or deleted between two subsequent paging
-requests.
-** When using cursor-based pagination, paging cannot continue when the
-cursor entry has been deleted while fetching two pages
-* Performance considerations - efficient server-side processing using
-offset-based pagination is hardly feasible for:
-** Higher data list volumes, especially if they do not reside in the
-database’s main memory
-** Sharded or NoSQL databases
-* Cursor-based navigation may not work if you need the total count of
-results and / or backward iteration support
+* データの変更は結果セットのページに異常を引き起こす可能性がある
+** オフセットベースのページネーションは、ページ遷移の間に更新や削除がされると、結果の重複やロストを引き起こす可能性がある。
+** カーソルベースのページネーションを使うときは、2つのページを取得する間にカーソルの指し示すエンティティの削除がおこなわれると、ページングを継続することはできない。
+* パフォーマンスの考慮 - オフセットベースのページネーションを使ったサーバ処理は効率的に実行するのが難しい
+** データベースのメインメモリにデータが存在しない場合は特に、コストの高い処理になる。
+** 共有データベースかNoSQLか?
+* カーソルベースのナビゲーションは、結果の総件数が必要だったり、後方へのページネーションをサポートする必要がある場合には実現できないかもしれません。
 
-Further reading:
+さらには以下の文書もあります:
 
 * https://dev.twitter.com/rest/public/timelines[Twitter]
 * http://use-the-index-luke.com/no-offset[Use the Index, Luke]
