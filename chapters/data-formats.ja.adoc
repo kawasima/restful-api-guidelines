@@ -20,12 +20,12 @@ JSONペイロードは https://tools.ietf.org/html/rfc7159[RFC-7159] にした�
 [#172]
 == {SHOULD} 標準のメディアタイプとして `application/json` を使う
 
-以前このガイドラインでは、`application/x.zalando.article+json`のようなカスタムのメディアタイプを使ってもよいとしました。
+以前このガイドラインでは、`application/x.zalando.article+json` のようなカスタムのメディアタイプを使ってもよいとしました。
 これは、<<114,media type versioning>>で必要な場合以外では、おすすめしないし避けるべきです。
 かわりに、標準のメディアタイプである `application/json` (または `application/problem+json` <<176>>) を使いましょう。
 
-`x`で始まるカスタムのメディアタイプは、JSONの標準メディアタイプと比較して何のメリットもないばかりか、
-自動化をより難しくしてしいます。
+`x` で始まるカスタムのメディアタイプは、JSONの標準メディアタイプと比較して何のメリットもないばかりか、
+自動化をより難しくしてしまいます。
 これはまた https://tools.ietf.org/html/rfc6838#section-3.4[RFC
 6838で使用を抑制されています]。
 
@@ -40,7 +40,7 @@ JSONペイロードは https://tools.ietf.org/html/rfc7159[RFC-7159] にした�
 [[http-headers]]
 === HTTPヘッダ
 
-独自のものを含むHTTPヘッダは、http://tools.ietf.org/html/rfc7231#section-7.1.1.1[RFC 7231で定義されている日付フォーマット] を使いましょう。
+独自のものを含むHTTPヘッダは、 http://tools.ietf.org/html/rfc7231#section-7.1.1.1[RFC 7231 で定義されている日付フォーマット] を使いましょう。
 
 [#170]
 == {MAY} 国、言語、通貨のコードは標準を使う
@@ -59,7 +59,7 @@ language variants
 [#171]
 == {MUST} 数値型と整数型のフォーマットを定義する
 
-APIで`number`または`integer`の型のプロパティを定義するときは、
+APIで `number` または `integer` の型のプロパティを定義するときは、
 クライアントが誤った精度を使って、無意識に値が変わってしまわないように、精度を定義しなければなりません。
 
 [cols="15%,15%,70%",options="header",]
@@ -74,8 +74,8 @@ APIで`number`または`integer`の型のプロパティを定義するときは
 |=====================================================================
 
 精度はクライアントとサーバの双方で、もっとも適した言語の型に変換されなければなりません。
-例えば、次の定義においてJavaでは、`Money.amount`は`BigDecimal`に、
-`OrderList.page_size`は`int` または `Integer` に変換されるでしょう。
+例えば、次の定義においてJavaでは、 `Money.amount` は `BigDecimal` に、
+`OrderList.page_size` は `int` または `Integer` に変換されるでしょう。
 
 [source,yaml]
 ----

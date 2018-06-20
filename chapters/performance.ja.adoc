@@ -114,15 +114,13 @@ Content-Type: application/json
 <DIGIT> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
 ----
 
-A `fields_expression` as defined by the grammar describes the properties
-of an object, i.e. `(name)` returns only the `name` property of the root
-object. `(name,partner(name))` returns the `name` and `partner`
-properties where `partner` itself is also an object and only its `name`
-property is returned.
+上記で定義された `fields_expression` は、オブジェクトのプロパティを記述するものです。
+つまり `(name)` はルートオブジェクトの `name` プロパティしか返しません。
+`(name,partner(name))` は、 `name` と `name` プロパティだけもった `partner` オブジェクトを
+返します。
 
-Hint: OpenAPI doesn't allow you to formally specify whether depending on
-a given parameter will return different parts of the specified result
-schema. Explain this in English in the parameter description.
+ヒント: OpenAPIは与えられたパラメータに応じて、結果スキーマの一部を返すかどうか公式には定まっていません。
+したがって、パラメータのdescriptionに英語でこの説明を記述してください。
 
 [#158]
 == {SHOULD} サブリソースの任意の埋め込みを可能にする
@@ -135,9 +133,7 @@ schema. Explain this in English in the parameter description.
 一般的な手段(例えば透過的にリソースを差し込むHTTPプロキシ)で実現されるのかは、
 実装次第です。
 
-命名に関しては <<137>> を参照ください。例えば埋め込みリソース展開の "embed"
-See <<137>> for naming, e.g. "embed" for steering of embedded
-resource expansion.
+命名に関しては <<137>> を参照ください。例えば埋め込みリソース展開には "embed" を使います。
 埋め込みクエリには、前述のフィルタリングと同様の https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form[BNF] 文法を使うようにしてください。
 
 サブリソースの埋め込みは、例えばある注文がそのサブリソース (/order/\{orderId}/items)
@@ -179,7 +175,7 @@ APIがキャッシュをサポートすることが意図されていれば、�
 API設計者がよくこれを理解していることが示されない限りは、RESTful APIに関して
 クライアントサイドでのキャッシュや透過的なHTTPキャッシュは避けるべきです。
 
-デフォルトでは、APIは`Cache-Control: no-cache`ヘッダをセットすべきです。
+デフォルトでは、APIは `Cache-Control: no-cache` ヘッダをセットすべきです。
 
 **注意:** このデフォルトセッティングをドキュメントに書く必要はありません。
 たいていのフレームワークは、レスポンスに自動的に付与するからです。

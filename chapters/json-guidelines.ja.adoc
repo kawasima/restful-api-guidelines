@@ -111,7 +111,7 @@ Stringは列挙型で設計された値を表現するには妥当な型です�
 http://tools.ietf.org/html/rfc3339#section-5.6[RFC 3339]
 で定義された日付と時刻のフォーマットを使いましょう。
 
-* "date"には`年 "-" 月 "-" 日`を使う。例: `2015-05-28`
+* "date"には `年 "-" 月 "-" 日` を使う。例: `2015-05-28`
 * "date-time"には `年-月-日 "T" 時:分:秒`を使う, 例: `2015-05-28T14:07:17Z`
 
 https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#data-types[OpenAPI

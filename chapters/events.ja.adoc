@@ -9,7 +9,7 @@ Zalandoのアーキテクチャは疎結合なマイクロサービス中心で�
 
 イベントは _イベント型_ と呼ぶ項目を使って定義します。
 イベント型は送信者によってスキーマを使って宣言され、受信者によって解釈されるイベント構造をもちます。
-イベント型は、名前、オーナーアプリケーション(暗黙的にオーナーのチーム)、エベントのカスタムデータ
+イベント型は、名前、オーナーアプリケーション(暗黙的にオーナーのチーム)、イベントのカスタムデータ
 を定義したスキーマ、スキーマがどう進化していくかを宣言している互換モードなどを、
 標準情報として宣言します。
 イベント型では、またイベントのバリデーションや強化戦略、イベントストリームの中で、
@@ -69,13 +69,9 @@ Open APIスキーマオブジェクトは、いくつかのJSONスキーマキ�
 
 一方でスキーマオブジェクトは、JSONスキーマキーワードを再定義しているものもあります。
 
-* `additionalProperties`: 互換性保証を謳うイベント型には、このフィールドを使うことにかんしては制約を設けておたほうがよいでしょう。詳細は<<210>>のガイドラインをみてください。
-For event types that declare compatibility
-guarantees, there are recommended constraints around the use of this
-field. See the guideline <<210>> for details.
+* `additionalProperties`: 互換性保証を謳うイベント型には、このフィールドを使うことに関しては制約を設けておたほうがよいでしょう。詳細は<<210>>のガイドラインをみてください。
 
 最後に、スキーマオブジェクトは、JSONスキーマのいくつかのキーワードを _拡張しています_ 。
-Finally, the Schema Object _extends_ JSON Schema with some keywords:
 
 * `readOnly`: イベントが論理的にイミュータブルであることを意味します。
 `readOnly`は冗長とみなされるかもしれませんが無害です。
@@ -100,12 +96,9 @@ Zalandoのアーキテクチャにおいて、イベントは _イベント型_ 
 一貫性があって検証可能であることを保証するものになります。
 
 イベント型のオーナーは、互換モードの選択に気をつけなければなりません。
-モードはスキーマの進化の意味付けをします。
-モードの範囲は、イベント送信者が
-Event type owners must pay attention to the choice of compatibility
-mode. The mode provides a means to evolve the schema. The range of
-modes are designed to be flexible enough so that producers can evolve
-schemas while not inadvertently breaking existing consumers:
+モードはスキーマの進化の方法を示します。
+イベント送信者が既存のイベント受信者に不用意に破壊的変更を与えずに、スキーマを
+修正するのにどれだけな柔軟性があるかは、モードの範囲の設計に依存します。
 
 * `none`: たとえ既存のイベント送信者・受信者を破壊しようと、どんなスキーマの修正も受け入れられる。
 イベントを検証する際は、スキーマで宣言されていない未定義のプロパティも受け入れなければ
@@ -114,20 +107,15 @@ schemas while not inadvertently breaking existing consumers:
 読むことができる、すなわちイベント受信者は、 <<api-design-principles>> ガイドラインの
 ロバストネスの原則にしたがう限り、以前のバージョンを使っている最新のスキーマバージョンで
 タグ付けされたイベントも読むことができます。
-* `forward`: A schema `S1` is forward compatible if the previously
-registered schema, `S0` can read events defined by `S1` - that is,
-consumers can read events tagged with the latest schema version using
-the previous version as long as consumers follow the robustness
-principle described in the guideline's <<api-design-principles>>.
-* `compatible`: これは変更が完全な互換性をもつことを意味します。新しい
-スキーマ `S1` は、最初のスキーマバージョン
-互換モードでは、既存のスキーマへは新しい任意のプロパティと定義の追加のみ許され、
+* `compatible`: これは変更が完全な互換性をもつことを意味します。
+最初のスキーマバージョンから、送出されたすべてのイベントが
+最新のスキーマでも有効なものであるとき、新しいスキーマ `S1` は、
+完全互換です。
+compatibleモードでは、既存のスキーマへは新しい任意のプロパティと定義の追加のみ許され、
 他の変更は禁止されます。
 
 互換性モードはセマンティックバージョニング (MAJOR.MINOR.PATCH) にしたがう
-`version`フィールドで
-The compatibility mode interact with revision numbers in the schema
-`version` field, which follows semantic versioning (MAJOR.MINOR.PATCH):
+`version`フィールドに影響します。
 
 * 互換モード `compatible` では、イベント型はPATCHまたはMINORバージョンのみ
 変更でき、破壊的変更であるMAJORバージョンアップは許されまない。
@@ -148,9 +136,8 @@ The compatibility mode interact with revision numbers in the schema
 ----
 EventType:
   description: |
-    An event type defines the schema and its runtime properties. The required
-    fields are the minimum set the creator of an event type is expected to
-    supply.
+    イベント型はスキーマと実行時のプロパティを定義します。必須のフィールドはイベント型の
+    作成者が最低限セットすることが期待されているものです。
   required:
     - name
     - category
@@ -159,27 +146,26 @@ EventType:
   properties:
     name:
       description: |
-        Name of this EventType.  Note: the name can encode the
-        owner/responsible for this EventType and ideally should follow a
-        naming pattern that makes it easy to read and understand.
+        このEventTypeの名前です。 注意: 名前はこのEventTypeのオーナー/責務を符号化
+        したもので、可読性と理解しやすさのため命名パターンにしたがってください。
       type: string
       pattern: '[a-zA-Z][-0-9a-zA-Z_]*(\.[a-zA-Z][-0-9a-zA-Z_]*)*'
       example: order.order_cancelled, business_partner.contract
     owning_application:
       description: |
-        Name of the application (eg, as would be used in infrastructure
-        application or service registry) owning this `EventType`.
+        この `EventType` を所有するアプリケーションの名前です。
+        (基盤アプリケーションやサービスレジストリで使われます)
       type: string
       example: price-service
     category:
-      description: Defines the category of this EventType.
+      description: このEventTypeのカテゴリです。
       type: string
       x-extensible-enum:
         - data
         - general
     compatibility_mode:
       description: |
-        The compatibility mode to evolve the schema.
+        このスキーマを発展させていくための互換性モードです。
       type: string
       x-extensible-enum:
         - compatible
@@ -187,50 +173,48 @@ EventType:
         - none
       default: forward
     schema:
-      description: The most recent payload schema for this EventType.
+      description: このEventTypeの最新のペイロードのスキーマです。
       type: object
       properties:
         version:
-          description: Values are based on semantic versioning (eg "1.2.1").
+          description: セマンティックバージョニングに基づくバージョン番号です ("1.2.1"のようなもの)。
           type: string
           default: '1.0.0'
         created_at:
-          description: Creation timestamp of the schema.
+          description: スキーマの作成日時
           type: string
           readOnly: true
           format: date-time
           example: '1996-12-19T16:39:57-08:00'
         type:
           description: |
-             The schema language of schema definition. Currently only
-             json_schema (JSON Schema v04) syntax is defined, but in the
-             future there could be others.
+             スキーマ定義のスキーマ言語です。現在はjson_schema (JSON Schema v04) のみ
+             が定義できます。がこれは将来的には他のものも指定可能になるでしょう。
           type: string
           x-extensible-enum:
             - json_schema
         schema:
           description: |
-              The schema as string in the syntax defined in the field type.
+              フィールド型に定義された文法で表現した文字列としてのスキーマ
           type: string
       required:
         - type
         - schema
     created_at:
-      description: When this event type was created.
+      description: イベント型が新規作成された日時
       type: string
       pattern: date-time
     updated_at:
-      description: When this event type was last updated.
+      description: イベント型の最終更新日時
       type: string
       pattern: date-time
 ----
 
-APIs such as registries supporting event types, may extend the model,
-including the set of supported categories and schema formats. For
-example the Nakadi API's event category registration also allows the
-declaration of validation and enrichment strategies for events, along
-with supplemental information, such as how events are partitioned in the
-stream.
+イベント型をサポートしているレジストリのようなAPIは、サポートされたカテゴリやスキーマ形式の
+集合を含んだモデルを拡張しているかもしれません。
+例えばNakadi APIのイベントカテゴリレジストリは、イベントのバリデーションの宣言や
+強化戦略、ストリームの中でどうパーティショニングされるかのような補足情報が
+記述できるようになっています。
 
 [#198]
 == {MUST} イベントが周知のイベントカテゴリに準拠することを保証する
@@ -239,8 +223,7 @@ _イベントカテゴリ_ はイベント型の一般的な分類です。
 ガイドラインは2つのカテゴリを定義します。
 
 * 汎用イベント: 汎用目的のカテゴリ
-* データ更新イベント: a category used for describing changes to data
-entities used for data replication based data integration.
+* データ更新イベント: データ統合に基づくレプリケーションに使用されるデータの変更について記述するカテゴリ
 
 カテゴリは将来的に成長していくことが予想されます。
 
@@ -256,12 +239,12 @@ _汎用イベントカテゴリ_ は、Open API スキーマオブジェクト�
 ----
 GeneralEvent:
   description: |
-    A general kind of event. Event kinds based on this event define their
-    custom schema payload as the top level of the document, with the
-    "metadata" field being required and reserved for standard metadata. An
-    instance of an event based on the event type thus conforms to both the
-    EventMetadata definition and the custom schema definition. Previously
-    this category was called the Business Category.
+    汎用目的のイベントの種類です。このイベントに基づくイベントの種類は、
+    ドキュメントのトップレベルとして、カスタムスキーマペイロードを定義します。
+    ペイロードには、"metadata" フィールドが必要です。
+    したがって、このイベント型に基づくイベントのインスタンスは、EventMetadataの定義と、
+    カスタムスキーマ定義の両方に準拠することになります。
+    以前はこのカテゴリは、業務カテゴリと呼ばれていました。
   required:
     - metadata
   properties:
@@ -269,27 +252,20 @@ GeneralEvent:
         $ref: '#/definitions/EventMetadata'
 ----
 
-Event types based on the General Event Category define their custom
-schema payload at the top-level of the document, with the `metadata`
-field being reserved for standard information (the contents of
-`metadata` are described further down in this section).
+汎用イベントカテゴリに属するイベント型は、ドキュメントのトップレベルに
+標準情報のための予約されている `metadata` フィールドを使って、
+カスタムスキーマのペイロードを定義します。
+(`metadata` の内容は、このセクションのずっと下の方に記述してあります)
 
-In the example fragment below, the reserved `metadata` field is shown
-with fields "a" and "b" being defined as part of the custom schema:
+注意:
 
-Note:
+* 以前のガイドラインでは、汎用イベントは _業務イベント_ と呼んでいた。
+カテゴリの構造が、他の種類のイベントでも使われるようになったので、
+チームの使い方を反映して名前を変更した。
+* 汎用イベントは元の業務プロセスを駆動するイベントを定義する目的でも、今でも有用だし、そういう使い方にはおすすめする。
+* Nakadiのブローカーは、汎用カテゴリを業務カテゴリとして参照し、イベント型は「business」というキーワードで登録される。それ以外のJSONの構造は同じである。
 
-* The General Event in a previous version of the guidelines was called a
-_Business Event_. Implementation experience has shown that the
-category's structure gets used for other kinds of events, hence the name
-has been generalized to reflect how teams are using it.
-* The General Event is still useful and recommended for the purpose of
-defining events that drive a business process.
-* The Nakadi broker still refers to the General Category as the Business
-Category and uses the keyword "business" for event type registration.
-Other than that, the JSON structures are identical.
-
-See <<201>> for more guidance on how to use the category.
+カテゴリの使い方に関するガイドは <<201>> により詳細があります。
 
 *データ更新イベントカテゴリ*
 
@@ -300,11 +276,10 @@ _データ更新イベントカテゴリ_ は、Open API スキーマオブジ�
 ----
 DataChangeEvent:
   description: |
-    Represents a change to an entity. The required fields are those
-    expected to be sent by the producer, other fields may be added
-    by intermediaries such as a publish/subscribe broker. An instance
-    of an event based on the event type conforms to both the
-    DataChangeEvent's definition and the custom schema definition.
+    エンティティの変更の表現です。必須フィールドは、送信者によって送られることが
+    期待され、そうでないフィールドはpub/subブローカのような仲介者によって、
+    付加される可能性があります。 イベント型に基づくイベントのインスタンスは、
+    DataChangeEventの定義とカスタムスキーマ定義の両方に準拠します。
   required:
     - metadata
     - data_op
@@ -312,38 +287,34 @@ DataChangeEvent:
     - data
   properties:
     metadata:
-      description: The metadata for this event.
+      description: このイベントのメタデータです。
       $ref: '#/definitions/EventMetadata'
     data:
       description: |
-        Contains custom payload for the event type. The payload must conform
-        to a schema associated with the event type declared in the metadata
-        object's `event_type` field.
+        イベント型のカスタムペイロードを含みます。ペイロードは、メタデータオブジェクトの
+        `event_type` フィールドに宣言されたイベント型と関連したスキーマに準拠しなければ
+        なりません。
       type: object
     data_type:
-      description: name of the (business) data entity that has been mutated
+      description: 変更された(業務)データエンティティの名前です。
       type: string
       example: 'sales_order.order'
     data_op:
       type: string
       enum: ['C', 'U', 'D', 'S']
       description: |
-        The type of operation executed on the entity:
-
-        - C: Creation of an entity
-        - U: An update to an entity.
-        - D: Deletion of an entity.
-        - S: A snapshot of an entity at a point in time.
+        エンティティに対して実行した操作の種類です。
+        - C: エンティティの新規作成
+        - U: エンティティの更新
+        - D: エンティティの削除
+        - S: ある時点でのエンティティのスナップショット作成
 ----
 
 データ更新イベントカテゴリは、構造的に汎用イベントカテゴリとは異なります。
 `data` フィールドでカスタムペイロードを定義し、 `data_type` にデータ変更に関する
 固有の情報を定義します。
-It defines a field called `data` for placing the custom
-payload information, as well as specific information related to data
-changes in the `data_type`. In the example fragment below, the fields
-`a` and `b` are part of the custom payload housed inside the `data`
-field:
+例えば次の例では、 `a` と `b` のフィールドは、 `data` フィールドの内側に
+おかれたカスタムペイロードの一部です。
 
 データ更新イベントカテゴリの使い方の指針は、以下のガイドラインも参照ください。
 
@@ -370,37 +341,37 @@ EventMetadata:
     - occurred_at
   properties:
     eid:
-      description: Identifier of this event.
+      description: このイベントの識別子です。
       type: string
       format: uuid
       example: '105a76d8-db49-4144-ace7-e683e8f4ba46'
     event_type:
-      description: The name of the EventType of this Event.
+      description: このイベントのEventTypeの名前です
       type: string
       example: 'example.important-business-event'
     occurred_at:
-      description: When the event was created according to the producer.
+      description: イベントが送信者によって作成された日時
       type: string
       format: date-time
       example: '1996-12-19T16:39:57-08:00'
     received_at:
       description: |
-        When the event was seen by an intermediary such as a broker.
+        ブローカのような仲介者にイベントが届いた日時
       type: string
       readOnly: true
       format: date-time
       example: '1996-12-19T16:39:57-08:00'
     version:
       description: |
-        Version of the schema used for validating this event. This may be
-        enriched upon reception by intermediaries. This string uses semantic
-        versioning.
+        このイベントをバリデーションするのに使われるスキーマのバージョンです。
+        これは仲介者によって。This may be enriched upon reception by intermediaries.
+        この文字列にはセマンティックバージョニングが使われます。
       type: string
       readOnly: true
     parent_eids:
       description: |
-        Event identifiers of the Event that caused the generation of
-        this Event. Set by the producer.
+        このイベントが生成される原因となったイベントの識別子です。
+        イベント送信者がセットします。
       type: array
       items:
         type: string
@@ -408,178 +379,154 @@ EventMetadata:
       example: '105a76d8-db49-4144-ace7-e683e8f4ba46'
     flow_id:
       description: |
-        A flow-id for this event (corresponds to the X-Flow-Id HTTP header).
+        (X-Flow-Id HTTPヘッダと対応した) このイベントのflow-idです。
       type: string
       example: 'JAh6xH4OQhCJ9PutIV_RYw'
     partition:
       description: |
-        Indicates the partition assigned to this Event. Used for systems
-        where an event type's events can be sub-divided into partitions.
+        このイベントに割り当てられたパーティションを示します。
+        あるイベント型のイベントがパーティションに分割されるシステムで使わます。
       type: string
       example: '0'
 ----
 
-Please note than intermediaries acting between the producer of an event
-and its ultimate consumers, may perform operations like validation of
-events and enrichment of an event's `metadata`. For example brokers such
-as Nakadi, can validate and enrich events with arbitrary additional
-fields that are not specified here and may set default or other values,
-if some of the specified fields are not supplied. How such systems work
-is outside the scope of these guidelines but producers and consumers
-working with such systems should look into their documentation for
-additional information.
+イベントの送信者と、その最終的な受信者の間で、イベントのバリデーションやイベントの
+`metadata` を充実させるような操作がなされる可能性があることに注意してください。
+例えばNakadiのようなブローカは、バリデーションしたり、任意のフィールドを追加したり、
+あるフィールドが与えられていなければ、デフォルト値などをセットしたりできます。
+そんなシステムがどう動くかは、このガイドラインのスコープ外ですが、イベント送信者と受信者が、
+それを扱わなくてはならないので、追加の情報をドキュメントに書いておくべきです。
+
 
 [#199]
-== {MUST} Ensure that Events define useful business resources
+== {MUST} イベントに有用な業務リソースを定義していることを保証する
 
-Events are intended to be used by other services including business
-process/data analytics and monitoring. They should be based around the
-resources and business processes you have defined for your service
-domain and adhere to its natural lifecycle (see also <<139>> and <<140>>).
+イベントは業務プロセス/データの分析・モニタリングを含む他のサービスによって
+使われることを想定しています。
+したがって、サービスドメインのために定義されたリソースや業務プロセスに基づくものであるべきだし、
+業務の自然なライフサイクルに即したものであるべきです (<<139>> および <<140>> を参照)。
 
-As there is a cost in creating an explosion of event types and topics,
-prefer to define event types that are abstract/generic enough to be
-valuable for multiple use cases, and avoid publishing event types
-without a clear need.
+イベント型やトピックスを大量に作るのはコストがかかるので、複数のユースケースで使えるような
+抽象的/汎用的なイベント型を定義するようにしましょう。そして、明確なニーズがない限りは
+イベント型を公開するのは避けましょう。
 
 [#200]
-== {MUST} Events must not provide sensitive customer personal data
+== {MUST} イベントにカスタマの個人情報データを載せてはならない
 
-Similar to API permission scopes, there will be Event Type permissions
-passed via an OAuth token supported in near future. In the meantime,
-teams are asked to note the following:
+APIの権限スコープと同様に、近い将来イベント型の権限もOAuthトークンで渡せるようになるでしょう。
+それまでは、次の注意事項にしたがうようにしてください。
 
-* Sensitive data, such as (e-mail addresses, phone numbers, etc) are
-subject to strict access and data protection controls.
-* Event type owners *must not* publish sensitive information unless it's
-mandatory or necessary to do so. For example, events sometimes need to
-provide personal data, such as delivery addresses in shipment orders (as
-do other APIs), and this is fine.
+* (Eメールアドレス、電話番号などの)機微な情報は、厳重なアクセス管理とデータ保護がされなければならない
+* イベント型のオーナーは、それが必須か任意かによらず、機微な情報を公開 *してはならない* 。
+例えばイベントが(他のAPIと同様) 注文配送の送付先住所のような個人情報を扱う必要が時々あるが、
+これは問題ない。
 
 [#201]
-== {MUST} Use the General Event Category to signal steps and arrival points in business processes
+== {MUST} 業務プロセスのステップと到達点を通知するために、汎用イベントカテゴリを使う
 
-When publishing events that represent steps in a business process, event
-types must be based on the General Event category.
+イベントが業務プロセスにおけるステップを表現したものであるならば、
+イベント型は汎用イベントカテゴリのものでなくてはならなりません。
 
-All your events of a single business process will conform to the
-following rules:
+単一の業務プロセスにまつわるすべてのイベントは、次のルールを遵守してください。
 
-* Business events must contain a specific identifier field (a business
-process id or "bp-id") similar to flow-id to allow for efficient
-aggregation of all events in a business process execution.
-* Business events must contain a means to correctly order events in a
-business process execution. In distributed settings where monotonically
-increasing values (such as a high precision timestamp that is assured to
-move forwards) cannot be obtained, the `parent_eids` data structure
-allows causal relationships to be declared between events.
-* Business events should only contain information that is new to the
-business process execution at the specific step/arrival point.
-* Each business process sequence should be started by a business event
-containing all relevant context information.
-* Business events must be published reliably by the service.
+* 業務イベントには、業務プロセスの実行にあたり全てのイベントを効率的に集約するために、
+特定の識別子フィールド (業務プロセスID または "bp-id") を含める。 flow-idと同様。
+* 業務イベントには業務プロセス実行にあたり、正しくイベントを順序付けするための方法を含める。
+(時系列性を信頼して良い正確なタイムスタンプのような) 単調増加する値が得られないような
+分散環境においては、`parent_eids` データがイベント間の因果関係を表すものとて使える。
+* 業務イベントは特定のステップ/到達点にて、業務プロセスの実行に対して、新しい情報のみ
+を含んでいるべきである。
+* それぞれの業務プロセスシーケンスは、すべての関連するコンテキスト情報を含んだ
+業務イベントによって開始されるべきである。
+* 業務イベントは、サービスによって確実に送信されなければならない。
 
-At the moment we cannot state whether it's best practice to publish all
-the events for a business process using a single event type and
-represent the specific steps with a state field, or whether to use
-multiple event types to represent each step. For now we suggest
-assessing each option and sticking to one for a given business process.
+単一のイベント型を使い、状態フィールドで特定のステップを表現する業務業務プロセスのイベント
+すべてを公開するのがよいのかどうか、
+各ステップを表現するために複数のイベント型を使ったほうがよいのかどうか、
+現時点では何がベストプラクティスか私たちには分かりません。
+与えられた業務プロセスについて、今は私たちはそれぞれの選択肢を評価し、その1つにこだわって
+みようと、そう考えているのです。
 
 [#202]
-== {MUST} Use Data Change Events to signal mutations
+== {MUST} 変化を通知するためにデータ変更イベントを使う
 
-When publishing events that represents created, updated, or deleted
-data, change event types must be based on the Data Change Event
-category.
+データの作成、更新、削除を表すイベントを送出するとき、イベント型はデータ変更イベントカテゴリ
+のものでなくてはなりません。
 
-* Change events must identify the changed entity to allow aggregation of
-all related events for the entity.
-* Change events <<203>>.
-* Change events must be published reliably by the service.
+* 変更イベントは、あるエンティティに関連するすべてのイベントを集約できるよう
+変更されたエンティティを識別できなくてはなりません。
+* 変更イベントは <<203>>
+* 変更イベントはサービスによって確実に送信されなければならない。
 
 [#203]
-== {SHOULD} Provide a means for explicit event ordering
+== {SHOULD} 明示的にイベントを順序付けする方法を与える
 
-Some common error cases may require event consumers to reconstruct event
-streams or replay events from a position within the stream. Events
-_should_ therefore contain a way to restore their partial order of
-occurrence.
+エラーが発生した場合、イベントストリームを再構成したり、
+ストリームの中での位置からイベントを再現したりすることを、イベント受信者に要求することが
+あります。
+それゆえにイベントは、部分的な発生順を再現できる方法を含んで _いなければなりません_ 。
 
-This can be done - among other ways - by adding - a strictly
-monotonically increasing entity version (e.g. as created by a database)
-to allow for partial ordering of all events for an entity - a strictly
-monotonically increasing message counter
+これは、(例えばデータベースで作成する) エンティティのバージョンやメッセージカウンタを
+使って実現します。これらは厳密かつ単調に増加する値を使います。
 
-System timestamps are not necessarily a good choice, since exact
-synchronization of clocks in distributed systems is difficult, two
-events may occur in the same microsecond and system clocks may jump
-backward or forward to compensate drifts or leap-seconds. If you use
-system timestamps to indicate event ordering, you must carefully ensure
-that your designated event order is not messed up by these effects.
+システムタイムスタンプを使うのはあまり良い選択ではありません。分散システムにおいて
+正確な時刻同期は困難だし、2つのイベントが同じマイクロ秒で発生するかもしれないし、
+またシステムクロックは、時刻合わせのドリフトやうるう秒で前後する可能性もあるためです。
+もしイベントの順番を表すのにシステムタイムスタンプを使えば、設計したイベント順がこれらの影響で
+混乱を来さないことを注意深く保証しなければなりません。
 
-*Note* that basing events on data structures that can be converged upon
-in a distributed setting (such as
+分散環境でデータ構造によってこの問題を解消する (
 https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type[CRDTs],
-https://en.wikipedia.org/wiki/Logical_clock[logical clocks] and
-https://en.wikipedia.org/wiki/Vector_clock[vector clocks]) is outside
-the scope of this guidance.
+https://en.wikipedia.org/wiki/Logical_clock[logical clocks] や
+https://en.wikipedia.org/wiki/Vector_clock[vector clocks] のような)
+仕組みはこのガイドラインのスコープ外であることに *注意* してください。
 
 [#204]
-== {SHOULD} Use the hash partition strategy for Data Change Events
+== {SHOULD} データ変更イベントにはハッシュパーティション戦略を使う
 
-The `hash` partition strategy allows a producer to define which fields
-in an event are used as input to compute a logical partition the event
-should be added to. Partitions are useful as they allow supporting
-systems to scale their throughput while provide local ordering for event
-entities.
+`hash` パーティション戦略は、イベントが追加されるべき論理パーティションを
+計算するためのインプットとして使われるフィールドを、イベント送信者は定義できます。
+イベントエンティティの順序をパーティションローカルで決めれる間は、スループットを
+スケールできるようになります。
 
-The `hash` option is particulary useful for data changes as it allows
-all related events for an entity to be consistently assigned to a
-partition, providing a relative ordered stream of events for that
-entity. This is because while each partition has a total ordering,
-ordering across partitions is not assured by a supporting system, thus
-it is possible for events sent across partitions to appear in a
-different order to consumers that the order they arrived at the server.
+`hash` オプションは、特にデータ変更に有用です。それによって、あるエンティティに関連するすべてのイベントを、
+パーティションへ一貫性をもって割り当てることができるし、そのエンティティに関する
+順序付けされたイベントストリームを提供できるようになるからです。
+これは各パーティションが全順序性をもつならば、パーティションをまたいだ順序が
+サポートするシステムでは保証されないので、パーティションをまたいで送信されたイベントは、
+サーバに到着したのとは異なる順序で、イベント受信者に見える可能性があることを示しています。
 
-When using the `hash` strategy the partition key in almost all cases
-should represent the entity being changed and not a per event or change
-identifier such as the `eid` field or a timestamp. This ensures data
-changes arrive at the same partition for a given entity and can be
-consumed effectively by clients.
+`hash` 戦略を使うとき、ほとんどすべての場合、パーティションキーは変更されるエンティティを
+表すものであり、 `eid`フィールドやタイムスタンプのようなイベント毎に付与されたり、
+変更識別子だったりするものではありません。
+これによって、データの変更イベントが、同じエンティティでは同じパーティションに入ることが保証され、
+クライアントは効率的にイベントを受信できるようになる。
 
-There may be exceptional cases where data change events could have their
-partition strategy set to be the producer defined or random options, but
-generally `hash` is the right option - that is while the guidelines here
-are a "should", they can be read as "must, unless you have a very good
-reason".
+データ変更イベントが、送信者側が定義したり、ランダムに選択したりと、
+独自のパーティション戦略をもつ例外的な場合があるかもしれませんが、
+一般的にいって、 `ハッシュ` が正しい選択しです。
+ここでのガイドラインは "should" ですが、"すごくイカした理由がない限りは、must" と読み替えてください。
 
 [#205]
-== {SHOULD} Ensure that Data Change Events match API representations
+== {SHOULD} データ変更イベントがAPI表現にマッチすることを保証する
 
-A data change event's representation of an entity should correspond to
-the REST API representation.
+データ変更イベントのエンティティ表現は、REST APIの表現と対応しているべきです。
 
-There's value in having the fewest number of published structures for a
-service. Consumers of the service will be working with fewer
-representations, and the service owners will have less API surface to
-maintain. In particular, you should only publish events that are
-interesting in the domain and abstract away from implementation or local
-details - there's no need to reflect every change that happens within
-your system.
+あるサービスにとって最小限の構造しか持たないようにすることに価値があります。
+そうすれば、サービスの利用者にとってはより少ない表現しか使わずにすむし、
+サービスオーナーにとっては、保守しなくてはならないAPIが少なくてすみます。
+特に、そのドメインに関連していて、実装やローカルの詳細から切り離され抽象化されたイベントのみ
+公開するようにすべきです。
+システム内で起こるすべての変更を反映する必要はありません。
 
-There are cases where it could make sense to define data change events
-that don't directly correspond to your API resource representations.
-Some examples are -
+APIリソース表現と直接関係のないデータ変更イベントを定義する意義がある場合もあります。例えば次のような場合です。
 
-* Where the API resource representations are very different from the
-datastore representation, but the physical data are easier to reliably
-process for data integration.
-* Publishing aggregated data. For example a data change to an individual
-entity might cause an event to be published that contains a coarser
-representation than that defined for an API
-* Events that are the result of a computation, such as a matching
-algorithm, or the generation of enriched data, and which might not be
-stored as entity by the service.
+* APIリソース表現がデータストア表現とかなり乖離があるが、物理的なデータの方がデータ統合のための
+確実に処理するのがより簡単である。
+* 集約されたデータの送信。例えば個々のエンティティへの変更データが、
+APIのために定義されたものよりも、粒度のあらい表現を含んだイベントが送出されるかもしれない。
+* マッチングアルゴリズムのような計算結果や大量に生成されたデータで、
+サービスによってエンティティとして保存しないかもしれないイベント。
 
 [#206]
 == {MUST} イベントの権限はAPIの権限に対応しなければならない
@@ -597,30 +544,19 @@ EventTypeのオーナーでその定義に責任をもつのは、1つの送信�
 多いですが、そのオーナは同種のイベントを送信する複数のサービスの1つであってもよいです。
 
 [#208]
-== {MUST} 全体のガイドラインにしたがってイベントのペイロードを定義する Define Event Payloads in accordance with the overall Guidelines
+== {MUST} 全体のガイドラインにしたがってイベントのペイロードを定義する
 
 イベントは他のAPIデータやAPIガイドラインと整合性のとれたものでなくてはなりません。
 
 <<introduction>> で表したすべてが、サービス間でデータをやり取りするイベントに適用されます。
-Everything expressed in the <<introduction>> to
-these Guidelines is applicable to event data interchange between
-services.
-APIと同様に、イベントが
-This is because our events, just like our APIs, represent a
-commitment to express what our systems do and designing high-quality,
-useful events allows us to develop new and interesting products and
-services.
+APIと同様にイベントは、私たちのシステムが何をしているのかを表現するための責務を果たし、
+高品質に設計された有用なイベントが、私たちの新しく面白いプロダクトやサービス開発を支えるのです。
 
 イベントが他の種類のデータと異なるのは、非同期のpub-subメッセージングのように、
-データの伝達に使われるところにあります。ですが、REST APIが、
-例えば検索リクエストやページ分割されたフィードを使われるため、イベントでは
-利用されないものだ、ということはなく、サービスのREST APIのために作った
-モデルを
-What distinguishes events from other kinds of data is the delivery style
-used, asynchronous publish-subscribe messaging. But there is no reason
-why they could not be made available using a REST API, for example via a
-search request or as a paginated feed, and it will be common to base
-events on the models created for the service’s REST API.
+データの伝達に使われるところにあります。だからといって、
+例えば検索リクエストやページ分割されたフィードのように、REST APIを使うような
+ところでイベントが使えない訳ではありません。
+サービスのREST APIのために作ったモデルを、イベントでもベースとすることになるでしょう。
 
 次のガイドラインの章がイベントにも適用されます。
 
@@ -674,33 +610,27 @@ RESTのクライアント/サーバでは適用できていた content-negotiati
 イベントの設計では重要かつふつうに考えなきゃならいことになってくるのです。
 イベントスキーマの成長を可能にするため、ガイドラインは次の点を推奨します。
 
-* Publishers who intend to provide compatibility and allow their schemas
-to evolve safely over time *must not* declare an `additionalProperties`
-field with a value of `true` (i.e., a wildcard extension point). Instead
-they must define new optional fields and update their schemas in advance
-of publishing those fields.
-* Consumers *must* ignore fields they cannot process and not raise
-errors. This can happen if they are processing events with an older copy
-of the event schema than the one containing the new definitions
-specified by the publishers.
+* イベント送信者は後方互換性を維持し安全にスキーマを修正できるよう、
+`additionalProperties` を `true` (つまりワイルドカードの拡張ポイントを意味する) で宣言 *してはならない* 。
+かわりに新しい任意のフィールドを定義し、安これらのフィールドを公開する前に、スキーマを更新しなければならない。
+* イベント受信者は自分が処理できないフィールドは無視し、エラーを発生させては *いけない* 。
+これは送信者によって指定された新しい定義を含むものよりも、古いイベントスキーマが適用されたイベントを
+処理しなければならないときに発生する。
 
-The above constraint does not mean fields can never be added in future
-revisions of an event type schema - additive compatible changes are
-allowed, only that the new schema for an event type must define the
-field first before it is published within an event. By the same turn the
-consumer must ignore fields it does not know about from its copy of the
-schema, just as they would as an API client - that is, they cannot treat
-the absence of an `additionalProperties` field as though the event type
-schema was closed for extension.
+上記制約は、イベント型スキーマの将来のリビジョンで、フィールドが追加できないことを意味してはいません。
+イベント型の新しいスキーマが、イベント送信前に前にまずフィールドを定義していれば、
+互換性のある追加で許されたオペレーションです。
+同じ順番で、受信者はAPIクライアントと同様に、スキーマのコピーに情報のないフィールドを無視しなければなりません。
+すなわち、 イベント型スキーマが拡張に対して閉じていたとしても
+`additionalProperties` フィールドがないことを扱うことができないのです。
 
-Requiring event publishers to define their fields ahead of publishing
-avoids the problem of _field redefinition_. This is when a publisher
-defines a field to be of a different type that was already being
-emitted, or, is changing the type of an undefined field. Both of these
-are prevented by not using `additionalProperties`.
+_フィールド再定義 _ の問題を避けるため、イベント送信者にイベント送信する前に、
+フィールドを定義すること要求します。
+これはイベント送信者が、既に送出された異なる型のイベントにフィールドを定義したり、未定義のフィールドの型を変更したりしている場合です。
+どちらも、 `additionalProperties` を使わないことで防げます。
 
-See also "Treat Open API Definitions As Open For Extension By Default" +
-in the <<compatibility>> section for further guidelines on the use of `additionalProperties`.
+`additionalProperties` の使用についてのガイドラインは、 <<compatibility>>
+の章の「Open APIの定義をデフォルトで拡張に対してオープンとして扱う」を参照ください。
 
 [#211]
 == {MUST} ユニークなイベント識別子を使う
@@ -722,7 +652,7 @@ in the <<compatibility>> section for further guidelines on the use of `additiona
 [#212]
 == {SHOULD} 冪等な順不同の処理を設計する
 
-<<149,idempotent>>で順不同の処理をするものとしてイベントを設計しておくと、
+<<149,冪等>> で順不同の処理をするものとしてイベントを設計しておくと、
 非常にレジリエントなシステムとなります。もしイベントの処理に失敗しても、
 送信者と受信者は、処理を一時停止したり、処理結果の整合性を崩すことなく、
 イベント処理をスキップしたりディレイさせたりリトライしたりできます。
@@ -735,7 +665,7 @@ in the <<compatibility>> section for further guidelines on the use of `additiona
 ことによって達成されます。
 
 * プロセス/リソース/エンティティの識別子
-* <<203,monotonically increasing ordering key>>
+* <<203,単調増加する順序付けられたキー>>
 * 変更後のプロセス/リソースの状態
 
 受信側が現在の状態にだけ関心があるのであれば、各リソースの最新イベントよりも古いものは

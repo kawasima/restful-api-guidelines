@@ -8,12 +8,16 @@ jobs:
       - checkout
       - run:
           name: install asciidoctor
-          command: gem install asciidoctor coderay
+          command: gem install asciidoctor asciidoctor-pdf asciidoctor-epub3 coderay
       - run:
           name: mkdir
           command: mkdir ./dist
       - run:
           command: asciidoctor -D dist -o index.html index.ja.adoc
+      - run:
+          command: asciidoctor-pdf -D dist -o zalando-guidelines-ja.pdf index.ja.adoc
+      - run:
+          command: asciidoctor-epub3 -D dist -o zalando-guidelines-ja.epub index.ja.adoc
       - run:
           command: cp -r assets ./dist
       - run:

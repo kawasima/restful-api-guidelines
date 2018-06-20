@@ -29,7 +29,7 @@ API定義から生成されたバイナリまたはソースコードの互換�
 [#107]
 == {SHOULD} 互換性を維持した拡張をやろう
 
-APIの設計者は後方互換性を維持しつつ、でRESTful APIを進化させていくために、次のルールにしたがうべきです。
+APIの設計者は後方互換性を維持しつつ、RESTful APIを進化させていくために、次のルールにしたがうべきです。
 
 * 任意のフィールドのみ追加して、必須のフィールドは追加してはならない。
 * フィールドの意味は決して変えてはならない (例えばcustomer-numberをcustomer-idに変更することは、両者はカスタマの一意キーとしての意味は異なるのでNG)
@@ -65,8 +65,6 @@ http://martinfowler.com/bliki/TolerantReader.html["TolerantReader"]
 == {SHOULD} APIを保守的に設計する
 
 サービスプロバイダAPIの設計者は、クライアントから受け付けるものについて保守的で正確であるべきです。
-Designers of service provider APIs should be conservative and accurate
-in what they accept from clients:
 
 * ペイロードやURL中の未知のフィールドは無視すべきでない。サーバは400のレスポンスコードを返して、
 クライアントにエラーである旨を通知すべきである。
@@ -105,7 +103,7 @@ JSONオブジェクトは属性を追加することによって、互換性を�
 後方互換性を崩すことなく可能になります。
 
 [#111]
-== {MUST} Open APIの定義をデフォルトで拡張に対してオープンであるかのうように扱う
+== {MUST} Open APIの定義をデフォルトで拡張に対してオープンとして扱う
 
 Open API 2.0仕様では、オブジェクトのデフォルト拡張についてはあまり仕様化されておらず、
 拡張に関しては `additionalProperties` のように、JSONスキーマキーワードを再定義したものになっています。

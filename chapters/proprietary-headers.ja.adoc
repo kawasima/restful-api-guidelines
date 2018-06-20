@@ -30,10 +30,10 @@ APIの一部分だけではなく、それに続くやり取りに必要とさ�
 APIの利用側・提供側の間でのやりとりの規定は複雑化します。
 そのため、ガイドラインではどの `X-` ヘッダを使用するか、どう使われるかを制限しています。
 
-The Internet Engineering Task Force's states in
-https://tools.ietf.org/html/rfc6648[RFC-6648] that company specific
-header' names should incorporate the organization's name. We aim for
-backward compatibility, and therefore keep the `X-` prefix.
+https://tools.ietf.org/html/rfc6648[RFC-6648] の中で、
+企業固有のヘッダの名前には、組織の名前を含むべきだ、という見解を
+Internet Engineering Task Force は示しています。
+私たちは後方互換の目的で、 `X-` 始まりのヘッダを使い続けています。
 
 次の独自ヘッダは、このガイドラインで使用法が規定されたものです。
 HTTPヘッダフィールド名は、大文字・小文字を区別しないことをお忘れなく。

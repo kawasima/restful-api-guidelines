@@ -5,21 +5,16 @@
 == {MUST} OpenAPI仕様を公開する
 
 すべてのサービスアプリケーションは、外に向けたAPIのOpen APIの仕様を公開しなければなりません。
-内部APIは任意ではありますが、APIマネジメント基盤を使うメリットは大きいので、公開しておくに
-こしたことはありません。i.e. APIs marked with the
-*component-internal* <<219, API audience>> group
+内部API (つまり <<219, APIオーディエンス>> が *component-internal* のもの) は任意ではありますが、APIマネジメント基盤を使うメリットは大きいので、公開しておくに
+こしたことはありません。
 
-APIはその**OpenAPI仕様**を、プロビジョニングサービスをデプロイするのに使われる
-**デプロイメント成果物**の中の**/zalando-apis**ディレクトリへコピーすることで公開されます。
-ディレクトリは**自己完結型のYAML**
-**ファイル**だけを置くようにしてください。そこには1つのAPIについて記述します。
-(see
-https://docs.google.com/a/zalando.de/document/d/1WBpRHp1DAtz7Pfjt0QwPuZNR1e70APRqUlCCby3JiOM[internal narrative]
-for more details).
-
-We prefer this deployment artifact-based method over the
-past (now legacy) `.well-known/schema-discovery` service endpoint-based
-publishing process, that we only support for backward compatibility reasons.
+APIはその **OpenAPI仕様** を、プロビジョニングサービスをデプロイするのに使われる
+**デプロイメント成果物** の中の **/zalando-apis** ディレクトリへコピーすることで公開されます。
+ディレクトリは それぞれ1つのAPIについて書かれた **自己完結型のYAML**
+**ファイル** だけを置くようにしてください。
+(今となってはレガシーな) `.well-nown/schema-discovery`
+サービスエンドポイントを使ったデプロイよりも、私たちは、この成果物ベースのデプロイを優先します。
+レガシーな方式は、後方互換のために残してあるだけです。
 
 背景: 動的で複雑な私たちのインフラでは、APIクライアント開発者に、動いているアプリケーションすべての
 API仕様を、オンラインからアクセス出来るような場所を提供することが重要です。

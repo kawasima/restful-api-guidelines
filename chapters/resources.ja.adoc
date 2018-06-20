@@ -59,8 +59,8 @@ API定義の以外にドキュメントをたくさん書かなきゃいけな�
 
 使い勝手を向上させるため、パスセグメントそれぞれがリソースやリソースの集合を正しく指すような、
 直感的に理解できるURLを目指すべきです。
-例えば`/customers/12ev123bv12v/addresses/DE_100100101`はAPIのパスとしてあったとき、
-`/customers/12ev123bv12v/addresses`, `/customers/12ev123bv12v`や`/customers`も、
+例えば `/customers/12ev123bv12v/addresses/DE_100100101` はAPIのパスとしてあったとき、
+`/customers/12ev123bv12v/addresses` , `/customers/12ev123bv12v` や `/customers` も、
 原則的には妥当なパスでなくてはなりません。
 
 基本形のURL構造:
@@ -89,10 +89,7 @@ UUIDは分散非協調な方法で競合することなく、かつ他にサー�
 
 しかし、UUIDにはいくつかのデメリットがあります。
 
-* 意味のない人工的なキーである。例えば、
-* pure technical key without meaning; not ready for naming or name scope
-conventions that might be helpful for pragmatic reasons, e.g. we learned
-to use names for product attributes, instead of UUIDs
+* 意味のない人工的なキーである。せっかく命名規約を用意しているのに、使わないのは実用的な理由から良くない。例えば、UUIDの代わりに製品属性に付けられた名前を使おう。
 * 使いづらい
 * 人間には覚えられないし、それを使ってコミュニケーションできない
 * デバッグやログ解析に使いづらい

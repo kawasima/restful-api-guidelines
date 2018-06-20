@@ -76,13 +76,10 @@ RFC 7231により詳細があります。
 Content-Location]
 
 [#181]
-== {MAY} Preferヘッダを使うUse the Prefer header to indicate processing preferences
+== {MAY} 処理するプリファレンスを示すためにPreferヘッダを使う
 
-`Prefer`ヘッダは https://tools.ietf.org/html/rfc7240[RFC7240]
-で定義されており、クライアントがサーバの振る舞いをリクエスト
-The `Prefer` header defined in
-https://tools.ietf.org/html/rfc7240[RFC7240] allows clients to request
-processing behaviors from servers.
+`Prefer` ヘッダは https://tools.ietf.org/html/rfc7240[RFC7240]
+で定義されており、クライアントがサーバの振る舞いをリクエストするのに使われます。
 https://tools.ietf.org/html/rfc7240[RFC7240] では多くのプリファレンスが
 事前定義されていて拡張も可能です。
 Prefer ヘッダのサポートは、任意でありAPI設計の裁量次第ですが、

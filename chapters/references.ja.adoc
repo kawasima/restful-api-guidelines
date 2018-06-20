@@ -27,7 +27,7 @@
 [[dissertations]]
 == 論文
 
-* http://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm[Roy Thomas Fielding - Architectural Styles and the Design of Network-Based Software Architectures]. This is the text which defines what REST is.
+* http://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm[Roy Thomas Fielding - Architectural Styles and the Design of Network-Based Software Architectures]. これはRESTとは何かについて書かれたものです。
 
 [[books]]
 == 書籍
@@ -40,3 +40,5 @@
 == ブログ
 
 * http://restful-api-design.readthedocs.org/en/latest/[Lessons-learned blog: Thoughts on RESTful API Design]
+
+[%hardbreaks]

@@ -9,18 +9,21 @@
 :creator: Zalando SE
 :producer: Asciidoctor
 :keywords: Zalando, Guidelines, RESTful, API, Events, Schema
-:copyright: CC-BY-SA 3.0
+:copyright: CC-BY-SA 4.0
 
 :MUST: pass:[<span class="must-keyword"><strong>Must:</strong></span>]
 :SHOULD: pass:[<span class="should-keyword"><strong>Should:</strong></span>]
 :MAY: pass:[<span class="may-keyword"><strong>May:</strong></span>]
 
 = Zalando RESTful API と イベントスキーマのガイドライン
-Zalando SE (翻訳: kawasima)
+Zalando SE (翻訳: https://github.com/kawasima[kawasima])
+Original: https://opensource.zalando.com/restful-api-guidelines/
 
 image::assets/api-zalando-small.jpg[API Guild Logo]
 
-別の形式: link:zalando-guidelines.pdf[PDF], link:zalando-guidelines.epub[EPUB3] (Comming soon)
+別の形式: link:zalando-guidelines-ja.pdf[PDF], link:zalando-guidelines-ja.epub[EPUB3]
+
+License: CC-BY-SA 4.0 © Zalando SE 2018 & CC-BY-SA 4.0 © kawasima 2018
 
 toc::[]
 
