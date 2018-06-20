@@ -8,7 +8,14 @@ jobs:
       - checkout
       - run:
           name: install asciidoctor
-          command: gem install asciidoctor asciidoctor-pdf asciidoctor-epub3 coderay
+          command: |
+            gem install asciidoctor
+            asciidoctor-diagram
+            asciidoctor-pdf:1.5.0.alpha.16
+            asciidoctor-epub3:1.5.0.alpha.7
+            asciidoctor-mathematical
+            epubcheck:3.0.1
+            coderay
       - run:
           name: mkdir
           command: mkdir ./dist
