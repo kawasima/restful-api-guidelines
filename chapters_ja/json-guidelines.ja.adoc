@@ -23,7 +23,7 @@ GitHub, Stack Exchange, Twitterなど。一方でGoogleやAmazonは、- だけ�
 必要不可欠なことです。
 
 [#216]
-== {SHOULD} キーフォーマットに制限がないmapは、 `additionalProperties` を使って定義する
+== {SHOULD} Mapは `additionalProperties` を使って定義する
 
 ここで「map」は、文字列のキーから他の型へのマッピングを意味します。
 JSONにおいてこれはオブジェクトとして表現されます。キーと値のペアはプロパティ名とプロパティの値によって

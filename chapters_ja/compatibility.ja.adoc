@@ -127,6 +127,7 @@ APIフォーマットは `additionalProperties` をfalseと宣言してはなり
 
 このガイドラインはデフォルトの拡張可能性に焦点を当てているのであって、
 ある状況下では単なる値として `additionalProperties` を使うことを否定はしていません。
+例えば、 <<216>> を参照。
 
 [#112]
 == {SHOULD} 列挙型の代わりに、上限なしの値リスト(x-extenible-enum)を使う

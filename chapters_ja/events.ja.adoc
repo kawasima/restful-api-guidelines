@@ -146,11 +146,13 @@ EventType:
   properties:
     name:
       description: |
-        このEventTypeの名前です。 注意: 名前はこのEventTypeのオーナー/責務を符号化
-        したもので、可読性と理解しやすさのため命名パターンにしたがってください。
+        このEventTypeの名前です。 注意: 全体での一意性と可読性を保つため、
+        `<functional-name>.<event-name>` の形式で命名するようにしてください。
       type: string
-      pattern: '[a-zA-Z][-0-9a-zA-Z_]*(\.[a-zA-Z][-0-9a-zA-Z_]*)*'
-      example: order.order_cancelled, business_partner.contract
+      pattern: '[a-z][a-z0-9-]*\.[a-z][a-z0-9-]*'
+      example: |
+        transactions.order.order-cancelled,
+        customer.personal-data.email-changed
     owning_application:
       description: |
         この `EventType` を所有するアプリケーションの名前です。
@@ -630,7 +632,7 @@ _フィールド再定義 _ の問題を避けるため、イベント送信者�
 どちらも、 `additionalProperties` を使わないことで防げます。
 
 `additionalProperties` の使用についてのガイドラインは、 <<compatibility>>
-の章の「Open APIの定義をデフォルトで拡張に対してオープンとして扱う」を参照ください。
+の章のルール <<111>> を参照ください。
 
 [#211]
 == {MUST} ユニークなイベント識別子を使う
@@ -674,14 +676,32 @@ _フィールド再定義 _ の問題を避けるため、イベント送信者�
 再生成するために、順番に並んだキーを使います。
 
 [#213]
-== {MUST} イベントの型名の規約にしたがう
+== {MUST} イベント型の名前は命名規約にしたがう
 
-イベントの型はこれらの命名規約にしたがいましょう。
+イベント型の名前は、それぞれ <<219, オーディエンス>> に依存した命名規約に準拠しなければなりません。
+(詳細は <<223>> の `<functional-name>` 定義を参照ください)
 
-* イベントの名前はURLセールでなくてはならない。これはイベント型名が、他のシステムや
-APIでURLとして使われる可能性があるため。
-* イベント型名は、小文字と数字のみからなり、ハイフン、アンダースコアまたはピリオドを
-セパレータとして使うことができる。
+[source,bnf]
+----
+<event-type-name>       ::= <functional-event-name> | <application-event-name>
+
+<functional-event-name> ::= <functional-name>.<event-name>
+
+<event-name>            ::= [a-z][a-z0-9-]* -- 自由なイベント名 (機能を表す名前)
+----
+
+次のアプリケーション固有のレガシーな規約は、 <<223, 内部>> イベント型名に *のみ*
+適用するようにしてください。
+
+[source,bnf]
+----
+<application-event-name> ::= [<organization-id>.]<application-id>.<event-name>
+<organization-id>  ::= [a-z][a-z0-9-]* -- 組織の識別子 (例えばチームIDのような)
+<application-id>   ::= [a-z][a-z0-9-]* -- アプリケーションの識別子
+----
+
+**注意:** 同じエンティティをデータ変更イベントとRESTful APIの両方で扱うときは、
+一貫性のある名前を使うようにしましょう。
 
 [#214]
 == {MUST} 重複したイベントに備える

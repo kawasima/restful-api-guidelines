@@ -1,6 +1,67 @@
 [[api-naming]]
 = APIの命名
 
+[#223]
+== {MUST-SHOULD} 機能本位の命名体系を使う
+
+機能本位の命名は、あるアプリケーション群の中で、_ホスト_ や _権限_、 _イベント名_
+のような各所から利用されるリソースに、整合性をもたせる強力で簡単な方法です。
+そうすることで、コンポーネントについての意味のあるコンテキスト情報を
+読み手に提供しつつ、名前の一意性も保証できます。
+さらにもっとも重要なのは、技術的、組織的な変化の中でAPIを安定した状態が保たれるという点です。
+
+拡大していく <<219, オーディエンス>> とともにAPIがこの利点を享受できるよう、
+<<224, ホスト名>> や <<215, 権限名>>、 <<213, イベント名>> に関して、
+次のような機能本位の命名体系にしたがうことを強く推奨します。
+
+[cols="25%,75%,options="header"]
+|================================================================
+| *Functional Naming* | *オーディエンス*
+| *must*   | external-public, external-partner, company-internal
+| *should* | component-internal, business-unit-internal
+|================================================================
+
+機能本位の命名体系に導くために、
+一意な `functional-name` が各機能コンポーネントに割り当てられます。
+それはコンポーネントが属する機能グループのドメイン名からなり、
+機能コンポーネントを一意に識別できる短い名前です。
+
+[source,bnf]
+----
+<functional-name>       ::= <functional-domain>-<functional-component>
+<functional-domain>     ::= [a-z][a-z0-9]*  -- 管理されたコンポーネントの機能グループ
+<functional-component>  ::= [a-z][a-z0-9-]* -- 機能コンポーネント自身の名前
+----
+
+機能の命名パターンの詳細ルールについては、以下のものも参照ください。
+
+* <<224>>
+// * <<225>>
+* <<213>>
+
+[#224]
+== {MUST} ホスト名の命名規約にしたがう
+
+APIにおけるホスト名は、以下に示すようにそれぞれ <<219, オーディエンス>> ごとに
+定められた機能の命名ルールに準拠すべきです。
+(詳細は <<223>> の `<functional-name>` 定義を参照ください)
+
+[source,bnf]
+-----
+<hostname>             ::= <functional-hostname> | <application-hostname>
+
+<functional-hostname>  ::= <functional-name>.zalandoapis.com
+-----
+
+次に示すアプリケーション固有のレガシーな規約は、 <<223, 内部>> APIのホスト名に *だけ* 適用できます。
+
+[source,bnf]
+-----
+<application-hostname> ::= <application-id>.<organization-unit>.zalan.do
+<application-id>       ::= [a-z][a-z0-9-]*  -- アプリケーション識別子
+<organization-id>      ::= [a-z][a-z0-9-]*  -- 組織単位の識別子。例えば、チームID
+-----
+
 [#129]
 == {MUST} パスセグメントはハイフンで区切られた小文字を使う
 

@@ -1,0 +1,136 @@
+[[security]]
+= セキュリティ
+
+[#104]
+== {MUST} OAuth 2.0でエンドポイントをセキュアにする
+
+すべてのAPIエンドポイントはOAuth 2.0を使ってセキュアにする必要があります。
+API仕様におけるセキュリティ定義のやり方は、
+https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#security-definitions-object[公式のOpenAPI仕様] を参照してください。
+次に例も示しておきます。
+
+[source,yaml]
+----
+securityDefinitions:
+  oauth2:
+    type: oauth2
+    flow: application
+    tokenUrl: https://identity.zalando.com/oauth2/token
+    scopes:
+      fulfillment-order-service.read: Access right needed to read from the fulfillment order service.
+      fulfillment-order-service.write: Access right needed to write to the fulfillment order service.
+----
+
+上記例はセキュリティ標準として、エンドポイントへのアクセスを認証するのに
+クライアント認証フローのOAuth2を使った際の定義です。
+さらに、スコープセクションを使って2つのAPIアクセス権を定義しています。
+エンドポイントの権限の使い方は後述します。 <<105, 次のセクション>> を参照ください。
+
+`securityDefinitions` でOAuthトークンを取得するフローを指定するのは、ほとんど意味がありません。
+APIエンドポイントは、どうOAuthトークンが生成されようが気にする必要はありません。
+不幸にも `flow` フィールドは必須であり、消すことはできません。
+APIエンドポイントは、常に `flow: application` を設定し、
+この情報は無視するべきです。
+
+[#105]
+== {MUST} 権限を定義し割り当てる (スコープ)
+
+APIはリソースを保護するために権限を定義しなければなりません。
+少なくとも1つの権限が、それぞれのエンドポイントに割り当てられなければなりません。
+権限は <<104, 前節>> で示したように定義されます。
+
+権限のスキーマの命名は、 <<224, ホスト名>> と <<213, イベント型名>> の命名に対応しています。
+権限名の設計には <<225>> を参照ください。
+
+
+権限の種類が多く細かくなり過ぎて、複雑なガバナンスを強いられることがないよう、
+リソース拡張なしで、コンポーネント固有の権限を使うことにこだわりましょう。
+大概のユースケースでは、(read と write違いで)特定のAPIへのアクセスを制限することは、荷主か小売か、カスタマか運用スタッフか、といったクライアントの種類によってアクセスを制御するのに十分なものです。
+ただ、APIが異なるオーナーには異なるリソースを返すような状況下では、
+リソース固有のスコープは意味があるかもしれません。
+
+標準とリソース固有の権限の例を以下に示します。
+
+[cols="25%,20%,15%,40%",options="header",]
+|=======================================================================
+| Application ID | Resource ID | Access Type | Example
+| `order-management` | `sales_order` | `read` | `order-management.sales_order.read`
+| `order-management` | `shipment_order` | `read` | `order-management.shipment_order.read`
+| `fulfillment-order` | | `write` | `fulfillment-order.write`
+| `business-partner-service` | |`read` | `business-partner-service.read`
+|=======================================================================
+
+////
+//権限名の先頭の変化
+
+[cols="15%,15%,15%,15%,40%",options="header",]
+|=======================================================================
+| Domain | Component | Resource | Access Type | Example
+| finance | exchange-rate | - | write | z::finance.exchange-rate.write
+| transactions | order | - | read | z::transactions.order.read
+| customer | address | shipment-address | read  | z::customer.address.shipment-address.read
+|=======================================================================
+[cols="30%,15%,15%,40%",options="header",]
+|=======================================================================
+| Application | Resource | Access Type | Example
+| business-partner-service | | - | read | z::business-partner-service.read
+| order-management | sales_order | write | z::order-management.sales_order.write
+|=======================================================================
+
+////
+
+権限名を定義し、権限をAPI仕様の先頭でセキュリティ定義として宣言したら、
+https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#securityRequirementObject[`セキュリティ` 要求] を記述して、以下のように各API操作に割り当てます。
+
+[source,yaml]
+----
+paths:
+  /sales-orders/{order-number}:
+    get:
+      summary: Retrieves a sales order
+      security:
+        - oauth2:
+          - sales-order-service.sales_order.read
+----
+
+非常にレアケースですが、API全体または、その内いくつかのエンドポイントが、特定のアクセス制御を必要としない
+ことがあります。しかし、この場合も `uid` の疑似アクセス権スコープを明示的に割り当てるようにすべきです。
+これはユーザIDで、OAuth2のデフォルトスコープとして常に利用できます。
+
+[source,yaml]
+----
+paths:
+  /public-information:
+    get:
+      summary: Provides public information about ...
+               Accessible by any user; no access rights needed.
+      security:
+        - oauth2:
+          - uid
+----
+
+ヒント: "Authorization" ヘッダを明示的に定義する必要はありません。
+セキュリティセクションが定義されていれば、暗黙的にそれは標準ヘッダとなるからです。
+
+[#225]
+== {MUST} 権限(スコープ)の命名規約にしたがう
+
+<<223, Functional naming>> が権限にもサポートされない限り、
+APIの権限名は次の命名パターンに準拠しなければなりません。
+
+[source,bnf]
+-----
+<permission> ::= <standard-permission> |  -- 大部分のユースケースでこれを使うべき
+                 <resource-permission> |  -- 異なるユースケースへの特別なセキュリティアクセスのため
+                 <pseudo-permission>      -- アクセスが制限されないことを明示的に指し示すのに使う
+
+<standard-permission> ::= <application-id>.<access-mode>
+<resource-permission> ::= <application-id>.<resource-name>.<access-mode>
+<pseudo-permission>   ::= uid
+
+<application-id>      ::= [a-z][a-z0-9-]*  -- アプリケーション識別子
+<resource-name>       ::= [a-z][a-z0-9-]*  -- 自由なリソース識別子
+<access-mode>         ::= read | write    -- 将来拡張されるかもしれない
+-----
+
+このパターンは、以前の定義とも互換性があります。

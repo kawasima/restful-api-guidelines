@@ -5,7 +5,7 @@
 == {MUST} APIメタ情報を含める
 API仕様はAPI管理のための、次のOpenAPIメタ情報を含まなければならない。
 
-- `#/info/title` : APIの(一意の)識別できる名前
+- `#/info/title` : APIを(一意に)識別でき、その機能を表す名前
 - `#/info/version` : API仕様のバージョン。 <<116, セマンティックルール>> にしたがう。
 - `#/info/description` : APIの説明
 - `#/info/contact/{name,url,email}` : 担当のチームの情報
@@ -95,10 +95,6 @@ info:
   <...>
 ----
 
-
-https://docs.google.com/document/d/1lRXcTZbZMnFeTVCaazitSWxSdKXGWkOUn99Gr-huNXg[API識別子物語] により情報があります。
-
-
 [#219]
 == {MUST} APIオーディエンスを提供する
 
@@ -108,25 +104,21 @@ https://docs.google.com/document/d/1lRXcTZbZMnFeTVCaazitSWxSdKXGWkOUn99Gr-huNXg[
 私たちは、次に示すようなAPIオーディエンスグループを使って、組織や法的な境界で分類しています。
 
 *component-internal*::
-  The API consumers with this audience are restricted to applications of the
-  same *functional component* which typically represents a specific *product*
-  with clear functional scope and ownership
-  (see https://docs.google.com/document/d/1ZSfVkdX_Dwpz22Xl-CFXgxe1u1eY_IfTNdFNMmnGi8c/edit#heading=h.wwteqf6ovyh[details (internal link)]).
-  All services of a functional component / product are owned by a specific dedicated owner
-  and engineering team(s). Typical examples of component-internal APIs are APIs
-  being used by internal helper and worker services or that support service operation.
+  このオーディエンスのAPI利用者は、同一 *機能コンポーネント* のアプリケーションに制限される。
+  機能コンポーネント/プロダクトのすべてのサービスは、専門のオーナーとエンジニアチームが管理する。
+  component-internal APIの典型例には、内部のヘルパーやワーカーサービスに利用されるもの、
+  サービス運用を支援するものがある。
 *business-unit-internal*::
-  The API consumers with this audience are restricted to applications of a
-  specific product portfolio owned by the same business unit.
+  このオーディエンスのAPI利用者は、同一の業務ユニットが持っている
+  固有のプロダクトポートフォリオのアプリケーションに制限される。
 *company-internal*::
-  The API consumers with this audience are restricted to applications owned
-  by the business units of the same the company (e.g. Zalando company with
-  Zalando SE, Zalando Payments SE & Co. KG. etc.)
+  このオーディエンスのAPI利用者は、同一企業の業務ユニット (例えば Zalando SE, Zalando Payments SE & Co. KG. など)
+  が持つアプリケーションに制限される。
 *external-partner*::
-  The API consumers with this audience are restricted to applications of
-  business partners of the company owning the API and the company itself.
+  このオーディエンスのAPI利用者は、APIを所有している企業の提携企業と、その企業自身の
+  アプリケーションに制限される。
 *external-public*::
-  APIs with this audience can be accessed by anyone with Internet access.
+  このオーディエンスのAPIは、インターネットにアクセスできる誰でも利用できる。
 
 *注意:* より小さなオーディエンスグループは、より大きなグループに含まれることを意味します。
 したがってオーディエンスグループを追加で宣言する必要はありません。
@@ -145,14 +137,12 @@ APIオーディエンスは、Open API仕様の`info`-ブロックにAPIメタ�
     - external-partner
     - external-public
   description: |
-    Intended target audience of the API. Relevant for standards around
-    quality of design and documentation, reviews, discoverability,
-    changeability, and permission granting.
+    対象とするAPIのオーディエンス。設計とドキュメント、レビュー、探しやすさ、
+    変更しやすさ、権限付与などの質に標準に影響する。
 ----
 
 *注意:* API仕様につき、オーディエンスは正確に*1つだけ*です。その理由は、小さなオーディエンスグループは、大きなオーディエンスグループに含まれるからです。もしAPIの一部が異なる対象オーディエンスを持つのであれば、
 API仕様を分割することをおすすめします。たとえ冗長だとしてもです。
-(https://docs.google.com/document/d/1ff9b6oIa6dyQRyaj36-jmFdtCjWlngnGMsligR4RMIY/edit#heading=h.401bmun50mlj[rationale])
 
 例:
 
