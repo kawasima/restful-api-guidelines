@@ -17,8 +17,9 @@
 [cols="25%,75%,options="header"]
 |================================================================
 | *Functional Naming* | *オーディエンス*
-| *must*   | external-public, external-partner, company-internal
-| *should* | component-internal, business-unit-internal
+| *must*   | external-public, external-partner
+| *should* | company-internal, business-unit-internal
+| *may*    | component-internal
 |================================================================
 
 機能本位の命名体系に導くために、

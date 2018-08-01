@@ -78,6 +78,7 @@ API定義の以外にドキュメントをたくさん書かなきゃいけな�
 /carts/1681e6b88ec1/items
 /carts/1681e6b88ec1/items/1
 /customers/12ev123bv12v/addresses/DE_100100101
+/content/images/9cacb4d8
 ----
 
 [#144]

@@ -8,7 +8,7 @@
 
 2つのページネーションのテクニックがあります。
 
-* http://developer.infoconnect.com/paging-results-limit-and-offset[Limit/Offsetベース]: 最初のページエントリをオフセット数値で特定する
+* https://developer.infoconnect.com/paging-results[Limit/Offsetベース]: 最初のページエントリをオフセット数値で特定する
 * https://dev.twitter.com/overview/api/cursoring[カーソルベース] — またの名を
 キーベース — ページネーション: 単一のキー要素で最初のページエントリを特定する
 (https://developers.facebook.com/docs/graph-api/using-graph-api/v2.4#paging[Facebookのガイド]も見てください)

@@ -48,7 +48,7 @@ https://docs.oracle.com/javase/8/docs/api/java/math/BigDecimal.html[`BigDecimal`
 詳細は http://stackoverflow.com/a/3730040/342852[Stack Overflow]
 
 いくつかのJSONパーサ(例えばNodeJS)は、デフォルトでnumberをfloatに変換してしまいます。
-https://docs.google.com/spreadsheets/d/12wTj-2w39f69XZGwRDrosNc1yWPwQpGgEs_DCt5ODaQ[議論 (internal link)]を経て、私たちは金額のフォーマットに"decimal"を使うことに決めました。
+メリデメの議論を経て、私たちは金額のフォーマットに"decimal"を使うことに決めました。
 OpenAPIフォーマットの標準ではないけれど、パーサがnumberをfloatやdoubleに変換してしまうことを避けることができるからです。
 
 [#174]
@@ -116,13 +116,6 @@ APIクライアント開発者にとってZalandoリソースの共通理解が�
 addressee:
   description: a (natural or legal) person that gets addressed
   type: object
-  required:
-    - first_name
-    - last_name
-    - street
-    - city
-    - zip
-    - country_code
   properties:
     salutation:
       description: |
