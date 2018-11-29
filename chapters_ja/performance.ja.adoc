@@ -39,7 +39,7 @@ http://tools.ietf.org/html/rfc7231#section-5.3.4[RFC 7231 Section 5.3.4].
 
 ユースケースとペイロードサイズに依存して、返却するエンティティのフィールドの
 フィルタリングをサポートすることによって、必要とするネットワーク帯域を大いに
-減らこすとができるでしょう。
+減らすことができるでしょう。
 フィールドクエリパラメータを付けることで、クライアントは欲しいデータに応じて、
 フィールドのサブセットを決めることができます。
 例は https://cloud.google.com/appengine/docs/python/taskqueue/rest/performance#partial-response[Google
