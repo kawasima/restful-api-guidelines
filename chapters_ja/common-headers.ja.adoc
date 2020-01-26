@@ -5,49 +5,40 @@
 特定の状況では役に立ったりするいくつかのヘッダについて記述します。
 
 [#178]
-== {MUST} 正しいContentヘッダを使う
+== {MUST} `Content-*` ヘッダを正しく使う
 
 Contentやエンティティに関するヘッダには、`Content-`のプレフィクスが付いています。
 これらにはメッセージボディの内容に関することが書かれていて、HTTPリクエストとレスポンスの両方で使用されます。
 共通的に使われるContentヘッダは次のようなものですが、その限りではありません。
 
-* https://tools.ietf.org/html/rfc6266[`Content-Disposition`] はファイルとして
-保存されることを意図したり、そのときのデフォルトのファイル名を与えるのに使う。
-* https://tools.ietf.org/html/rfc7231#section-3.1.2.2[`Content-Encoding`]
-はContentに適用される圧縮/暗号アルゴリズムを示す。
-* https://tools.ietf.org/html/rfc7230#section-3.3.2[`Content-Length`]
-はContentの長さをbyte長で示す。
-* https://tools.ietf.org/html/rfc7231#section-3.1.3.2[`Content-Language`]
-indicates that the body is meant for people literate in some human
-language(s).
-* https://tools.ietf.org/html/rfc7231#section-3.1.4.2[`Content-Location`]
-はボディが別の場所にあることを示す
-(<<179>> により詳細があります)。
-* https://tools.ietf.org/html/rfc7231#section-3.1.1.5[`Content-Type`]
-は、ボディのメディアタイプを示す。
-
+* {Content-Disposition} はファイルとして保存されることを意図したり、そのときのデフォルトのファイル名を与えるのに使う。
+* {Content-Encoding} はContentに適用される圧縮/暗号アルゴリズムを示す。
+* {Content-Length} はContentの長さをbyte長で示す。
+* {Content-Language} はボディがある人間のための言語で書かれていることを示す。
+* {Content-Location} はボディが別の場所にあることを示す (<<179>> により詳細があります)。
+* {Content-Range} はボディの一部を取得することを指し示すのに使われる。
+* {Content-Type} は、ボディのメディアタイプを示す。
+ 
 [#133]
 == {MAY} 標準のヘッダを使う
 
 http://en.wikipedia.org/wiki/List_of_HTTP_header_fields[このリスト]
-を使い、OpenAPI定義にサポートするヘッダを記述します。
+を使い、Open API定義にサポートするヘッダを記述します。
 
 [#179]
 == {MAY} Content-Location ヘッダを使う
 
-Content-Location ヘッダは _任意_ であり、成功した書き込み操作(PUT, POST, PATCH)や読み込み操作(GET, HEAD)
+Content-Location ヘッダは _任意_ であり、成功した書き込み操作({PUT}, {POST}, {PATCH})や読み込み操作({GET}, {HEAD})
 で使われ、キャッシュ位置を示したり、リソースの実際の場所を受信者に通知したりします。
-これによりクライアントはリソースを識別し、このヘッダの付いたレスポンスを受け取ったらローカルコピーを
-更新することができるのです。
+これによりクライアントはリソースを識別し、このヘッダの付いたレスポンスを受け取ったらローカルコピーを更新することができるのです。
 
 Content-Locationヘッダは、次のユースケースを実現するのに使われます。
 
-* GETやHEADで、リクエストされたURIとは異なる場所が、
-返されるリソースはコンテントネゴシエーションに依存したものであったり、リソース固有の識別子を与えることを
-示すのに使われる。
-* PUTやPATCHでは、リクエストされたURIと同一の場所を指し、
+* {GET}や{HEAD}で、リクエストされたURIとは異なる場所が、
+返されるリソースはコンテントネゴシエーションに依存したものであったり、リソース固有の識別子を与えることを示すのに使われる。
+* {PUT}や{PATCH}では、リクエストされたURIと同一の場所を指し、
 返却されたリソースが、新しく生成/更新されたリソースの現在の表現であることを明示するのに使われる。
-* POSTやDELETEでは、
+* {POST}や{DELETE}では、
 リクエストされたアクションに対するレスポンスに、ステータスレポートリソースが含まれることを示すのに使われる。
 
 *注意*: Content-Locationヘッダを使用する際には、Content-Typeヘッダも正しく
@@ -63,81 +54,65 @@ Content-Location: /products/123/images?format=raw
 ----
 
 [#180]
-== {SHOULD} Content-Locationの代わりにLocationヘッダを使う
+== {SHOULD} `Content-Location` の代わりに `Location` ヘッダを使う
 
-セマンティクスやキャッシュに関して、Content-Locationを正しく使うのは
-難しいので、私たちはContent-Location の使用を _推奨していません_ 。
-たいていの場合、Content-Location特有の曖昧さや複雑さに悩まされる代わりに、
-Locationヘッダを使うことで、クライアントにリソースの場所を直接知らせることで十分です。
+セマンティクスやキャッシュに関して、{Content-Location}を正しく使うのは
+難しいので、私たちは{Content-Location} の使用を _推奨していません_ 。
+たいていの場合、{Content-Location}特有の曖昧さや複雑さに悩まされる代わりに、
+{Location}ヘッダを使うことで、クライアントにリソースの場所を直接知らせることで十分です。
 
-RFC 7231により詳細があります。
-* https://tools.ietf.org/html/rfc7231#section-7.1.2[7.1.2 Location]
-* https://tools.ietf.org/html/rfc7231#section-3.1.4.2[3.1.4.2
-Content-Location]
+より詳細な話が、RFC 7231 {RFC-7231}#section-7.1.2[7.1.2 Location],
+{RFC-7231}#section-3.1.4.2[3.1.4.2 Content-Location] にあります。
 
 [#181]
-== {MAY} 処理するプリファレンスを示すためにPreferヘッダを使う
+== {MAY} 処理するプリファレンスを示すために{Prefer}ヘッダのサポートを検討しよう
 
-`Prefer` ヘッダは https://tools.ietf.org/html/rfc7240[RFC7240]
-で定義されており、クライアントがサーバの振る舞いをリクエストするのに使われます。
-https://tools.ietf.org/html/rfc7240[RFC7240] では多くのプリファレンスが
-事前定義されていて拡張も可能です。
-Prefer ヘッダのサポートは、任意でありAPI設計の裁量次第ですが、
+{Prefer}ヘッダは {RFC7240}[RFC 7420]で定義されており、クライアントがサーバの振る舞いをリクエストするのに使われます。多くのプリファレンスが事前定義されていて拡張も可能です。
+{Prefer}ヘッダのサポートは、任意でありAPI設計の裁量次第ですが、
 既存のインターネット標準と同様に、独自の"X-"ヘッダを定義して処理することをおすすめします。
 
-`Prefer` ヘッダはAPI定義に次のように定義します。
+{Prefer}ヘッダはAPI定義に次のように定義します。
 
 [source,yaml]
 ----
-Prefer:
-  name: Prefer
-  description: |
-    The RFC7240 Prefer header indicates that particular server
-    behaviors are preferred by the client but are not required
-    for successful completion of the request.
-    # (indicate the preferences supported by the API)
+components:
+  headers:
+  - Prefer:
+      description: >
+        RFC7240のPreferヘッダは特定のサーバの挙動が、そのクライアントにとって望ましく
+        リクエストが ([RFC7240](https://tools.ietf.org/html/rfc7240)参照)
+        このAPIでは次の振る舞いがサポートされる。
 
-  in: header
-  type: string
-  required: false
+        # (APIまたはAPIエンドポイントによって)
+        * **respond-async** は結果を待つかわりに、202 - accepted - を使って非同期にできるだけ速く応答を返すようにサーバに伝える。
+        * **return=<minimal|representation>** はリソースなしで204を使い応答を返して欲しい場合(minimal)、リソースありで200や201を使い応答を返して欲しい場合(representation)を使い分ける。
+        * **wait=<delta-seconds>** はリクエストを同期的に処理する最大時間を示すのに使う。
+        * **handling=<strict|lenient>** はエラーに対して厳格でレポートするか、あるいは寛容で可能な限り処理を継続するかをサーバに指示するのに使う。
+      in: header
+      type: string
+      required: false
 ----
 
-`Prefer` をサポートするAPIは、 これまた
-https://tools.ietf.org/html/rfc7240[RFC7240]
-で定義された `Preference-Applied` ヘッダを返すかもしれません。
-これはプリファレンスが適用されたかどうかを指し示すのに使われます。
+*注意:* APIエンドポイントがサポートする{Prefer}ヘッダの仕様へは振る舞いだけをコピーしよう。必要ならそれぞれのサポートされるユースケースで異なる{Prefer}ヘッダを明記しよう。
+
+サポートするAPIは{Preference-Applied}ヘッダを返してもよい。これは{RFC-7240}[RFC 7240]で定義され、プリファレンスが適用されたかどうかを指し示す。
 
 [#182]
-== {MAY} If-Match/If-None-MatchヘッダともにEtagを使う
+== {MAY} If-Match/If-None-MatchヘッダともにEtagのサポートを検討しよう
 
-リソースが作成、更新されるときは、コンフリクトの発生を検知し、'更新データのロスト'や
-'重複して作成される'問題を防ぐ必要があります。
-https://tools.ietf.org/html/rfc7232[RFC 7232 "HTTP: Conditional Requests"]
-にしたがい、
-https://tools.ietf.org/html/rfc7232#section-2.3[`ETag`]
-ヘッダを
-https://tools.ietf.org/html/rfc7232#section-3.1[`If-Match`]
-または
-https://tools.ietf.org/html/rfc7232#section-3.2[`If-None-Match`]
-の条件ヘッダとともに使うことで、それが出来るようになります。
+リソースが作成、更新されるときは、コンフリクトの発生を検知し、'更新データのロスト'や'重複して作成される'問題を防ぐ必要があります。[RFC-7232]{RFC 7232 "HTTP: Conditional Requests"}にしたがい、{ETag}ヘッダを{If-Match}または{If-None-Match}の条件ヘッダとともに使うことで、それが出来るようになります。
 `ETag: <entity-tag>` ヘッダの内容は、(a) レスポンスボディのハッシュ値か、
-(b) エンティティの最終更新日時フィールドのハッシュ値、(c) エンティティのバージョンの
-番号または識別子の何れかにします。
+(b) エンティティの最終更新日時フィールドのハッシュ値、(c) エンティティのバージョンの番号または識別子の何れかにします。
 
-PUT, POST, PATCHの同時更新操作でコンフリクトが発生したことを検出するために、
-サーバは `If-Match: <entity-tag>` ヘッダがあれば、更新エンティティのバージョンが、
-リクエストの `<entity-tag>` と一致しているかをチェックしなければなりません。
-もし一致するエンティティがなければ、412 - precondition failed のステータスコードを
-返すようにします。
+{PUT}, {POST}, {PATCH}の同時更新操作でコンフリクトが発生したことを検出するために、サーバは `If-Match: <entity-tag>` ヘッダがあれば、更新エンティティのバージョンが、リクエストの{entity-tag>}と一致しているかをチェックしなければなりません。
+もし一致するエンティティがなければ、{412} - precondition failed のステータスコードを返すようにします。
 
-他のユースケース、
-リソース生成時にコンフリクトを検出する方法としては、
-`If-None-Match:` ヘッダに `*` のパラメータを使います。
+他のユースケース、リソース生成時にコンフリクトを検出する方法と同様に、
+`If-None-Match: *` が使えます。
 もしエンティティにマッチするものがあれば、既に同じリソースが作成されていることを
 示すので、412 - precondition failed のステータスコードを返します。
 
-`ETag`, `If-Match`, `If-None-Match` ヘッダは、API定義においては次のように
-定義されます。
+{ETag}, {If-Match}, {If-None-Match}ヘッダは、API定義においては次のように定義されます。
 
 [source,yaml]
 ----
@@ -184,3 +159,46 @@ IfNoneMatch:
 ----
 
 別のアプローチについての議論は、<<optimistic-locking>> セクションも参照ください。
+
+[#230]
+== {MAY} `Idempotency-Key` ヘッダのサポートを検討しよう
+
+リソースを生成したり更新したりするとき、タイムアウトやネットワーク障害のためにリトライするケースで、重複実行を避けるため同じレスポンを返す強い<<冪等性>>が役に立ったり、必要になったりします。一般的にこれはクライアント固有の _一意のリクエストキー_ をリソースの一部ではなく、{Idempotency-Key}ヘッダを通じて送信することによって実現されます。
+
+_一意のリクエストキー_ は、一時的(例えば24時間くらい)に保存され、成功したか失敗したかによらずレスポンスと(これはオプションですが)最初のリクエストのハッシュを一緒に格納します。サービスは、<<冪等>>動作を保証するために、リクエストをリトライする代わりに、キーキャッシュ内の_ 一意のリクエストキー_ を検索し、キーキャッシュからレスポンスを返すことができます。オプションとして、レスポンスを返す前にリクエストのハッシュを使って整合性をチェックできます。キーがキーストアにない場合、リクエストは通常どおり実行され、レスポンスはキーキャッシュに格納されます。
+
+これにより、クライアントは同じレスポンスを複数回受信しながら、タイムアウトやネットワーク障害などの後に安全にリクエストをリトライできます。 *注意:* このコンテキストでのリクエストのリトライは、全く同じリクエストを送信する必要があります。つまり、結果を変更するようなリクエストの更新は禁止されています。キーキャッシュ内のリクエストハッシュは、この誤った使い方から保護することができます。このようなリクエストは、ステータスコード{400}を使用して拒否することをお勧めします。
+
+*重要:* 信頼性の高い<<冪等>>実行セマンティクスを付与するには、分散システムにおける障害、タイムアウト、同時リクエストの潜在的なすべての落とし穴を考慮して、リソースとキーキャッシュをハードトランザクションセマンティクスで更新する必要があります。これは、ローカルコンテキストを超える正しい実装を非常に難しくします。
+
+{Idempotency-キー}ヘッダーは次のように定義する必要がありますが、有効期限は自由に選択できます。
+
+[source,yaml]
+----
+components:
+  headers:
+  - Idempotency-Key:
+      description: |
+        Idempotency Keyは、リクエストを一意に識別するためクライアントによって生成
+        される自由な識別子である。サービスによって同じリクエストのリトライである
+        ことを特定したり、2度同じリクエストを実行せずに、同じリクエストを返すこと
+        で冪等な振る舞いを保証するために、サービスによって使われる。
+
+        クライアントは同じキーをもつ一連のリクエストは、さらなるチェックなしに
+        同じレスポンスを返すかもしれないことに注意すべきだ。それゆえUUID v4 (Random)や他の十分衝突を回避できるだけのエントロピーをもったランダム文字列を使うこと
+        を推奨する。
+
+        Idempotency Keyは24時間で有効期限が切れる。クライアントはこの制限内で
+        これらを使う責任を持たねばならない。
+
+      type: string
+      format: uuid
+      require: false
+      example: "7da7a728-f910-11e6-942a-68f728c1ba70"
+----
+
+*ヒント:* キーキャッシュはリクエストログとして意図されていません。したがって、その生存期間は制限すべきだし、そうしないとデータリソースのサイズを簡単に超えてしまうことになります。
+
+*注意:* {Idempotency-Key}ヘッダはこのセクションの他のヘッダと異なりRFCで標準化されていません。https://stripe.com/docs/api/idempotent_requests[Stripe API]での使われ方だけを参考にしました。<<proprietary-headers>>のセクションの規約とは合いませんが、ヘッダの名前と意味を変えたくはなく、他の共通ヘッダと同じようにこれを扱うことを決めました。
+
+
