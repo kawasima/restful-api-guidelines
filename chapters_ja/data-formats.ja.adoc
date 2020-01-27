@@ -85,21 +85,20 @@
 [[http-headers]]
 === HTTPヘッダ
 
-独自のものを含むHTTPヘッダは、 http://tools.ietf.org/html/rfc7231#section-7.1.1.1[RFC 7231 で定義されている日付フォーマット] を使いましょう。
+独自のものを含むHTTPヘッダは、 {RFC-7231}#section-7.1.1.1[RFC 7231 で定義されている日付フォーマット] を使いましょう。
 
+[#128]
 [#170]
-== {MAY} 国、言語、通貨のコードは標準を使う
+== {SHOULD} 国、言語、通貨のコードは標準を使う
 
 国、言語、通貨は次の標準コードを使いましょう。
 
-* https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2[ISO 3166-1-alpha2
-国コード]
+* {ISO-3166-1-a2}[ISO 3166-1-alpha2 国コード]
 ** (“UK”ではなく“GB”を使う。Zalandoでは「UK」というワードが使われているのを見かけるかもしれないが)
-* https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes[ISO 639-1
-言語コード]
-** https://tools.ietf.org/html/bcp47[BCP-47] (based on ISO 639-1) for
-language variants
-* https://en.wikipedia.org/wiki/ISO_4217[ISO 4217 通貨コード]
+* {ISO-639-1}[ISO 639-1 言語コード]
+** {BCP47}[BCP 47] (based on {ISO-639-1}[ISO 639-1])
+   for language variants
+* {ISO-4217}[ISO 4217 通貨コード]
 
 [#171]
 == {MUST} 数値型と整数型のフォーマットを定義する
@@ -113,8 +112,8 @@ APIで `number` または `integer` の型のプロパティを定義すると�
 |integer |int32 |integer between pass:[-2<sup>31</sup>] and pass:[2<sup>31</sup>]-1
 |integer |int64 |integer between pass:[-2<sup>63</sup>] and pass:[2<sup>63</sup>]-1
 |integer |bigint |arbitrarily large signed integer number
-|number |float |IEEE 754-2008/ISO 60559:2011 binary64 decimal number
-|number |double |IEEE 754-2008/ISO 60559:2011 binary128 decimal number
+|number |float |{IEEE-754-2008}[IEEE 754-2008/ISO 60559:2011] binary32 decimal number
+|number |double |{IEEE-754-2008}[IEEE 754-2008/ISO 60559:2011] binary64 decimal number
 |number |decimal |arbitrarily precise signed decimal number
 |=====================================================================
 
@@ -124,22 +123,24 @@ APIで `number` または `integer` の型のプロパティを定義すると�
 
 [source,yaml]
 ----
-Money:
-  type: object
-  properties:
-    amount:
-      type: number
-      description: Amount expressed as a decimal number of major currency units
-      format: decimal
-      example: 99.95
-   ...
-
-OrderList:
-  type: object
-  properties:
-    page_size:
-      type: integer
-      description: Number of orders in list
-      format: int32
-      example: 42
+components:
+  schemas:
+    Money:
+      type: object
+      properties:
+        amount:
+          type: number
+          description: Amount expressed as a decimal number of major currency units
+          format: decimal
+          example: 99.95
+       ...
+    
+    OrderList:
+      type: object
+      properties:
+        page_size:
+          type: integer
+          description: Number of orders in list
+          format: int32
+          example: 42
 ----

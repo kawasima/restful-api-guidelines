@@ -15,7 +15,7 @@ APIは機能、業務の観点で定義され、実装の観点からは切り�
 ドキュメント化するのは役に立ちません。
 レスポンスコードがアプリケーション固有の機能の意味を伝えないか、または
 追加の説明を必要とするような標準でない使われ方をする限りは、
-複数のエラーレスポンス仕様は、次のパターンを用いて組み合わせることができます。
+複数のエラーレスポンス仕様は、次のパターンを用いて組み合わせることができます。(<<#234>>も参照)
 
 [source,yaml]
 ----
@@ -23,15 +23,16 @@ responses:
   ...
   default:
     description: error occurred - see status code and problem object for more information.
-    schema:
-      $ref: 'https://zalando.github.io/problem/schema.yaml#/Problem'
+    content:
+      "application/problem+json":
+        schema:
+          $ref: 'https://opensource.zalando.com/problem/schema.yaml#/Problem'
 ----
 
 API設計者は関連するオンラインAPIドキュメントの一部として、
-** トラブルシューティングボード ** について考えなければなりません。
+**トラブルシューティングボード** について考えなければなりません。
 API固有のエラーについての情報とハンドリングの指針を提供し、API仕様からリンクを通じて参照されるものにもなります。
 これはサービスのサポート業務を減らし、サービス利用者、提供者双方の業績に貢献します。
-
 
 [#150]
 == {MUST} 標準のHTTPステータスコードを使う
@@ -39,9 +40,8 @@ API固有のエラーについての情報とハンドリングの指針を提�
 標準のHTTPステータスコードのみを使い、その意味に沿うように一貫性をもった設計をしなければなりません。
 どうかHTTPステータスコードを新たに発明しないようにしてください。
 
-RFCの標準では ~60 の異なるHTTPステータスコードと同時にその意味も定義されていてます。
-(主に https://tools.ietf.org/html/rfc7231#section-6[RFC7231] と
-https://tools.ietf.org/html/rfc6585[RFC-6585])
+RFCの標準では \~60 の異なるHTTPステータスコードと同時にその意味も定義されていてます。
+(主に {RFC-7231}#section-6[RFC7231] と {RFC-6585}[RFC-6585])
 — そして
 https://tools.ietf.org/html/draft-tbray-http-legally-restricted-status-05[draft
 legally-restricted-status]
@@ -55,10 +55,9 @@ https://en.wikipedia.org/wiki/List_of_HTTP_status_codes[Wikipedia]
 ここに載ってないHTTPステータスコードを使っても良いですが、
 その場合、API定義に明示しなくてはなりません。
 
-ここに載ってるコードを使う限りは、そうする必要はありません。
+**重要:** ここに定義された意味でコードを使う限りは、そうする必要はありません。
 一貫性のない定義をしてしまうリスクは低いし、常識をドキュメントに書きすぎると可読性が下がるからです。
-HTTPステータスコードがリストにない、または使うには追加の情報が必要とされるときだけ、
-API仕様にレスポンスのHTTPステータスコードの詳細を明記しましょう。
+HTTPステータスコードがリストにない、または使うには追加の情報が必要とされるときだけ、API仕様にレスポンスのHTTPステータスコードの詳細を明記しましょう。
 
 [[success-codes]]
 === 成功コード
@@ -66,21 +65,21 @@ API仕様にレスポンスのHTTPステータスコードの詳細を明記し�
 [cols="10%,70%,20%",options="header",]
 |=======================================================================
 |Code |Meaning |Methods
-|200 |OK - 標準の成功レスポンス |All
+|[[status-code-200]]{200}|OK - 標準の成功レスポンス |{All}
 
-|201 |Created - エンティティが正常に作成されたこととを示す。空のレスポンス
+|[[status-code-201]]{201}|Created - エンティティが正常に作成されたこととを示す。空のレスポンス
 でも作成されたリソースを返してもよい。がそのリソースのURLをLocationヘッダにセットする。
 (より詳細は <<common-headers>> 参照)
-_常に_ Locationヘッダをセットすること。 |POST, PUT
+_常に_ Locationヘッダをセットすること。 |{POST}, {PUT}
 
-|202 |Accepted - リクエストは成功し非同期で処理されている。
-|POST, PUT, DELETE, PATCH
+|[[status-code-202]]{202}|Accepted - リクエストは成功し非同期で処理されている。
+|{POST}, {PUT}, {DELETE}, {PATCH}
 
-|204 |No content - レスポンスボディがない。 |PUT, DELETE, PATCH
+|[[status-code-204]]{204}|No content - レスポンスボディがない。 |{PUT}, {DELETE}, {PATCH}
 
-|207 |Multi-Status - バッチ/バルクリクエストで、レスポンスボディは複数の
+|[[status-code-207]]{207}|Multi-Status - バッチ/バルクリクエストで、レスポンスボディは複数の
 ステータスを含んでいる。<<152>> 参照
-|POST
+|{POST}
 |=======================================================================
 
 [[redirection-codes]]
@@ -89,15 +88,15 @@ _常に_ Locationヘッダをセットすること。 |POST, PUT
 [cols="10%,70%,20%",options="header",]
 |=======================================================================
 |Code |Meaning |Methods
-|301 |Moved Permanently - 以後のリクエストはすべて与えられたURIに直接送るようにすべき。
-|All
+|[[status-code-301]]{301}|Moved Permanently - 以後のリクエストはすべて与えられたURIに直接送るようにすべき。
+|{All}
 
-|303 |See Other - GETメソッドを使って別のURIへリクエストを送ってくれ。
-|PATCH, POST, PUT, DELETE
+|[[status-code-303]]{303}|See Other - GETメソッドを使って別のURIへリクエストを送ってくれ。
+|{PATCH}, {POST}, {PUT}, {DELETE}
 
-|304 |Not Modified - If-Modified-Since や If-None-Match ヘッダで送られた
+|[[status-code-304]]{304}|Not Modified - If-Modified-Since や If-None-Match ヘッダで送られた
 日付やバージョンから、リソースは何も変更されていない。
-|GET
+|{GET}
 |=======================================================================
 
 [[client-side-error-codes]]
@@ -106,42 +105,41 @@ _常に_ Locationヘッダをセットすること。 |POST, PUT
 [cols="10%,70%,20%",options="header",]
 |=======================================================================
 |Code |Meaning |Methods
-|400 |Bad request - 一般的な / 未知のエラー。入力のペイロードが業務ロジックバリデーションで
+|[[status-code-400]]{400}|Bad request - 一般的な / 未知のエラー。入力のペイロードが業務ロジックバリデーションで
 エラーになったときにも送出される。
-|All
+|{All}
 
-|401 |Unauthorized - ユーザはログインしなければならない。(“Unauthenticated”の意) |All
+|[[status-code-401]]{401}|Unauthorized - ユーザはログインしなければならない。(“Unauthenticated”の意) |{All}
 
-|403 |Forbidden - ユーザはこのリソースのアクセス権限がない。|All
+|[[status-code-403]]{403}|Forbidden - ユーザはこのリソースのアクセス権限がない。|{All}
 
-|404 |Not found - リソースが見つからない。 |All
+|[[status-code-404]]{404}|Not found - リソースが見つからない。 |{All}
 
-|405 |Method Not Allowed - メソッドがサポートされていない。OPTIONSで調べることができる。 |All
+|[[status-code-405]]{405}|Method Not Allowed - メソッドがサポートされていない。OPTIONSで調べることができる。 |{All}
 
-|406 |Not Acceptable - リクエストで送られたAcceptヘッダにしたがったレスポンスを返すことができない。
-|All
+|[[status-code-406]]{406}|Not Acceptable - リクエストで送られたAcceptヘッダにしたがったレスポンスを返すことができない。
+|{All}
 
-|408 |Request timeout - リソース待ちでサーバがタイムアウトした。
-|All
+|[[status-code-408]]{408}|Request timeout - リソース待ちでサーバがタイムアウトした。
+|{All}
 
-|409 |Conflict - リクエストは競合が発生したために完遂できなかった。例えば2つのクライアントが同じリソースを作成しようとしたり、同時に整合性の保てない更新要求が発生するようなケース。
-|POST, PUT, DELETE, PATCH
+|[[status-code-409]]{409}|Conflict - リクエストは競合が発生したために完遂できなかった。例えば2つのクライアントが同じリソースを作成しようとしたり、同時に整合性の保てない更新要求が発生するようなケース。
+|{POST}, {PUT}, {DELETE}, {PATCH}
 
-|410 |Gone - リソースがもう存在しない。例えば、意図して削除されたリソースにアクセスしたケース。|All
+|[[status-code-410]]{410}|Gone - リソースがもう存在しない。例えば、意図して削除されたリソースにアクセスしたケース。|{All}
 
-|412 |Precondition Failed - 条件に合わないリクエストがされた。例えばIf-Matchを満たさないケース。
+|[[status-code-412]]{412}|Precondition Failed - 条件に合わないリクエストがされた。例えばIf-Matchを満たさないケース。
 楽観ロックで使われる。
-|PUT, DELETE, PATCH
+|{PUT}, {DELETE}, {PATCH}
 
-|415 |Unsupported Media Type - 例えばクライアントがContent-Typeなしでリクエストボディを送っていたケース
-content type |POST, PUT, DELETE, PATCH
+|[[status-code-415]]{415}|Unsupported Media Type - 例えばクライアントがContent-Typeなしでリクエストボディを送っていたケース
+|{POST}, {PUT}, {DELETE}, {PATCH}
 
-|423 |Locked - 悲観ロック。例えば、処理中。 |PUT, DELETE,
-PATCH
+|[[status-code-423]]{423}|Locked - 悲観ロック。例えば、処理中。 |{PUT}, {DELETE}, {PATCH}
 
-|428 |Precondition Required - サーバは条件付きリクエストを要求する。(e.g. to make sure that the “lost update problem” is avoided). |All
+|[[status-code-428]]{428}|Precondition Required - サーバは条件付きリクエストを要求する。例えば、更新が失われるのを避けるために。(<<181>>参照) |{All}
 
-|429 |Too many requests - クライアントが大量のリクエストを送ってきた。 <<153>> 参照。 |All
+|[[status-code-429]]{429}|Too many requests - クライアントが大量のリクエストを送ってきた。 <<153>> 参照。 |{All}
 |=======================================================================
 
 [[server-side-error-codes]]
@@ -150,15 +148,14 @@ PATCH
 [cols="10%,70%,20%",options="header",]
 |=======================================================================
 |Code |Meaning |Methods
-|500 |Internal Server Error - サーバで予期しないエラーが起きたことを示す。(クライアントのリトライは単純には行えない可能性があります)
-|All
+|[[status-code-500]]{500}|Internal Server Error - サーバで予期しないエラーが起きたことを示す。(クライアントのリトライは単純には行えない可能性があります)
+|{All}
 
-|501 |Not Implemented - サーバはリクエストを実行できない (暗に将来実行可能になることを指す)。
-|All
+|[[status-code-501]]{501}|Not Implemented - サーバはリクエストを実行できない (暗に将来実行可能になることを指す)。
+|{All}
 
-|503 |Service Unavailable - サーバが(一時的に)利用できない (つまり高負荷のため)
- -- クライアントのリトライは単純には行えない可能性があります
-|All
+|[[status-code-503]]{503}|Service Unavailable - サーバが(一時的に)利用できない (つまり高負荷のため) -- クライアントのリトライは単純には行えない可能性があります。可能なら、サービスはクライアントにどれくらい待てば良いかを指示するために、{Retry-After}を設定します。
+|{All}
 |=======================================================================
 
 [#220]
@@ -169,19 +166,19 @@ PATCH
 [#152]
 == {MUST} バッチリクエストやバルクリクエストには 207 を使う
 
-APIには性能上の理由から、つまり通信と処理を効率化する目的で、POSTを使った _バッチ_ または _バルク_ リクエストを
+APIには性能上の理由から、つまり通信と処理を効率化する目的で、{POST}を使った _バッチ_ または _バルク_ リクエストを
 提供する必要があります。
 この場合、サービスはバッチまたはバルクリクエストの各パートに対応した複数のレスポンスコードを
 通知する必要があるかもしれません。
 HTTPはバッチ/バルクリクエストとレスポンスの扱いに関して、指針を示していないので、
 私たちは次のようなアプローチを定義します。
 
-* バッチ/バルクリクエストには、 *常に* ステータスコード *207* を返さなければならない。
+* バッチ/バルクリクエストには、 *常に* ステータスコード{207}を返さなければならない。
 ただし個々のパートを処理する前にエラーが発生した場合はその限りではない。
 * バッチ/バルクレスポンスは、 *常に* バッチ/バルクリクエストの各パートに関する十分なステータスと
-モニタリング情報を含む、複数状態をもつオブジェクトを、ステータスコード207とともに返す。
+モニタリング情報を含む、複数状態をもつオブジェクトを、ステータスコード{207}とともに返す。
 * バッチ/バルクリクエストは、もしサービスが個々のパートを処理する前にエラーが発生したり、
-予期しないエラーが発生した場合は、400/500のステータスコードを返すかもしれない。
+予期しないエラーが発生した場合は、{4xx}/{5xx}のステータスコードを返すかもしれない。
 
 すべてのパートで処理が _失敗_ したり、各パートが _非同期に_ 実行される _場合においても_
 このルールが適用されます!
@@ -194,19 +191,15 @@ _バルク_ とは1つのリクエストで独立した作成または更新用�
 ありません。
 
 [#153]
-== {MUST} レート制限のヘッダには429を使う
+== {MUST} レート制限のためのヘッダと429コードを使う
 
-クライアントのリクエストレートをコントロールしたいAPIは、
-http://tools.ietf.org/html/rfc6585['429 Too Many Requests']レスポンス
-コードを使います。
-もしクライアントがリクエストレートを越えたら、リクエストは実行されなくなります。
+クライアントのリクエストレートを管理したいAPIは、もしクライアントがリクエストレートを超過したら、{429} (Too Many Requests)レスポンスコードを使わなければなりません ({RFC-6585}[RFC 6585]参照)。
 そのようなレスポンスは、クライアントにそのような追加の情報を知らせるために、
 ヘッダをセットしなくてはなりません。その手段は次の2つがあります。
 
-* クライアントが次のリクエストを送るまで、どれくらい待てばよいかを支持するための、https://tools.ietf.org/html/rfc7231#section-7.1.3['Retry-After'] ヘッダを返す。
+* クライアントが次のリクエストを送るまで、どれくらい待てばよいかを指示するための、{Retry-After}ヘッダを返す。
 Retry-Afterヘッダはリトライできるようになる日時をHTTP dateで表現したものか、
-遅延秒数の何れかを含みます。どちらも許容されますが、APIではは遅延秒数を使うのを
-優先します。
+遅延秒数の何れかを含みます。どちらも許容されますが、APIでは遅延秒数を使うのを優先します。
 * 'X-RateLimit' ヘッダトリオを返す。サーバは(後述する)これらのヘッダを使って、与えられたタイムウィンドウ内で
 許容されるリクエストの数や、ウィンドウがいつリセットされるかの形式で、サービスレベルを表現します。
 
@@ -215,7 +208,7 @@ Retry-Afterヘッダはリトライできるようになる日時をHTTP dateで
 * `X-RateLimit-Limit`: クライアントがこのウィンドウ内で最大リクエストできる数
 * `X-RateLimit-Remaining`: 現在のウィンドウでリクエストできる残数
 * `X-RateaLimit-Reset`: レート制限ウィンドウがリセットされる秒数。
-これはGitHubやTwitterの同名のヘッダとは異なり、UTCエポック秒数を返すことに *注意*　。
+これはGitHubやTwitterの同名のヘッダとは異なり、UTCエポック秒数を返すことに **注意** します。
 
 両方のアプローチを認めている理由は、APIごとに異なるニーズが存在するからです。
 Retry-After は一般的な負荷やリクエストのスロットリングに関しては十分なものですが、
@@ -226,14 +219,13 @@ Retry-After は一般的な負荷やリクエストのスロットリングに�
 これはそのAPIを実装したサービス与えられたウィンドウで、各スロット対象毎にリクエストの数を
 追跡できる能力があることを暗に示しています。
 
-
 [#176]
 == {MUST} Problem JSONを使う
 
-http://tools.ietf.org/html/rfc7807[RFC 7807] でProblem JSONオブジェクトと、
+{RFC-7807}[RFC 7807] でProblem JSONオブジェクトと、
 `application/problem+json` メディアタイプが定義されています。
 処理中に発生したどんな問題も(適切なステータスコードとともに)これを使い、
-クライアントサイドのエラー(4xx)か、サーバサイドのエラー(5xx)かに関わらず、
+クライアントサイドのエラー({4xx})か、サーバサイドのエラー({5xx})かに関わらず、
 ステータスコードよりも詳細な情報を返すべきです。
 
 Problem JSONオブジェクトのOpenAPIスキーマ定義は、
@@ -247,15 +239,17 @@ https://zalando.github.io/problem/schema.yaml[GitHub上]
 responses:
   503:
     description: Service Unavailable
-    schema:
-      $ref: 'https://zalando.github.io/problem/schema.yaml#/Problem'
+    content:
+      "application/problem+json":
+        schema:
+          $ref: 'https://opensource.zalando.com/problem/schema.yaml#/Problem'
 ----
 
 もしAPIが追加のエラー詳細情報を返す必要があれば、
 Problem JSONの拡張としてカスタムの型を定義することもできます。
 
 **ヒント** (後方互換性のために):
-このガイドラインの以前のバージョンでは(http://tools.ietf.org/html/rfc7807[RFC 7807] が
+このガイドラインの以前のバージョンでは({RFC-7807}[RFC 7807] が
 公開される前だったので)、
 `application/x.problem+json` のメディアタイプを返すようにしていました。
 この変更前に定義されたAPIサーバは、

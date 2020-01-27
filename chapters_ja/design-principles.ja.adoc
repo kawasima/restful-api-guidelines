@@ -15,7 +15,7 @@ RESTful APIは、固有のユースケースからは切り離され、クライ
 
 * 私たちはJSONペイロードをもったRESTベースのAPIを好む
 * 私たちはシステムが、真にRESTfulになることを好む
-footnoteref:[fielding-restful,R.Fieldingの定義だと、REST APIはHATEOAS(レベル3)をサポート
+footnote:fielding-restful[R.Fieldingの定義だと、REST APIはHATEOAS(レベル3)をサポート
 しなくてはなりません。
 私たちのガイドラインは、完全なREST準拠はさほど推奨していません。
 (<<hypermedia>>)で示すような限定的なハイパーメディアの使い方をしています。
@@ -45,9 +45,8 @@ From Start to Finish]
 http://restful-api-design.readthedocs.org/en/latest/[Thoughts on RESTful
 API Design]
 * Fielding Dissertation:
-http://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm[Architectural
+http://www.ics.uci.edu/\~fielding/pubs/dissertation/top.htm[Architectural
 Styles and the Design of Network-Based Software Architectures]
-
 
 [[api-as-a-product]]
 == 製品としてのAPI

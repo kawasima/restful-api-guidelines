@@ -10,28 +10,62 @@
 
 [source,yaml]
 ----
-Money:
-  type: object
-  properties:
-    amount:
-      type: number
-      description: Amount expressed as a decimal number of major currency units
-      format: decimal
-      example: 99.95
-    currency:
-      type: string
-      description: 3 letter currency code as defined by ISO-4217
-      format: iso-4217
-      example: EUR
-  required:
-    - amount
-    - currency
+include::../models/money-1.0.0.yaml[]
 ----
 
-金額の10進の値はその通貨での単一の値で表記します。
-小数点の前の数値はメジャーユニットであり、小数点の後ろの数値はマイナーユニットです。
-ビットコインのトランザクションのように、高い精度を要求する業務もあるので、API仕様に
-明記していない限りは、アプリケーションは制限なしの精度を受け取れるように
+Moneyのグローバルスキーマを参照をincludeするとよい。
+
+[source,yaml]
+----
+SalesOrder:
+  properties:
+    grand_total:
+      $ref: 'https://opensource.zalando.com/restful-api-guidelines/money-1.0.0.yaml#/Money'
+----
+
+APIが閉じたデータ型として、Moneyを取り扱わなくてはならないことに注意しましょう。つまり、インスタンス階層で使わることを意味しません。次のような使い方が許されないことを意味します。
+
+[source,json]
+----
+{
+  "amount": 19.99,
+  "currency": "EUR",
+  "discounted_amount": 9.99
+}
+----
+
+=== Cons
+
+* https://en.wikipedia.org/wiki/Liskov_substitution_principle[リスコフの置換原則]に違反している。
+* 既存のライブラリのサポート(例えば、https://github.com/zalando/jackson-datatype-money[Jackson Datatype Money])にのらない。
+* amountが一緒に組み合わさるので、柔軟性が損なわれる。(例えば、複合的な通貨が表現できない)
+
+より良いアプローチはhttps://en.wikipedia.org/wiki/Composition_over_inheritance[継承よりもコンポジション]を使うことです。
+
+[source,json]
+----
+{
+  "price": {
+    "amount": 19.99,
+    "currency": "EUR"
+  },
+  "discounted_price": {
+    "amount": 9.99,
+    "currency": "EUR"
+  }
+}
+----
+
+=== Pros
+
+* 継承がないので、置換原則にまつわる問題が無い。
+* 既存のライブラリでサポートされる。
+* 結合がない。つまり複合通貨も表現できる。
+* 価格は自己記述的になり、アトミックな値となる。
+
+=== 注意
+
+ビットコインのトランザクションのように、高い精度を要求する業務もあるので、API仕様に明記していない限りは、アプリケーションは制限なしの精度を受け取れるように
 準備しておかなければなりません。
 ユーロの正しい表記を例示します。
 
@@ -62,16 +96,16 @@ OpenAPIフォーマットの標準ではないけれど、パーサがnumberをf
 
 APIに繰り返し出てくるフィールドは以下のようなものです。
 
-* `id`: オブジェクトのID。 IDは数値でなく文字列でなくてはなりません。IDは文書化されているコンテキストの範囲でユニークかつ不変です。一度オブジェクトに付与されたら変更されてはならないし、再利用してもいけません。
-* `xyz_id`: オブジェクトが別のオブジェクトのIDを持つ場合、相手オブジェクト名に`_id`を付与した名前を使いましょう。 (e.g. `customer_number`ではなく`customer_id`; 子ノードから親ノードを参照する場合は、たとえ両方が`Node`型であっても、`parent_node_id`とします)
-* `created`: オブジェクトが作られた日時。`date-time`型でなくてはなりません。
-* `modified`: オブジェクトが更新された日時。`date-time`型でなくてはなりません。
-* `type`: オブジェクトの種類。このフィールドの型はstringとするべきです。
-typeはエンティティについてのランタイム情報を与えます。
+* [[id]]{id}: オブジェクトのID。 IDは数値でなく文字列でなくてはなりません。IDは文書化されているコンテキストの範囲でユニークかつ不変です。一度オブジェクトに付与されたら変更されてはならないし、再利用してもいけません。
+* [[xyz_id]]{xyz_id}: オブジェクトが別のオブジェクトのIDを持つ場合、相手オブジェクト名に`\_id` を付与した名前を使いましょう。 (e.g. `customer_number` ではなく`customer_id`; 子ノードから親ノードを参照する場合は、たとえ両方が`Node`型であっても、`parent_node_id` とします)
+* [[created_at]]{created_at} オブジェクトが作られた日時。`date-time` 型でなくてはなりません。
+* [[modified_at]]{modified_at}: オブジェクトが更新された日時。`date-time` 型でなくてはなりません。
+* [[type]]{type}: オブジェクトの種類。このフィールドの型はstringとするべきです。typeはエンティティについてのランタイム情報を与えます。
+* [[etag]]{etag}: <<158, 埋め込みサブリソース>>の<<182, ETag>>。続く{PUT}/{PATCH}の呼び出しで{ETag}を渡すのに使われる。(<<etag-in-result-entities>>参照)
 
 JSONスキーマの例:
 
-[source,json]
+[source,yaml]
 ----
 tree_node:
   type: object
@@ -79,11 +113,11 @@ tree_node:
     id:
       description: このノードの識別子
       type: string
-    created:
+    created_at:
       description: このノードがいつ作られたか
       type: string
       format: 'date-time'
-    modified:
+    modified_at:
       description: このノードが最後に更新されたのはいつか
       type: string
       format: 'date-time'
@@ -104,6 +138,69 @@ tree_node:
 これらのプロパティはいつも必要というわけではありませんが、これを慣例にしておくことで、
 APIクライアント開発者にとってZalandoリソースの共通理解が容易になるわけです。
 異なる名前が使われたり、APIごとにこれらの型が違ったりすると、API利用者にとっては不便なものになってしまいますからね。
+
+[[link-relation-fields]]
+=== リンク関連フィールド
+
+ページネーションとコレクション上での繰り返しをするために、シンプルなハイパーテキスト制御を使って一貫したルックアンドフィールを提供するには、レスポンスオブジェクトは、以下の共通パターンにしたがうべきです。
+
+* [[self]]{self}: 同一のコレクションオブジェクトまたはページを指し示す、ページネーションレスポンスまたはオブジェクトへのリンクおよびカーソル
+* [[first]]{first}: 最初のコレクションオブジェクトまたはページを指し示す、ページネーションレスポンスまたはオブジェクトへのリンクおよびカーソル
+* [[prev]]{prev}: 前のコレクションオブジェクトまたはページを指し示す、ページネーションレスポンスまたはオブジェクトへのリンクおよびカーソル
+* [[next]]{next}: 次のコレクションオブジェクトまたはページを指し示す、ページネーションレスポンスまたはオブジェクトへのリンクおよびカーソル
+* [[last]]{last}: 最後のコレクションオブジェクトまたはページを指し示す、ページネーションレスポンスまたはオブジェクトへのリンクおよびカーソル
+
+ページネーションのレスポンスは、ページ内容を送るためのArrayフィールドを追加で持ちます。
+
+* [[items]]{items}: 現在のページのすべてのアイテムをもつリソースの配列 ({items} はリソースの名前でもよい).
+
+ユーザ体験を単純化するため、適用されたクエリフィルタを使います。({GET-with-body}も参照)
+
+* [[query]]{query}: コレクションリソースをフィルタする検索リクエストでの適用されたクエリフィルタを含むオブジェクト。
+
+結果として、<<161, ページネーションリンク>>を使った標準のレスポンスページは、以下のようになります。
+
+[source,yaml]
+----
+ResponsePage:
+  type: object
+  properties: 
+    self:
+      description: 現在のページを指すページネーションリンク。
+      type: string
+      format: uri
+    first:
+      description: 最初のページを指すページネーションリンク。
+      type: string
+      format: uri
+    prev:
+      description: 前のページを指すページネーションリンク。
+      type: string
+      format: uri
+    next:
+      description: 次ページを指すページネーションリンク。
+      type: string
+      format: uri
+    last:
+      description: 最後のページを指すページネーションリンク。
+      type: string
+      format: uri
+
+     query:
+       description: >
+        コレクションリソースに適用されたクエリフィルタを含むオブジェクト。
+       type: object
+       properties: ...
+
+     items:
+       description: コレクションアイテムのArray。
+       type: array
+       required: false
+       items:
+         type: ...
+----
+
+レスポンスページは、コレクションや現在のページに関する追加のメタデータを含むかもしれません。
 
 [[address-fields]]
 === 住所フィールド

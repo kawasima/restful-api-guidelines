@@ -10,13 +10,12 @@
 
 以下のフレームワークは、OpenAPI YAMLファイルを使って、特にAPIファーストをサポートするよう設計されています。
 
-* https://github.com/zalando/connexion[Connexion: Flask上に構築されたPythonのOpenAPIファーストのフレームワーク]
-* https://github.com/zalando-stups/friboo[Friboo: SwaggerとOAuthをサポートするClojureでマイクロサービスを書くためのユーティリティライブラリ]
-* https://github.com/zalando/api-first-hand[Api-First-Hand: API-First Play Bootstrapping Tool for Swagger/OpenAPI specs]
-* https://github.com/swagger-api/swagger-codegen[Swagger Codegen: template-driven engine to generate client code in different languages by parsing Swagger Resource Declaration]
-* https://github.com/zalando-stups/swagger-codegen-tooling[Swagger Codegen Tooling: plugin for Maven that generates pieces of code from
-OpenAPI specification]
-* https://github.com/zalando/intellij-swagger[Intellij IDEA の Swagger プラグイン: IntelliJ IDEAでSwaggerファイルを編集するためのプラグイン]
+* *https://github.com/zalando/connexion[Connexion]:* Flask上に構築されたPythonのOpenAPIファーストのフレームワーク
+* *https://github.com/zalando-stups/friboo[Friboo]:*  SwaggerとOAuthをサポートするClojureでマイクロサービスを書くためのユーティリティライブラリ
+* *https://github.com/zalando/api-first-hand[Api-First-Hand]:* API-First Play Bootstrapping Tool for Swagger/OpenAPI specs
+* *https://github.com/swagger-api/swagger-codegen[Swagger Codegen]:* template-driven engine to generate client code in different languages by parsing Swagger Resource Declaration
+* *https://github.com/zalando-stups/swagger-codegen-tooling[Swagger Codegen Tooling]:* plugin for Maven that generates pieces of code from OpenAPI specification
+* *https://github.com/zalando/intellij-swagger[Intellij IDEA の Swagger プラグイン]:* IntelliJ IDEAでSwaggerファイルを編集するためのプラグイン
 
 Swagger/OpenAPI のホームページにも一覧があります
 http://swagger.io/open-source-integrations/[Community-Driven Language Integrations]
@@ -25,14 +24,15 @@ http://swagger.io/open-source-integrations/[Community-Driven Language Integratio
 [[support-libraries]]
 == サポートライブラリ
 
-These utility libraries support you in implementing various parts of our RESTful API guidelines (sorted alphabetically):
+これらのユーティリティライブラリは、私たちのAPIガイドラインを様々な部分の実装を手助けしてくれるものたちです。(アルファベット順)
 
-* https://github.com/zalando/problem[Problem: Java library that implements application/problem+json]
-* https://github.com/zalando/problem-spring-web[Problems for Spring Web MVC: library for handling Problems in Spring Web MVC]
-* https://github.com/zalando/jackson-datatype-money[Jackson Datatype Money: extension module to properly support datatypes of javax.money]
-* https://github.com/zalando-incubator/json-fields[JSON fields: framework for limiting fields of JSON objects exposed by Rest APIs]
-* https://github.com/zalando/tracer[Tracer: call tracing and log correlation in distributed systems]
-* https://github.com/zalando-stups/twintip-crawler[TWINTIP: API definition crawler for the STUPS ecosystem]
-* https://github.com/zalando/twintip-spring-web[TWINTIP Spring Integration: API discovery endpoint for Spring Web MVC]
-
-[%hardbreaks]
+* *https://github.com/zalando/problem[Problem]:*
+  Java library that implements application/problem+json
+* *https://github.com/zalando/problem-spring-web[Problems for Spring Web MVC]:*
+  library for handling Problems in Spring Web MVC
+* *https://github.com/zalando/jackson-datatype-money[Jackson Datatype Money]:*
+  extension module to properly support datatypes of javax.money
+* *https://github.com/zalando/tracer[Tracer]:*
+  call tracing and log correlation in distributed systems
+* *https://github.com/zalando/twintip-spring-web[TWINTIP Spring Integration]:*
+  API discovery endpoint for Spring Web MVC

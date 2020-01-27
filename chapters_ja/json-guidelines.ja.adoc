@@ -2,7 +2,7 @@
 = JSONガイドライン
 
 ZalandoにおいてJSONデータを定義するのに推奨されるガイドラインです。
-JSONとは、ここでは http://www.rfc-editor.org/rfc/rfc7159.txt[RFC 7159] ( https://www.ietf.org/rfc/rfc4627.txt[RFC 4627] のアップデート)を指します。
+JSONとは、ここでは {RFC-7159}[RFC 7159] ({RFC-4627}[RFC 4627] のアップデート)を指します。
 "application/json"のメディアタイプとAPIで定義されたカスタムのJSONメディアタイプをもちます。
 このガイドラインでは、Zalandoの用語やサービスの用例をもつJSONデータを使って、具体的なケースを示します。
 
@@ -10,17 +10,22 @@ JSONとは、ここでは http://www.rfc-editor.org/rfc/rfc7159.txt[RFC 7159] ( 
 後半は値についてのガイドラインになります。
 
 [#118]
-== {MUST} プロパティ名はASCIIスネークケースでなければならない (キャメルケースは使わない): `^[a-z_][a-z_0-9]*$`
+== {MUST} プロパティ名はASCIIスネークケースでなければならない (キャメルケースは使わない): `[a-z_][a-z_0-9]\*$`
 
 プロパティ名は、ASCII文字列という制限があります。最初の一文字はアルファベットまたはアンダースコアで、
 それに続く文字は、アルファベットまたはアンダースコア、数字のいずれかでなくてはなりません。
 
-(`_links` のようなキーワードのみ、 `_` から始まるプロパティ名とすることを推奨します)
+(`\_links`  のようなキーワードのみ、 `\_` から始まるプロパティ名とすることを推奨します)
 
 理念: 確立された標準は存在しませんが、多くの有名インターネット企業は、スネークケースを好みます。
 GitHub, Stack Exchange, Twitterなど。一方でGoogleやAmazonは、- だけでなくキャメルケースも
 使っています。同じところからくるJSONが一貫したルック・アンド・フィールとなるように設計するのは
 必要不可欠なことです。
+
+[#240]
+== {MUST} enumの値は、UPPER_SNAKE_CASE形式で宣言する
+
+Enumの値 (`enum` または {x-extensible-enum}で使われる) は、大文字のスネークケース形式を一貫して使う必要があります。 `VALUE` や `YET_ANOTHER_VALUE` のように。このすると、プロパティや他の要素との区別がハッキリつくためです。
 
 [#216]
 == {SHOULD} Mapは `additionalProperties` を使って定義する
@@ -36,25 +41,27 @@ mapのキーは、命名<<118,ルール 118>>の意味ではプロパティ名�
 ドキュメントにはmapオブジェクトのスキーマの詳細に、これを記述するようにしてください。
 これはそのようなmapの例です。(`transactions` プロパティがそれにあたります)
 
+
 ```yaml
-definitions:
-  Message:
-    description:
-      いくつかの言語に翻訳したメッセージ
-    type: object
-    properties:
-      message_key:
-        type: string
-        description: メッセージのキー
-      translations:
-        description:
-          このメッセージをいくつかの言語に翻訳したもの。
-          キーは https://tools.ietf.org/html/bcp47[BCP-47 言語タグ] である。
-        type: object
-        additionalProperties:
+components:
+  schemas:
+    Message:
+      description:
+        いくつかの言語に翻訳したメッセージ
+      type: object
+      properties:
+        message_key:
           type: string
+          description: メッセージのキー
+        translations:
           description:
-            キーによって識別された言語に、このメッセージを翻訳したもの
+            このメッセージをいくつかの言語に翻訳したもの。
+            キーは https://tools.ietf.org/html/bcp47[BCP-47 言語タグ] である。
+          type: object
+          additionalProperties:
+            type: string
+            description:
+              キーによって識別された言語に、このメッセージを翻訳したもの
 ```
 
 実際のJSONオブジェクトは次のようなものです。
@@ -77,7 +84,7 @@ definitions:
 複数の値をもつArrayのプロパティ名は複数形にします。これはオブジェクトの名前は単数形にすべきということも暗に示しています。
 
 [#122]
-== {MUST} Booleanのプロパティはnullであってはなりません
+== {MUST} Booleanのプロパティに `null` を使わない。
 
 booleanとして設計されたJSONプロパティは、スキーマ上nullであってはなりません。
 booleanはtrueとfalseの2つの値をもった列挙型です。もしnull値をもちたいことがあれば、
@@ -86,14 +93,34 @@ booleanの代わりに列挙型を使うことを強く奨めます。
 これはyes/no/unknownの値をもったterms_and_conditionsに置き換えることができます。
 
 [#123]
-== {SHOULD} null値はフィールドごと削除されるべき
+== {MUST} `null` とプロパティ自体が無いことを同一セマンティクスで使わない
 
-共通して使われるSwagger/OpenAPIでは、フィールドがnull値をもつことをサポートしていません。
-(もし必須としてマークされていなければ、フィールドごと消すという意図です)
+Open API 3.x では、プロパティが無い(`{}`)かもしれないことと、`null` (`{"example":null}`)を表すのに、`required`  と `nullable`  を付けることができます。
+もし、あるプロパティが `required` でなく `nullable`  だと定義されていたら(<<required-nullable-row-2, 下表の2行目>>のように)、このルールは、双方を正確に同じ方法で扱えるようにしなければなりません。
 
-しかしnull値をもつフィールドをクライアント-サーバ間で送受信することは避けられません。
-またnullが意味のある値となる場合もあります。JSON Merge Patch (https://tools.ietf.org/html/rfc7386[RFC 7382])は、
-プロパティの削除を示すのにnullを使います。
+次の表は、すべての組み合わせとそれが有効かどうかを示します。
+
+[cols=",,,",options="header",]
+|===========================================
+| {CODE-START}required{CODE-END} | {CODE-START}nullable{CODE-END}
+| {CODE-START}{}{CODE-END} | {CODE-START}{"example":null}{CODE-END}
+| `true`  |`true`   | {NO}  | {YES}
+| `false` | `true`  | {YES} | {YES} [[required-nullable-row-2]]
+| `true`  |`false`  | {NO}  | {NO}
+| `false` |`false`  | {YES} | {NO}
+|===========================================
+
+APIの設計者や実装者は、どちらの場合も異なる意味を割り当てたくなるかもしれませんが、表現力が高いことよりも、クライアントがその微妙な違いを理解せず誤って実装してしまうリスクの方がはるかに高いと考えられるので、私たちはこの選択肢には反対です。
+
+例えばミーティングのように、異なるユーザがスケジュールを調整できるようなAPIでは、各ユーザが `選択` しなければならない選択肢をリソースとできます。 _undecided_ と _decided_ の違いは、それぞれ _absent_ と `null` としてモデル化できる。 `null` の場合は、https://en.wikipedia.org/wiki/Null_object_pattern[Null object] (例えば、`{"id":"42"}` に対しての`{}` のように)として表すのが安全です。
+
+さらに多くの主要なライブラリは、 `null` / absent パターンをほとんどサポートしていないか、まったくサポートしてないかという状態です。(https://stackoverflow.com/questions/48465005/gson-distinguish-null-value-field-and-missing-field[Gson],
+https://github.com/square/moshi#borrows-from-gson[Moshi],
+https://github.com/FasterXML/jackson-databind/issues/578[Jackson],
+https://developer.ibm.com/articles/j-javaee8-json-binding-3/[JSON-B])
+特に、強い型付けを持つ言語では、第3の状態を表現するためには新しい複合型が必要なため、この問題に頭を悩まします。Nullable `Option` / `Optional` / `Maybe` 型を使うことができますが、これらの型のNullableな参照を持つことは、その型の目的と完全に矛盾してしまいます。
+
+このルールの唯一の例外はJSON Merge Patch {RFC-7396}[RFC 7396])で、これは `null` を使ってプロパティの削除を明示的に示しますが、存在しないプロパティは無視されます。つまり変更されません。
 
 [#124]
 == {SHOULD} 空のArray値はnullにはしない
@@ -105,10 +132,22 @@ Arrayが空であることは `[]` として曖昧さなく表現できます。
 
 Stringは列挙型で設計された値を表現するには妥当な型です。
 
+[#235]
+== {SHOULD} 日付/日時のプロパティには `\_at` をサフィックスとして付ける
+
+日付と日時のプロパティは `\_at` で終わるようにすべきです。よく似た名前のbooleanプロパティと区別できるようになります。
+
+- {created_at} rather than {created},
+- {modified_at} rather than {modified},
+- `occurred_at` rather than `occurred`, and
+- `returned_at` rather than `returned`.
+
+**注意:** {created} と {modified} はガイドラインの以前のバージョンで言及されていました。したがって、このルールより前のAPIでも引き続き受容されます。
+
 [#126]
 == {SHOULD} 日付型のプロパティ値はRFC 3339に準拠する
 
-http://tools.ietf.org/html/rfc3339#section-5.6[RFC 3339]
+{RFC-3339}#section-5.6[RFC 3339]
 で定義された日付と時刻のフォーマットを使いましょう。
 
 * "date"には `年 "-" 月 "-" 日` を使う。例: `2015-05-28`
@@ -136,16 +175,5 @@ https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#data-ty
 [#127]
 == {MAY} 期間(duration)と時間間隔(interval)はISO8601に準拠する
 
-期間と時間間隔の設計は、ISO 8601で推奨されている形式の文字列を使います。
-(期間については https://tools.ietf.org/html/rfc3339#appendix-A[付録A RFC 3339に文法が含まれます] )
-
-[#128]
-== {MAY} 標準の言語、国、通貨コードを使う
-
-* http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2[ISO 3166-1-alpha2 国コード]
-* (Zalandoでは"UK"という表記も見かけるかもしれないが、"UK"ではなく"GB"を使う)
-* https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes[ISO 639-1 言語コード]
-* https://tools.ietf.org/html/bcp47[BCP-47] (based on ISO 639-1) for language variants
-* http://en.wikipedia.org/wiki/ISO_4217[ISO 4217 通貨コード]
-
-上記で定義されているものを使いましょう。
+期間と時間間隔の設計は、{ISO-8601}[ISO 8601]で推奨されている形式の文字列を使います。
+(期間については {RFC-3339}#appendix-A[付録A RFC 3339に文法が含まれます] )

@@ -9,17 +9,18 @@
 2つのページネーションのテクニックがあります。
 
 * https://developer.infoconnect.com/paging-results[Limit/Offsetベース]: 最初のページエントリをオフセット数値で特定する
-* https://dev.twitter.com/overview/api/cursoring[カーソルベース] — またの名を
-キーベース — ページネーション: 単一のキー要素で最初のページエントリを特定する
+* https://dev.twitter.com/overview/api/cursoring[cursor/limitベース] — またの名をキーベース — ページネーション: 単一のキー要素で最初のページエントリを特定する
 (https://developers.facebook.com/docs/graph-api/using-graph-api/v2.4#paging[Facebookのガイド]も見てください)
 
 ページネーションの技術的概念は、問題がユーザエクスペリエンスと結びついていることも考慮しなければなりません。
 この https://www.smashingmagazine.com/2016/03/pagination-infinite-scrolling-load-more-buttons/[記事] で述べられているとおり、
-特定のページへのジャンプは、「前へ」「次へ」のページリンクよりもかなり使われることはありません。
+特定のページへのジャンプは、「前へ」「次へ」のページリンク(<<161>>参照)よりもあまり使われることはありません。
 それがオフセットベースのページネーションよりも、カーソルベースのページネーションを指向したい理由です。
 
+**注意:** ページネーションの一貫したルックアンドフィールを提供するため、<<137>>で定義された共通のクエリパラメータ名を使わなければなりません。
+
 [#160]
-== {SHOULD} Offsetベースのページネーションを避け、カーソルベースのページネーションを使う
+== {SHOULD} オフセットベースのページネーションを避け、カーソルベースのページネーションを使う
 
 カーソルベースのページネーションは、オフセットベースのページネーションと比較すると、
 いい感じでより効率的です。
@@ -39,6 +40,64 @@
 ** 共有データベースかNoSQLか?
 * カーソルベースのナビゲーションは、結果の総件数が必要だったり、後方へのページネーションをサポートする必要がある場合には実現できないかもしれません。
 
+ページネーションのために使われる{cursor}は、ページへのOpaqueポインタで、クライアントが *検査* したり *構築* したりしてはならない。通常は安全にコレクションを再作成できるように、ページの位置、すなわち、最初または最後のページ要素の識別子、ページネーションの方向、適用されたクエリフィルタを(暗号化)エンコードしたものです。{cursor}は次のように定義されます。
+
+[source,yaml]
+----
+Cursor:
+  type: object
+  properties: 
+    position:
+      description: >
+        Object containing the identifier(s) pointing to the entity that is
+        defining the collection resource page - normally the position is
+        represented by the first or the last page element.
+      type: object
+      properties: ...
+
+    direction:
+      description: >
+        The pagination direction that is defining which elements to choose
+        from the collection resource starting from the page position.
+      type: string
+      enum: [ ASC, DESC ]
+
+    query:
+      description: >
+        Object containing the query filters applied to create the collection
+        resource that is represented by this cursor.
+      type: object
+      properties: ...
+
+    query_hash:
+      description: >
+        Stable hash calculated over all query filters applied to create the
+        collection resource that is represented by this cursor.
+      type: string
+
+  required:
+    - position
+    - direction
+----
+
+カーソルベースのページネーションのためのページ情報は、{cursor}の集合で構成する必要があります。{next}に加えて、{prev},{first},{last},{self}を次のようにサポートすることもあります。(<<link-relation-fields>>参照)
+
+[source,json]
+----
+{
+  "cursors": {
+    "self": "...",
+    "first": "...",
+    "prev": "...",
+    "next": "...",
+    "last": "..."
+  },
+  "items": [... ]
+}
+----
+
+*注意:* {cursor}集合のサポートは<<161>>が好まれて、削除されるかもしれません。
+
 さらには以下の文書もあります:
 
 * https://dev.twitter.com/rest/public/timelines[Twitter]
@@ -47,49 +106,28 @@
 in PostgreSQL]
 
 [#161]
-== {MAY} 適用可能なところではページネーションリンクを使う
+== {SHOULD} 適用可能なところではページネーションリンクを使う
 
-* <<163,HATEOS>>を実装したAPIは、コレクション内でページネーションするために、<<165,simplified hypertext controls>>を使ってもよい
+クライアント設計を単純にするために、APIはコレクションのページネーションに適用できるときはいつでも<<165,simplified hypertext controls>>をサポートするべきです。{next}に加えて、{prev}, {first}, {last}, {self}のサポートを含むこともあります。(詳細は<<link-relation-fields>>参照)
 
-これらのコレクションは現在のページの項目を保持するために、`items`属性をもつべきです。
-コレクションは必要ならば自身や現在のページについてのメタデータ(例えば`index`や`page_size`)を付加してもよいです。
-
-明確な必要性がない限り、APIに総件数をもたせるのは避けるべきです。
-総件数を取得するがために、フルスキャンを引き起こす複雑なクエリやフィルタを発行することになり
-性能問題を引き起こすことがよくあるためです
-(例えば、カウントとるためにすべての要素をスキャンする必要があります)。
-これはAPIの実装の詳細に踏み込んだ話ですが、あなたの能力と、カウント機能を提供することとを
-よく考えるのは重要なことです
-
-もしコレクションが他のリソースへのリンクから構成されていれば、
-コレクションの名前は、
-http://www.iana.org/assignments/link-relations/link-relations.xml[IANA
-IANAにLink Relationsとして登録されたもの]にするべきです。ただし複数形にしましょう。
-
-例えば、"記事"のサービスは、`authors`へのハイパーリンクのコレクションを以下のように表現できます。
+このページ内容は{items}を通じて送信さる一方、{query}オブジェクトは次のように適用されたクエリフィルタも含むかもしれません。
 
 [source,json]
 ----
 {
-  "self": "https://.../articles/xyz/authors/",
-  "index": 0,
-  "page_size": 5,
-  "items": [
-    {
-      "href": "https://...",
-      "id": "123e4567-e89b-12d3-a456-426655440000",
-      "name": "Kent Beck"
-    },
-    {
-      "href": "https://...",
-      "id": "987e2343-e89b-12d3-a456-426655440000",
-      "name": "Mike Beedle"
-    },
-    ...
-  ],
-  "first": "https://...",
-  "next": "https://...",
-  "prev": "https://...",
-  "last": "https://..."
+  "self": "http://my-service.zalandoapis.com/resources?cursor=<self-position>",
+  "first": "http://my-service.zalandoapis.com/resources?cursor=<first-position>",
+  "prev": "http://my-service.zalandoapis.com/resources?cursor=<previous-position>",
+  "next": "http://my-service.zalandoapis.com/resources?cursor=<next-position>",
+  "last": "http://my-service.zalandoapis.com/resources?cursor=<last-position>",
+  "query": {
+    "query-param-<1>": ...,
+    "query-param-<n>": ...
+  },
+  "items": [...]
 }
 ----
+
+*注意:* 例えば{GET-with-body}が必要なときのような、複雑な検索リクエストでは、{cursor}はすべてのクエリフィルタをエンコードできないかもしれない。この場合、ページ位置と{cursor}の方向だけをエンコードし、ボディでクエリフィルタを送るのがベストプラクティスでしょう。レスポンスも同様です。ページネーションの順序を守るため、この場合、{cursor}が適用されたすべてのクエリフィルタのハッシュを含ませ、使う前に検証するのがおすすめです。
+
+*注目:* 必要性がない限り、トータル数を与えるのを避けるべきです。多くの場合、全件カウントをサポートすると、システムと性能に多大な影響が出ます。特にデータセットが増大し、リクエストが複雑になった場合は、フィルタによってフルスキャンが実行されます。これはAPIに関連した実装の詳細ですが、サービスの生存よりも、カウント機能が重要なのかよく考えましょう。

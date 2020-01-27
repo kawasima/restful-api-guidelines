@@ -11,26 +11,21 @@ https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#securit
 
 [source,yaml]
 ----
-securityDefinitions:
-  oauth2:
-    type: oauth2
-    flow: application
-    tokenUrl: https://identity.zalando.com/oauth2/token
-    scopes:
-      fulfillment-order-service.read: Access right needed to read from the fulfillment order service.
-      fulfillment-order-service.write: Access right needed to write to the fulfillment order service.
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
 ----
 
-上記例はセキュリティ標準として、エンドポイントへのアクセスを認証するのに
-クライアント認証フローのOAuth2を使った際の定義です。
-さらに、スコープセクションを使って2つのAPIアクセス権を定義しています。
-エンドポイントの権限の使い方は後述します。 <<105, 次のセクション>> を参照ください。
+次のコードスニペットは、このセキュリティスキームをすべてのAPIエンドポイントに適用するものです。クライアントのbearerトークンは、scope_1とscope_2のスコープを追加でもたなければなりません。
 
-`securityDefinitions` でOAuthトークンを取得するフローを指定するのは、ほとんど意味がありません。
-APIエンドポイントは、どうOAuthトークンが生成されようが気にする必要はありません。
-不幸にも `flow` フィールドは必須であり、消すことはできません。
-APIエンドポイントは、常に `flow: application` を設定し、
-この情報は無視するべきです。
+[source,yaml]
+----
+security:
+  - BearerAuth: [ scope_1, scope_2 ]
+----
 
 [#105]
 == {MUST} 権限を定義し割り当てる (スコープ)
@@ -41,7 +36,6 @@ APIはリソースを保護するために権限を定義しなければなり�
 
 権限のスキーマの命名は、 <<224, ホスト名>> と <<213, イベント型名>> の命名に対応しています。
 権限名の設計には <<225>> を参照ください。
-
 
 権限の種類が多く細かくなり過ぎて、複雑なガバナンスを強いられることがないよう、
 リソース拡張なしで、コンポーネント固有の権限を使うことにこだわりましょう。
@@ -80,17 +74,16 @@ APIはリソースを保護するために権限を定義しなければなり�
 ////
 
 権限名を定義し、権限をAPI仕様の先頭でセキュリティ定義として宣言したら、
-https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#securityRequirementObject[`セキュリティ` 要求] を記述して、以下のように各API操作に割り当てます。
+https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#securityRequirementObject[`セキュリティ`要求] を記述して、以下のように各API操作に割り当てます。
 
 [source,yaml]
 ----
 paths:
-  /sales-orders/{order-number}:
+  /business-partners/{partner-id}:
     get:
-      summary: Retrieves a sales order
+      summary: ビジネスパートナーについての情報を取得する
       security:
-        - oauth2:
-          - sales-order-service.sales_order.read
+        - BearerAuth: [ business-partner-service.read ]
 ----
 
 非常にレアケースですが、API全体または、その内いくつかのエンドポイントが、特定のアクセス制御を必要としない
@@ -105,8 +98,7 @@ paths:
       summary: Provides public information about ...
                Accessible by any user; no access rights needed.
       security:
-        - oauth2:
-          - uid
+        - BearerAuth: [ uid ]
 ----
 
 ヒント: "Authorization" ヘッダを明示的に定義する必要はありません。

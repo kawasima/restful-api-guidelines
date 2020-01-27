@@ -27,10 +27,14 @@ deploy_gh_pages () {
 }
 
 create_zally_issue () {
-    local pr_number=$(curl -s "${GH_REPO_URL}/commits/${TRAVIS_COMMIT}" | \
-        jq '.commit.message' | sed 's/.* #\([0-9]*\)\+ .*/\1/')
+    local pr_number count=0
+    while [ -z "${pr_number}" -a "${count}" -lt 30 ]; do
+	pr_number=$(curl -s "${GH_REPO_URL}/commits/${TRAVIS_COMMIT}" | \
+            jq -r '.commit.message | capture("#(?<n>[0-9]+) ") | .n' || true)
+	count=$((count + 1)); sleep 1
+    done
     local changed_files=($(curl -s "${GH_REPO_URL}/pulls/${pr_number}/files" | \
-        jq '.[] | .filename' | tr -d "\""))
+        jq -r '.[] | .filename'))
 
     local content_changed=false
     for f in "${changed_files[@]}"

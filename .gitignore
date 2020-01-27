@@ -2,3 +2,5 @@
 .sass-cache/
 output/
 index.ja.html
+.idea
+.vscode

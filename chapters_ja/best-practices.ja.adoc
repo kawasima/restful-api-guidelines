@@ -19,15 +19,15 @@ RESTful APIは通常、エンティティのリストを返すような検索の
 ETagヘッダは更新前に単一のエンティティリソースに対するGETリクエストを実行することによって取得できます。つまり、検索エンドポイントを使う際には、追加のリクエストが必要ということです。
 
 例:
-[source]
+[source,http]
 ----
 < GET /orders
 
 > HTTP/1.1 200 OK
 > {
 >   "items": [
->     { code: "O0000042"},
->     { code: "O0000043"}
+>     { id: "O0000042"},
+>     { id: "O0000043"}
 >   ]
 > }
 
@@ -35,11 +35,11 @@ ETagヘッダは更新前に単一のエンティティリソースに対するG
 
 > HTTP/1.1 200 OK
 > ETag: osjnfkjbnkq3jlnksjnvkjlsbf
-> { code: "BO0000042", ... }
+> { id: "BO0000042", ... }
 
 < PUT /orders/O0000042
 < If-Match: osjnfkjbnkq3jlnksjnvkjlsbf
-< { code: "O0000042", ... }
+< { id: "O0000042", ... }
 
 > HTTP/1.1 204 No Content
 
@@ -59,21 +59,21 @@ ETagヘッダは更新前に単一のエンティティリソースに対するG
 複数のエンティティを含むレスポンスでは、エンティティそれぞれに後続のPUTで使用可能な異なるETagが付与されます。
 
 例:
-[source]
+[source,http]
 ----
 < GET /orders
 
 > HTTP/1.1 200 OK
 > {
 >   "items": [
->     { code: "O0000042", etag: "osjnfkjbnkq3jlnksjnvkjlsbf", ... },
->     { code: "O0000043", etag: "kjshdfknjqlöwjdsljdnfkjbkn", ... }
+>     { id: "O0000042", etag: "osjnfkjbnkq3jlnksjnvkjlsbf", ... },
+>     { id: "O0000043", etag: "kjshdfknjqlöwjdsljdnfkjbkn", ... }
 >   ]
 > }
 
 < PUT /orders/O0000042
 < If-Match: osjnfkjbnkq3jlnksjnvkjlsbf
-< { code: "O0000042", ... }
+< { id: "O0000042", ... }
 
 > HTTP/1.1 204 No Content
 
@@ -93,26 +93,28 @@ GETの後の更新で、エンティティのETagが変わってしまってい�
 PUTがリクエストがされたとき、ペイロードに含まれたバージョン番号を、サーバはデータベース中のバージョン番号と突き合わせします。
 
 例:
-[source]
+[source,http]
 ----
 < GET /orders
 
 > HTTP/1.1 200 OK
 > {
 >   "items": [
->     { code: "O0000042", version: 1, ... },
->     { code: "O0000043", version: 42, ... }
+>     { id: "O0000042", version: 1, ... },
+>     { id: "O0000043", version: 42, ... }
 >   ]
 > }
 
 < PUT /orders/O0000042
-< { code: "O0000042", version: 1, ... }
+< { id: "O0000042", version: 1, ... }
 
 
 > HTTP/1.1 204 No Content
 
 GETのあと別リクエストで更新されていたら、データベース中のバージョン番号はリクエストボディで与えられたものより、大きな値になっているので、409を返します。
 
+[source,http]
+----
 > HTTP/1.1 409 Conflict
 ----
 
@@ -136,7 +138,7 @@ GETとPUTの間で発生した変更が上書きされるような状況を効�
 これはGETとPUTの間で発生するエンティティのどんな変更も、コンフリクトが検出可能で、バッチの残りをロックすることなく行えることを保証します。
 
 Example:
-[source]
+[source,http]
 ----
 < GET /orders
 
@@ -144,19 +146,20 @@ Example:
 > Last-Modified: Wed, 22 Jul 2009 19:15:56 GMT
 > {
 >   "items": [
->     { code: "O0000042", ... },
->     { code: "O0000043", ... }
+>     { id: "O0000042", ... },
+>     { id: "O0000043", ... }
 >   ]
 > }
 
 < PUT /block/O0000042
 < If-Unmodified-Since: Wed, 22 Jul 2009 19:15:56 GMT
-< { code: "O0000042", ... }
+< { id: "O0000042", ... }
 
 > HTTP/1.1 204 No Content
 
 GETのあと更新され、エンティティの最終更新日時が与えられた日時よりも後であれば、412を返します。
 
+[source,http]
 > HTTP/1.1 412 Precondition failed
 ----
 
@@ -171,5 +174,5 @@ GETのあと更新され、エンティティの最終更新日時が与えら�
 ロックは失敗する可能性がある。
 
 === 結論
-私たちは、 _Last-Modified / If-Unmodified-Since_ か _結果エンティティのETags_ のどちらかを
+私たちは、 _{Last-Modified} / {If-Unmodified-Since}_ か _結果エンティティの{ETag}_ のどちらかを
 使うことをおすすめします。

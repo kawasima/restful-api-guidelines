@@ -12,34 +12,31 @@ APIはクライアントの必要性に応じて、帯域幅を減らすため�
 
 共通のテクニックは、
 
-* <<156,gzip圧縮>>
-* リソース属性のサブセットを取得できるよう、フィールドフィルタをクエリに実装する (see <<157>> below)
-* paginate lists of data items (see <<pagination>> below)
-* `ETag` と `If-(None-)Match` ヘッダを使って、変更のないリソースの再フェッチを避ける (see <<182>>)
-* 巨大な結果セットに対しては、ページネーションを使ったインクリメントにアクセスする
+* リクエストとレスポンスのボディの圧縮(<<156>>参照)
+* リソース属性のサブセットを取得できるよう、フィールドフィルタをクエリに実装する (<<157>>参照)
+* {ETag}と{If-Match}/{If-None-Match}ヘッダを使って、変更のないリソースの再フェッチを避ける (<<182>>参照)
+* 巨大なデータコレクションへのインクリメンタルなアクセスのための<<pagination>>
+* マスタデータのキャッシュ。すなわち滅多に変更のない、または一切変更されないリソース (<<227>>参照)
 
 それぞれの詳細は以下に示します。
 
 [#156]
-== {SHOULD} gzip圧縮を使う
+== {SHOULD} `gzip` 圧縮を使う
 
 圧縮時間がボトルネックになるほど多くのリクエストを捌かなければならないなど、
 特別な理由がない限りは、APIレスポンスのペイロードをgzipで圧縮しましょう。
 そうすることでネットワークの転送も速くなるし、フロントエンドの応答性も向上します。
 
 gzip圧縮がサーバペイロードのデフォルトの選択肢ではありますが、サーバは
-圧縮しないペイロードもサポートするべきです。クライアントはAccept-Encodingリクエストヘッダを
-通じてそれをコントロールできます。see also
-http://tools.ietf.org/html/rfc7231#section-5.3.4[RFC 7231 Section 5.3.4].
-
-サーバもまたContent-Encodingヘッダを通じて、gzip圧縮が使われていることを明示すべきです。
+圧縮しないペイロードもサポートするべきです。クライアントは{Accept-Encoding}リクエストヘッダを
+通じてそれをコントロールできます。{RFC-7231}#section-5.3.4[RFC-7231 Section 5.3.4]も参照してください。
+サーバもまた{Content-Encoding}ヘッダを通じて、gzip圧縮が使われていることを明示すべきです。
 
 [#157]
-== {SHOULD} リソースフィールドのフィルタリングをサポートする
+== {SHOULD} フィルタリングによって部分的なレスポンスをサポートする。
 
-ユースケースとペイロードサイズに依存して、返却するエンティティのフィールドの
-フィルタリングをサポートすることによって、必要とするネットワーク帯域を大いに
-減らこすとができるでしょう。
+ユースケースとペイロードサイズに応じて、返却するエンティティのフィールドの
+フィルタリングをサポートすることによって、必要とするネットワーク帯域を大いに減らこすとができるでしょう。
 フィールドクエリパラメータを付けることで、クライアントは欲しいデータに応じて、
 フィールドのサブセットを決めることができます。
 例は https://cloud.google.com/appengine/docs/python/taskqueue/rest/performance#partial-response[Google
@@ -50,7 +47,7 @@ AppEngine API's partial response]をみてください。
 
 [source,http]
 ----
-GET http://api.example.org/resources/123 HTTP/1.1
+GET http://api.example.org/users/123 HTTP/1.1
 
 HTTP/1.1 200 OK
 Content-Type: application/json
@@ -60,12 +57,12 @@ Content-Type: application/json
   "name": "John Doe",
   "address": "1600 Pennsylvania Avenue Northwest, Washington, DC, United States",
   "birthday": "1984-09-13",
-  "partner": {
+  "friends": [{
     "id": "1fb43648-dae1-11e5-aa01-1fbc3abb1cd0",
     "name": "Jane Doe",
     "address": "1600 Pennsylvania Avenue Northwest, Washington, DC, United States",
     "birthday": "1988-04-07"
-  }
+  }]
 }
 ----
 
@@ -74,53 +71,42 @@ Content-Type: application/json
 
 [source,http]
 ----
-GET http://api.example.org/resources/123?fields=(name,partner(name)) HTTP/1.1
+GET http://api.example.org/users/123?fields=(name,friends(name)) HTTP/1.1
 
 HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
   "name": "John Doe",
-  "partner": {
+  "friends": [ {
     "name": "Jane Doe"
-  }
+  } ]
 }
 ----
 
-この例で示されているフィールドフィルタリングは、リクエストパラメータ"fields"を
-通じて実現されています。これは次に示す https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form[BNF] 文法で
-定義されたものです。
+{fields}クエリパラメータは、レスポンスのオブジェクトで返されるfieldsを決定するものです。例えば、 `(name)`  は `name` フィールドだけをもつ `users` オブジェクトを返します。また `(name,friends(name))` は、`name` とネストされた `name` フィールドだけもつ `friends` オブジェクトを返します。
+
+Open APIは公式にはパラメータによって異なるオフジェクトを返すスキーマをサポートしていません。フィールドパラメータを定義するときは、次の説明書きを加えておくくことをおすすめします。: `エンドポイントは戻りのオブジェクトのフィールドのフィルタリングをサポートする。
+[Rule \#157](https://opensource.zalando.com/restful-api-guidelines/\#157)`
+
+{fields}の値の文法は、次の https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form[BNF] で定義される
 
 [source,bnf]
 ----
-<fields> ::= <negation> <fields_expression> | <fields_expression>
-
-<negation> ::= "!"
-
-<fields_expression> ::= "(" <field_set> ")"
-
-<field_set> ::= <qualified_field> | <qualified_field> "," <field_set>
-
-<qualified_field> ::= <field> | <field> <fields_expression>
-
-<field> ::= <DASH_LETTER_DIGIT> | <DASH_LETTER_DIGIT> <field>
-
-<DASH_LETTER_DIGIT> ::= <DASH> | <LETTER> | <DIGIT>
-
-<DASH> ::= "-" | "_"
-
-<LETTER> ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
-
-<DIGIT> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+<fields>            ::= [ <negation> ] <fields_struct>
+<fields_struct>     ::= "(" <field_items> ")"
+<field_items>       ::= <field> [ "," <field_items> ]
+<field>             ::= <field_name> | <fields_substruct>
+<fields_substruct>  ::= <field_name> <fields_struct>
+<field_name>        ::= <dash_letter_digit> [ <field_name> ] 
+<dash_letter_digit> ::= <dash> | <letter> | <digit>
+<dash>              ::= "-" | "_"
+<letter>            ::= "A" | ... | "Z" | "a" | ... | "z"
+<digit>             ::= "0" | ... | "9"
+<negation>          ::= "!"
 ----
 
-上記で定義された `fields_expression` は、オブジェクトのプロパティを記述するものです。
-つまり `(name)` はルートオブジェクトの `name` プロパティしか返しません。
-`(name,partner(name))` は、 `name` と `name` プロパティだけもった `partner` オブジェクトを
-返します。
-
-ヒント: OpenAPIは与えられたパラメータに応じて、結果スキーマの一部を返すかどうか公式には定まっていません。
-したがって、パラメータのdescriptionに英語でこの説明を記述してください。
+**注意:** https://en.wikipedia.org/wiki/Principle_of_least_astonishment[驚き最小化の原則] にしたがい、デフォルト値を使って{fields}パラメータを定義すべきではありません。結果は直感に反するので、API利用者は混乱してしまうからです。
 
 [#158]
 == {SHOULD} サブリソースの任意の埋め込みを可能にする
@@ -160,23 +146,122 @@ GET /order/123?embed=(items) HTTP/1.1
 }
 ----
 
-[217]
-== {MUST} サポートされていればキャッシュを使う
+[#227]
+== {MUST} キャッシュ可能な `GET`, `HEAD`, `POST` エンドポイントをドキュメント化する
 
-APIがキャッシュをサポートすることが意図されていれば、キャッシュ境界(すなわち、
-`Cache-Control` と `Vary` ヘッダを付加することによって生存期間とキャッシュ制約)
-を定義することによって、これを明記しなければなりません。
-(https://tools.ietf.org/html/rfc7234[RFC-7234] を注意深く読んでください。)
+キャッシュは多くのことを考慮しなければなりません。例えば、一般的なレスポンス情報の<<cacheable,cacheability>>や、SSLを使ったエンドポイントを保護するガイドライン、リソースの更新とキャッシュ無効化のルール、複数のAPI利用者の存在などがあります。結果として、キャッシュは最良でも複雑(一貫性の観点などから)、最悪の場合は逆に非効率的なものになります。
 
-キャッシュは実に多くのことを考慮しなくてはなりません。例えば、レスポンス情報の一般的な
-キャッシュ可能性、SSLや<<104,OAuth>>を使ってエンドポイントを保護するためのガイドライン、
-リソースのアップデートや無効化ルール、複数のコンシューマインスタンスの存在など。
-結果としてキャッシュは、最良の場合「複雑」で、最悪の場合「何の役にも立たない」ものになるでしょう。
-API設計者がよくこれを理解していることが示されない限りは、RESTful APIに関して
-クライアントサイドでのキャッシュや透過的なHTTPキャッシュは避けるべきです。
+頻繁に使用され、そのためにレート制限されたマスタデータサービス、すなわち、作成後にほとんどあるいは全く更新されないデータなど、サービスがそれ自体を保護することをサポートしない限り、クライアントサイドでの、また透過的なWebキャッシュを使うことは避けるべきです。
 
-デフォルトでは、APIは `Cache-Control: no-cache` ヘッダをセットすべきです。
+デフォルトでは、API提供者と利用者は常に{Cache-Control}ヘッダを{Cache-Control-no-store}にセットすべきであり、もし{Cache-Control}が設定されていなければ、同じく{Cache-Control-no-store}がセットされたものとして扱うべきです。
 
-**注意:** このデフォルトセッティングをドキュメントに書く必要はありません。
-たいていのフレームワークは、レスポンスに自動的に付与するからです。
-しかし、このデフォルトから外れる場合は、しっかりとドキュメント化しなくてはなりません。
+**注意:** このデフォルト設定をドキュメント化する必要はありません。ただし、フレームワークがデフォルトでこのヘッダの値を付加していることを確認するか、あるいは手動で(例えば下記のようなSping Securityのベストプラクティスを使って) これを確認してください。このデフォルトから外れた設定は、十分なドキュメント化が必要です。
+
+[source,http]
+----
+Cache-Control: no-cache, no-store, must-revalidate, max-age=0
+----
+
+もしサービスが本当にキャッシュのサポートを必要とするなら、以下のルールにしたがってください。
+
+* <<cacheable>>な{GET}, {HEAD}, {POST}のエンドポイントはすべて、レスポンスに{Cache-Control}, {Vary}, {ETag}ヘッダのサポートを宣言することによってドキュメント化する。 
+  *注意:* {Expires}ヘッダは、キャッシュ生存期間の冗長で曖昧な定義を避けるため、定義してはならない。これらのヘッダのデフォルト文書をいかに示す。
+* 
+* Take care to specify the ability to support caching by defining the right
+  caching boundaries, i.e. time-to-live and cache constraints, by providing
+  sensible values for {Cache-Control} and {Vary} in your service. We will
+  explain best practices below.
+* [[cache-support-patterns]]Provide efficient methods to warm up and update
+  caches, e.g. as follows:
+** In general, you should support <<182, `ETag` Together With `If-Match`/
+   `If-None-Match` Header>> on all <<cacheable>> endpoints.
+** For larger data items support {HEAD} requests or more efficient {GET}
+   requests with {If-None-Match} header to check for updates.
+** For small data sets provide full collection {GET} requests supporting
+   {ETag}, as well as {HEAD} requests or {GET} requests with {If-None-Match}
+   to check for updates.
+** For medium sized data sets provide full collection {GET} requests supporting
+   {ETag} together with <<pagination>> and {entity-tag} filtering {GET} requests
+   for limiting the response to changes since the provided {entity-tag}. *Note:*
+   this is not supported by generic client and proxy caches on HTTP layer.
+
+*Hint:* For proper cache support, you must return {304} without content on a
+failed {HEAD} or {GET} request with  <<182, `If-None-Match: <entity-tag>`>> instead
+of {412}.
+
+[source,yaml]
+----
+components:
+  headers:
+  - Cache-Control:
+      description: |
+        The RFC 7234 Cache-Control header field is providing directives to
+        control how proxies and clients are allowed to cache responses results
+        for performance. Clients and proxies are free to not support caching of
+        results, however if they do, they must obey all directives mentioned in
+        [RFC-7234 Section 5.2.2](https://tools.ietf.org/html/rfc7234) to the
+        word.
+
+        In case of caching, the directive provides the scope of the cache
+        entry, i.e. only for the original user (private) or shared between all
+        users (public), the lifetime of the cache entry in seconds (max-age),
+        and the strategy how to handle a stale cache entry (must-revalidate).
+        Please note, that the lifetime and validation directives for shared
+        caches are different (s-maxage, proxy-revalidate).
+
+      type: string
+      required: false
+      example: "private, must-revalidate, max-age=300"
+
+  - Vary:
+      description: |
+        The RFC 7231 Vary header field in a response defines which parts of
+        a request message, aside the target URL and HTTP method, might have
+        influenced the response. A client or proxy cache must respect this
+        information, to ensure that it delivers the correct cache entry (see
+        [RFC-7231 Section
+        7.1.4](https://tools.ietf.org/html/rfc7231#section-7.1.4)).
+
+      type: string
+      required: false
+      example: "accept-encoding, accept-language"
+----
+
+*Hint:* For {ETag} source see <<182>>.
+
+The default setting for {Cache-Control} should contain the `private` directive
+for endpoints with standard <<104, OAuth authorization>>, as well as the
+`must-revalidate` directive to ensure, that the client does not use stale cache
+entries. Last, the `max-age` directive should be set to a value between a few
+seconds (`max-age=60`) and a few hours (`max-age=86400`) depending on the change
+rate of your master data and your requirements to keep clients consistent.
+
+[source,http]
+----
+Cache-Control: private, must-revalidate, max-age=300
+----
+
+The default setting for {Vary} is harder to determine correctly. It highly
+depends on the API endpoint, e.g. whether it supports compression, accepts
+different media types, or requires other request specific headers. To support
+correct caching you have to carefully choose the value. However, a good first
+default may be:
+
+[source,http]
+----
+Vary: accept, accept-encoding
+----
+
+Anyhow, this is only relevant, if you encourage clients to install generic
+HTTP layer client and proxy caches.
+
+*Note:* generic client and proxy caching on HTTP level is hard to configure.
+Therefore, we strongly recommend to attach the (possibly distributed) cache
+directly to the service (or gateway) layer of your application. This relieves
+from interpreting the {vary} header and greatly simplifies interpreting the
+{Cache-Control} and {ETag} headers. Moreover, is highly efficient with respect
+to caching performance and overhead, and allows to support more
+<<cache-support-patterns, advanced cache update and warm up patterns>>.
+
+Anyhow, please carefully read {RFC-7234}[RFC 7234] before adding any client or
+proxy cache.

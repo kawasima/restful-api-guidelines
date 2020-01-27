@@ -5,21 +5,21 @@
 == {MUST} APIメタ情報を含める
 API仕様はAPI管理のための、次のOpenAPIメタ情報を含まなければならない。
 
-- `#/info/title` : APIを(一意に)識別でき、その機能を表す名前
-- `#/info/version` : API仕様のバージョン。 <<116, セマンティックルール>> にしたがう。
-- `#/info/description` : APIの説明
-- `#/info/contact/{name,url,email}` : 担当のチームの情報
+- `\#/info/title` : APIを(一意に)識別でき、その機能を表す名前
+- `\#/info/version` : API仕様のバージョン。 <<116, セマンティックルール>> にしたがう。
+- `\#/info/description` : APIの説明
+- `\#/info/contact/{name,url,email}` : 担当のチームの情報
 
-OpenAPIの拡張プロパティにしたがい、以下も *定義しなければなりません* 。
+Open APIの拡張プロパティにしたがい、以下も *定義しなければなりません* 。
 
-- `#/info/x-api-id` : APIの一意の識別子 (<<215, 215 ルール参照>>)
-- `#/info/x-audience` : intended target audience of the API (<<219, 219 ルール参照>>)
+- `\#/info/x-api-id` : APIの一意の識別子 (<<215, 215 ルール参照>>)
+- `\#/info/x-audience` : intended target audience of the API (<<219, 219 ルール参照>>)
 
 
 [#116]
 == {MUST} セマンティックバージョニングを使う
 
-OpenAPIはAPI仕様のバージョンを、 `#/info/version` で指定します。
+Open APIはAPI仕様のバージョンを、 `\#/info/version` で指定します。
 バージョン情報の共通の意味を共有するために、私たちはAPI設計者に
 http://semver.org/spec/v2.0.0.html[セマンティックバージョン 2.0] の
 ルール `1` から `8` までと `11` に準拠することを期待します。
@@ -43,7 +43,7 @@ APIバージョン情報に使ってはいけない
 
 [source,yaml]
 ----
-swagger: '2.0'
+openapi: '3.0.1'
 info:
   title: Parcel Service API
   description: API for <...>
@@ -85,7 +85,7 @@ UUIDを使っておくことをおすすめします。
 例:
 [source,yaml]
 ----
-swagger: '2.0'
+openapi: '3.0.1'
 info:
   x-api-id: d0184f38-b98d-11e7-9c56-68f728c1ba70
   title: Parcel Service API
@@ -147,7 +147,7 @@ API仕様を分割することをおすすめします。たとえ冗長だと�
 
 [source,yaml]
 ----
-swagger: '2.0'
+swagger: '3.0.1'
 info:
   x-audience: company-internal
   title: Parcel Helper Service API

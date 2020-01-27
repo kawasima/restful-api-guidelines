@@ -88,12 +88,13 @@ HttpLink:
       description: Any URI that is using http or https protocol
       type: string
       format: uri
-  required: [ "href" ]
+  required:
+    - href
 ----
 
 `HttpLink` のようなオブジェクトをもつ属性の名前は、リンクとリンク先のリソースを含む
 オブジェクトとの関係を明記します。
-実装は http://www.iana.org/assignments/link-relations/link-relations.xhtml[IANA
+実装は {link-relations}[IANA
 Link Relation Registry] から適切なものを選んで、その名前を使うべきです。
 このガイドでは属性名にはスネークケースが使われていますが、
 IANAのリンクリレーション名は、ハイフンケース表記が使われています。IANA名のハイフンは、
@@ -133,15 +134,12 @@ IANAのリンクリレーション名は、ハイフンケース表記が使わ�
 コレクション内でのページネーションや自己参照のためのハイパーテキストコントロールは、
 拡張共通ハイパーテキストコントロールを使うよりも、
 http://www.iana.org/assignments/link-relations/link-relations.xml[リンクリレーション]
-で定義されている (`next`, `prev`, `first`, `last`, `self`)
+で定義されている ({next} {prev} {first}, {last}, {self})
 組合せたシンプルなURIを使うべきです。
 
-ページネーション可能なコレクションの一番よい表現方法は、 <<pagination>> を見てください。
+<<simple-hypertext-control-fields>>と<<161>>に、より例と詳細な情報があります。
 
 [#166]
 == {MUST} JSONエンティティと一緒にはLinkヘッダは使わない
 
-私たちは
-http://tools.ietf.org/html/rfc5988#section-5[RFC 5988 で定義された `Link` ヘッダ] は、
-JSONメディアタイプとは同時に使わないようにしています。
-JSONペイロードに直接組み込まれたリンクを、共通化されていないリンクヘッダの文法よりも優先します。
+柔軟性と精度のため、一般的ではないリンクヘッダ構文を使って、リンクを付加するのではなく、JSONペイロードに直接埋め込まれるリンクを好みます。結果として、{RFC-8288}#section-3[RFC-8288で定義される `Link` ヘッダ] を使うことは禁止されます。
