@@ -3,12 +3,12 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/ruby:2.4.1-node-browsers
+      - image: circleci/ruby:2.4-node-browsers
     steps:
       - checkout
       - run:
           name: install asciidoctor
-          command: gem install asciidoctor asciidoctor-diagram asciidoctor-pdf:1.5.0.alpha.16 asciidoctor-epub3:1.5.0.alpha.7 epubcheck:3.0.1 coderay
+          command: gem install asciidoctor:1.5.8 asciidoctor-diagram:1.5.19 asciidoctor-pdf:1.5.0.rc2.16 asciidoctor-epub3:1.5.0.alpha.11 epubcheck:3.0.1 coderay
       - run:
           name: mkdir
           command: mkdir ./dist
