@@ -10,12 +10,12 @@ JSONとは、ここでは {RFC-7159}[RFC 7159] ({RFC-4627}[RFC 4627] のアッ�
 後半は値についてのガイドラインになります。
 
 [#118]
-== {MUST} プロパティ名はASCIIスネークケースでなければならない (キャメルケースは使わない): `[a-z_][a-z_0-9]\*$`
+== {MUST} プロパティ名はASCIIスネークケースでなければならない (キャメルケースは使わない): `[a-z_][a-z_0-9]*$`
 
 プロパティ名は、ASCII文字列という制限があります。最初の一文字はアルファベットまたはアンダースコアで、
 それに続く文字は、アルファベットまたはアンダースコア、数字のいずれかでなくてはなりません。
 
-(`\_links`  のようなキーワードのみ、 `\_` から始まるプロパティ名とすることを推奨します)
+(`_links`  のようなキーワードのみ、 `_` から始まるプロパティ名とすることを推奨します)
 
 理念: 確立された標準は存在しませんが、多くの有名インターネット企業は、スネークケースを好みます。
 GitHub, Stack Exchange, Twitterなど。一方でGoogleやAmazonは、- だけでなくキャメルケースも
@@ -112,7 +112,7 @@ Open API 3.x では、プロパティが無い(`{}`)かもしれないことと�
 
 APIの設計者や実装者は、どちらの場合も異なる意味を割り当てたくなるかもしれませんが、表現力が高いことよりも、クライアントがその微妙な違いを理解せず誤って実装してしまうリスクの方がはるかに高いと考えられるので、私たちはこの選択肢には反対です。
 
-例えばミーティングのように、異なるユーザがスケジュールを調整できるようなAPIでは、各ユーザが `選択` しなければならない選択肢をリソースとできます。 _undecided_ と _decided_ の違いは、それぞれ _absent_ と `null` としてモデル化できる。 `null` の場合は、https://en.wikipedia.org/wiki/Null_object_pattern[Null object] (例えば、`{"id":"42"}` に対しての`{}` のように)として表すのが安全です。
+例えばミーティングのように、異なるユーザがスケジュールを調整できるようなAPIでは、各ユーザが `選択` しなければならない選択肢をリソースとできます。 _undecided_ と _decided_ の違いは、それぞれ _absent_ と `null` としてモデル化できる。 `null` の場合は、 https://en.wikipedia.org/wiki/Null_object_pattern[Null object] (例えば、`{"id":"42"}` に対しての` {}`  のように)として表すのが安全です。
 
 さらに多くの主要なライブラリは、 `null` / absent パターンをほとんどサポートしていないか、まったくサポートしてないかという状態です。(https://stackoverflow.com/questions/48465005/gson-distinguish-null-value-field-and-missing-field[Gson],
 https://github.com/square/moshi#borrows-from-gson[Moshi],
@@ -133,9 +133,9 @@ Arrayが空であることは `[]` として曖昧さなく表現できます。
 Stringは列挙型で設計された値を表現するには妥当な型です。
 
 [#235]
-== {SHOULD} 日付/日時のプロパティには `\_at` をサフィックスとして付ける
+== {SHOULD} 日付/日時のプロパティには `_at` をサフィックスとして付ける
 
-日付と日時のプロパティは `\_at` で終わるようにすべきです。よく似た名前のbooleanプロパティと区別できるようになります。
+日付と日時のプロパティは `_at` で終わるようにすべきです。よく似た名前のbooleanプロパティと区別できるようになります。
 
 - {created_at} rather than {created},
 - {modified_at} rather than {modified},
@@ -150,10 +150,10 @@ Stringは列挙型で設計された値を表現するには妥当な型です�
 {RFC-3339}#section-5.6[RFC 3339]
 で定義された日付と時刻のフォーマットを使いましょう。
 
-* "date"には `年 "-" 月 "-" 日` を使う。例: `2015-05-28`
-* "date-time"には `年-月-日 "T" 時:分:秒`を使う, 例: `2015-05-28T14:07:17Z`
+* "date"には `年 "-" 月 "-" 日`  を使う。例: `2015-05-28`
+* "date-time"には `年-月-日 "T" 時:分:秒` を使う, 例: `2015-05-28T14:07:17Z`
 
-https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#data-types[OpenAPI
+https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#data-types[Open API
 フォーマット] の"date-time"はRFCの"date-time"に相当し、`2015-05-28`のして表されるOpen APIフォーマットの
 "date"は、RFCの"full-date"に相当します。
 どちらもspecific profilesで、国際標準 http://en.wikipedia.org/wiki/ISO_8601[ISO 8601] のサブセットです。
@@ -175,5 +175,5 @@ https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#data-ty
 [#127]
 == {MAY} 期間(duration)と時間間隔(interval)はISO8601に準拠する
 
-期間と時間間隔の設計は、{ISO-8601}[ISO 8601]で推奨されている形式の文字列を使います。
+期間と時間間隔の設計は、 {ISO-8601}[ISO 8601]で推奨されている形式の文字列を使います。
 (期間については {RFC-3339}#appendix-A[付録A RFC 3339に文法が含まれます] )

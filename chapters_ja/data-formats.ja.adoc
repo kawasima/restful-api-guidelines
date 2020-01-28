@@ -4,9 +4,9 @@
 [#167]
 == {MUST} 構造化データのエンコードはJSONを使う
 
-構造化データを転送するためにJSONエンコードされたボディのペイロードを使いましょう。JSONペイロードは{RFC-7159}[RFC 7159] にしたがわなければなりません。トップレベルの構造としては、(可能であれば)将来拡張可能なように、JSONオブジェクトを使います。これはまた、Arrayを想定しているであろうコレクションリソースにも適用します。<<110>>参照。
+構造化データを転送するためにJSONエンコードされたボディのペイロードを使いましょう。JSONペイロードは {RFC-7159}[RFC 7159] にしたがわなければなりません。トップレベルの構造としては、(可能であれば)将来拡張可能なように、JSONオブジェクトを使います。これはまた、Arrayを想定しているであろうコレクションリソースにも適用します。<<110>>参照。
 
-それに加えて、JSONペイロードは部分的に、{RFC-7493}[RFC 7493]に準拠しなければなりません。
+それに加えて、JSONペイロードは部分的に、 {RFC-7493}[RFC 7493] に準拠しなければなりません。
 
 * {RFC-7493}#section-2.1[Section 2.1] の文字のエンコード
 * {RFC-7493}#section-2.3[Section 2.3] のオブジェクトの制約
@@ -30,7 +30,7 @@
 
 代替メディアタイプを使ったバイナリーデータが一般的には好まれます。<<168, 上のルール>>を参照。
 
-もし代替のコンテント表現が望むものでなければ、バイナリデータは `base64url` エンコードされた文字列プロパティとして、JSONドキュメントに埋め込まれるべきでです。{RFC-7493}#section-4.4[RFC 7493 Section 4.4]参照。
+もし代替のコンテント表現が望むものでなければ、バイナリデータは `base64url` エンコードされた文字列プロパティとして、JSONドキュメントに埋め込まれるべきでです。 {RFC-7493}#section-4.4[RFC 7493 Section 4.4] 参照。
 
 [#172]
 == {SHOULD} 標準のメディアタイプとして `application/json` を使う
@@ -42,7 +42,7 @@
 [#238]
 == {SHOULD} 標準化されたプロパティフォーマットを使う
 
-{https://json-schema.org/understanding-json-schema/reference/string.html#format}[JSON Schema] と {https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#data-types}[Open API] では、いくつか有用で広く使えるプロパティフォーマットを定義しています。次の表は、Eコマース環境で特に役に立つ追加のフォーマットをいくつか含んでいます。
+https://json-schema.org/understanding-json-schema/reference/string.html#format[JSON Schema] と https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#data-types[Open API] では、いくつか有用で広く使えるプロパティフォーマットを定義しています。次の表は、Eコマース環境で特に役に立つ追加のフォーマットをいくつか含んでいます。
 
 [cols="10%,25%,25%,40%",options="header",]
 |=====================================================================

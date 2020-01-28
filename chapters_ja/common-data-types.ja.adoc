@@ -36,11 +36,11 @@ APIが閉じたデータ型として、Moneyを取り扱わなくてはならな
 
 === Cons
 
-* https://en.wikipedia.org/wiki/Liskov_substitution_principle[リスコフの置換原則]に違反している。
-* 既存のライブラリのサポート(例えば、https://github.com/zalando/jackson-datatype-money[Jackson Datatype Money])にのらない。
+* https://en.wikipedia.org/wiki/Liskov_substitution_principle[リスコフの置換原則] に違反している。
+* 既存のライブラリのサポート(例えば、 https://github.com/zalando/jackson-datatype-money[Jackson Datatype Money] )にのらない。
 * amountが一緒に組み合わさるので、柔軟性が損なわれる。(例えば、複合的な通貨が表現できない)
 
-より良いアプローチはhttps://en.wikipedia.org/wiki/Composition_over_inheritance[継承よりもコンポジション]を使うことです。
+より良いアプローチは https://en.wikipedia.org/wiki/Composition_over_inheritance[継承よりもコンポジション] を使うことです。
 
 [source,json]
 ----
@@ -76,9 +76,9 @@ APIが閉じたデータ型として、Moneyを取り扱わなくてはならな
 * `1024.4225` = 1024 Euros, 42.25 Cent
 
 特定の言語でこのインタフェースを実装したり計算したりする際には、
-"amount"フィールドを決して`float`や`double`型に変換してはなりません。
+"amount"フィールドを決して `float` や `double` 型に変換してはなりません。
 そうしないと精度が失われてしまいます。代わりにJavaの
-https://docs.oracle.com/javase/8/docs/api/java/math/BigDecimal.html[`BigDecimal`]のような正確なフォーマットを使いましょう。
+https://docs.oracle.com/javase/8/docs/api/java/math/BigDecimal.html[`BigDecimal`] のような正確なフォーマットを使いましょう。
 詳細は http://stackoverflow.com/a/3730040/342852[Stack Overflow]
 
 いくつかのJSONパーサ(例えばNodeJS)は、デフォルトでnumberをfloatに変換してしまいます。
@@ -97,7 +97,7 @@ OpenAPIフォーマットの標準ではないけれど、パーサがnumberをf
 APIに繰り返し出てくるフィールドは以下のようなものです。
 
 * [[id]]{id}: オブジェクトのID。 IDは数値でなく文字列でなくてはなりません。IDは文書化されているコンテキストの範囲でユニークかつ不変です。一度オブジェクトに付与されたら変更されてはならないし、再利用してもいけません。
-* [[xyz_id]]{xyz_id}: オブジェクトが別のオブジェクトのIDを持つ場合、相手オブジェクト名に`\_id` を付与した名前を使いましょう。 (e.g. `customer_number` ではなく`customer_id`; 子ノードから親ノードを参照する場合は、たとえ両方が`Node`型であっても、`parent_node_id` とします)
+* [[xyz_id]]{xyz_id}: オブジェクトが別のオブジェクトのIDを持つ場合、相手オブジェクト名に `_id`  を付与した名前を使いましょう。 (e.g. `customer_number` ではなく `customer_id` ; 子ノードから親ノードを参照する場合は、たとえ両方が `Node` 型であっても、`parent_node_id`  とします)
 * [[created_at]]{created_at} オブジェクトが作られた日時。`date-time` 型でなくてはなりません。
 * [[modified_at]]{modified_at}: オブジェクトが更新された日時。`date-time` 型でなくてはなりません。
 * [[type]]{type}: オブジェクトの種類。このフィールドの型はstringとするべきです。typeはエンティティについてのランタイム情報を与えます。

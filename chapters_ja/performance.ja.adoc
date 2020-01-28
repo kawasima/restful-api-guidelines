@@ -29,7 +29,7 @@ APIはクライアントの必要性に応じて、帯域幅を減らすため�
 
 gzip圧縮がサーバペイロードのデフォルトの選択肢ではありますが、サーバは
 圧縮しないペイロードもサポートするべきです。クライアントは{Accept-Encoding}リクエストヘッダを
-通じてそれをコントロールできます。{RFC-7231}#section-5.3.4[RFC-7231 Section 5.3.4]も参照してください。
+通じてそれをコントロールできます。 {RFC-7231}#section-5.3.4[RFC-7231 Section 5.3.4] も参照してください。
 サーバもまた{Content-Encoding}ヘッダを通じて、gzip圧縮が使われていることを明示すべきです。
 
 [#157]
@@ -86,8 +86,7 @@ Content-Type: application/json
 
 {fields}クエリパラメータは、レスポンスのオブジェクトで返されるfieldsを決定するものです。例えば、 `(name)`  は `name` フィールドだけをもつ `users` オブジェクトを返します。また `(name,friends(name))` は、`name` とネストされた `name` フィールドだけもつ `friends` オブジェクトを返します。
 
-Open APIは公式にはパラメータによって異なるオフジェクトを返すスキーマをサポートしていません。フィールドパラメータを定義するときは、次の説明書きを加えておくくことをおすすめします。: `エンドポイントは戻りのオブジェクトのフィールドのフィルタリングをサポートする。
-[Rule \#157](https://opensource.zalando.com/restful-api-guidelines/\#157)`
+Open APIは公式にはパラメータによって異なるオフジェクトを返すスキーマをサポートしていません。フィールドパラメータを定義するときは、次の説明書きを加えておくくことをおすすめします。: `エンドポイントは戻りのオブジェクトのフィールドのフィルタリングをサポートする。 https://opensource.zalando.com/restful-api-guidelines/#157[Rule #157]`
 
 {fields}の値の文法は、次の https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form[BNF] で定義される
 
@@ -122,7 +121,7 @@ Open APIは公式にはパラメータによって異なるオフジェクトを
 命名に関しては <<137>> を参照ください。例えば埋め込みリソース展開には "embed" を使います。
 埋め込みクエリには、前述のフィルタリングと同様の https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form[BNF] 文法を使うようにしてください。
 
-サブリソースの埋め込みは、例えばある注文がそのサブリソース (/order/\{orderId}/items)
+サブリソースの埋め込みは、例えばある注文がそのサブリソース (/order/{orderId}/items)
 として注文品目をもつような場合には、以下のようにみえます。
 
 [source,http]
@@ -149,7 +148,7 @@ GET /order/123?embed=(items) HTTP/1.1
 [#227]
 == {MUST} キャッシュ可能な `GET`, `HEAD`, `POST` エンドポイントをドキュメント化する
 
-キャッシュは多くのことを考慮しなければなりません。例えば、一般的なレスポンス情報の<<cacheable,cacheability>>や、SSLを使ったエンドポイントを保護するガイドライン、リソースの更新とキャッシュ無効化のルール、複数のAPI利用者の存在などがあります。結果として、キャッシュは最良でも複雑(一貫性の観点などから)、最悪の場合は逆に非効率的なものになります。
+キャッシュは多くのことを考慮しなければなりません。例えば、一般的なレスポンス情報の<<cacheable,キャッシュ可能性>>や、SSLを使ったエンドポイントを保護するガイドライン、リソースの更新とキャッシュ無効化のルール、複数のAPI利用者の存在などがあります。結果として、キャッシュは最良でも複雑(一貫性の観点などから)、最悪の場合は逆に非効率的なものになります。
 
 頻繁に使用され、そのためにレート制限されたマスタデータサービス、すなわち、作成後にほとんどあるいは全く更新されないデータなど、サービスがそれ自体を保護することをサポートしない限り、クライアントサイドでの、また透過的なWebキャッシュを使うことは避けるべきです。
 
@@ -164,30 +163,15 @@ Cache-Control: no-cache, no-store, must-revalidate, max-age=0
 
 もしサービスが本当にキャッシュのサポートを必要とするなら、以下のルールにしたがってください。
 
-* <<cacheable>>な{GET}, {HEAD}, {POST}のエンドポイントはすべて、レスポンスに{Cache-Control}, {Vary}, {ETag}ヘッダのサポートを宣言することによってドキュメント化する。 
-  *注意:* {Expires}ヘッダは、キャッシュ生存期間の冗長で曖昧な定義を避けるため、定義してはならない。これらのヘッダのデフォルト文書をいかに示す。
-* 
-* Take care to specify the ability to support caching by defining the right
-  caching boundaries, i.e. time-to-live and cache constraints, by providing
-  sensible values for {Cache-Control} and {Vary} in your service. We will
-  explain best practices below.
-* [[cache-support-patterns]]Provide efficient methods to warm up and update
-  caches, e.g. as follows:
-** In general, you should support <<182, `ETag` Together With `If-Match`/
-   `If-None-Match` Header>> on all <<cacheable>> endpoints.
-** For larger data items support {HEAD} requests or more efficient {GET}
-   requests with {If-None-Match} header to check for updates.
-** For small data sets provide full collection {GET} requests supporting
-   {ETag}, as well as {HEAD} requests or {GET} requests with {If-None-Match}
-   to check for updates.
-** For medium sized data sets provide full collection {GET} requests supporting
-   {ETag} together with <<pagination>> and {entity-tag} filtering {GET} requests
-   for limiting the response to changes since the provided {entity-tag}. *Note:*
-   this is not supported by generic client and proxy caches on HTTP layer.
+* <<cacheable,キャッシュ可能>>な{GET}, {HEAD}, {POST}のエンドポイントはすべて、レスポンスに{Cache-Control}, {Vary}, {ETag}ヘッダのサポートを宣言することによってドキュメント化する。 *注意:* {Expires}ヘッダは、キャッシュ生存期間の冗長で曖昧な定義を避けるため、定義してはならない。これらのヘッダのデフォルト文書を以下に示す。
+* {Cache-Control}と{Vary}を使って正しくキャッシュ境界、すなわち生存期間やキャッシュ制約を定義し、キャッシュのサポートを明記しよう。以下でベストプラクティスを示す。
+* [[cache-support-patterns]]キャッシュをウォームアップし、更新するのに効率的な方法を提供する。つまり、以下のようなものである。
+** 一般的には、<<182, `If-Match` / `If-None-Match`  ヘッダと一緒に `ETag` >> を全ての <<cacheable, キャッシュ可能な>> エンドポイントでサポートする。
+** 巨大なデータには、{HEAD}リクエストや{If-None-Match}ヘッダとともに{GET}を使う効率的なリクエストで、更新のチェックをする。
+** 小さなデータセットでは、{ETag}をサポートした{GET}リクエストを提供し、{If-Non-Match}付きの{HEAD}リクエストや{GET}リクエストで更新のチェックをする。
+** 中くらいのサイズのデータセットは、<<pagination>>とともに{ETag}をサポートする{GET}リクエストと、与えられた{entity-tag}以降の変更に対してレスポンスを制限する{GET}リクエストをフィルタリングするための{entity-tag}を使う。 *注意:* これは一般的なクライアントやHTTPレイヤでのプロキシキャッシュではサポートされない。
 
-*Hint:* For proper cache support, you must return {304} without content on a
-failed {HEAD} or {GET} request with  <<182, `If-None-Match: <entity-tag>`>> instead
-of {412}.
+*ヒント:* キャッシュを適切にサポートするために、失敗した{HEAD}リクエストまたは{GET}リクエストでは、{304}ではなく<<182, `If-None-Match: <entity-tag>`>>を指定したコンテンツなしの{412}を返す必要があります。
 
 [source,yaml]
 ----
@@ -227,41 +211,39 @@ components:
       example: "accept-encoding, accept-language"
 ----
 
-*Hint:* For {ETag} source see <<182>>.
+*ヒント:* {ETag}ソースには<<182>>を参照してください。
 
-The default setting for {Cache-Control} should contain the `private` directive
-for endpoints with standard <<104, OAuth authorization>>, as well as the
-`must-revalidate` directive to ensure, that the client does not use stale cache
-entries. Last, the `max-age` directive should be set to a value between a few
-seconds (`max-age=60`) and a few hours (`max-age=86400`) depending on the change
-rate of your master data and your requirements to keep clients consistent.
+{Cache-Control}のためのデフォルト設定は、標準の<<104,OAuth認証>>を持つエンドポイントに対する
+`private` ディレクティブと、クライアントが古いキャッシュエントリを使わないようにするための
+`must-revalidate` ディレクティブが含まれている必要があります。
+最後に `max-age` ディレクティブは、マスタデータの変更率とクライアントの一貫性を保つための
+要件に応じて、数秒( `max-age=60` )から数時間( `max=age86400` )の間の値に設定する必要があります。
 
 [source,http]
 ----
 Cache-Control: private, must-revalidate, max-age=300
 ----
 
-The default setting for {Vary} is harder to determine correctly. It highly
-depends on the API endpoint, e.g. whether it supports compression, accepts
-different media types, or requires other request specific headers. To support
-correct caching you have to carefully choose the value. However, a good first
-default may be:
+{Vary}のデフォルト設定を正しく決めるのはもっと難しいことです。
+APIエンドポイントに大きく依存します。例えば、圧縮をサポートするかどうか、
+異なるメディアタイプを受け付けるかどうか、他のリクエスト固有のヘッダを
+必要とするかどうか、など。正しいキャッシュをサポートするには、この値を
+注意深く選択してください。出発点となるデフォルト値は、おそらく以下のものでしょう。
 
 [source,http]
 ----
 Vary: accept, accept-encoding
 ----
 
-Anyhow, this is only relevant, if you encourage clients to install generic
-HTTP layer client and proxy caches.
+いずれにせよ、これはクライアントに一般的なHTTPレイヤクライアントとプロキシキャッシュを
+クライアントが使おうとするときのみ、これが関係してきます。
 
-*Note:* generic client and proxy caching on HTTP level is hard to configure.
-Therefore, we strongly recommend to attach the (possibly distributed) cache
-directly to the service (or gateway) layer of your application. This relieves
-from interpreting the {vary} header and greatly simplifies interpreting the
-{Cache-Control} and {ETag} headers. Moreover, is highly efficient with respect
-to caching performance and overhead, and allows to support more
-<<cache-support-patterns, advanced cache update and warm up patterns>>.
+*注意:* HTTPレベルでの一般的なクライアントとプロキシキャッシュは、設定が難しいです。
+それゆえに、(おそらく分散)キャッシュを、アプリケーションのサービス(またはゲートウェイ)レイヤ
+に直接用意することを強く推奨します。{Vary}ヘッダの解釈から解放され、{Cache-Control}と
+{ETag}ヘッダの理解も非常に単純になります。さらにはキャッシュパフォーマンスやオーバーヘッドに
+ついても非常に効率的にもなるし、<<cache-support-patterns, 高度なキャッシュ更新とウォームアップのパターン>>.もサポートできるようになります。
 
-Anyhow, please carefully read {RFC-7234}[RFC 7234] before adding any client or
-proxy cache.
+いずれにせよ、どんなクライアントキャッシュやプロキシキャッシュを導入する前には、
+{RFC-7234}[RFC 7234] を注意深く読んでください。
+

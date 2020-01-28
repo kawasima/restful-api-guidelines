@@ -16,13 +16,13 @@
 [#101]
 == {MUST} OpenAPIを使ってAPIの仕様を提供する
 
-私たちは http://swagger.io/specification/[OpenAPI] (以前はSwaggerと呼ばれていたもの)を、API定義の標準として使っています。APIの設計者はAPI仕様ファイルを、可読性向上のため*YAML*を使って書きます。*Open API 3.0* バージョンを使うことを推奨しますが、*Open API 2.0* (別名 Swagger 2)もまだサポートした方がよいでしょう。
+私たちは http://swagger.io/specification/[Open API] (以前はSwaggerと呼ばれていたもの)を、API定義の標準として使っています。APIの設計者はAPI仕様ファイルを、可読性向上のため *YAML* を使って書きます。*Open API 3.0* バージョンを使うことを推奨しますが、*Open API 2.0* (別名 Swagger 2)もまだサポートした方がよいでしょう。
 
 API仕様はソースコード管理システムを使って、バージョン管理するべきです。一番良いのはAPIの実装コードを同じやり方にしておくことです。
 
 API実装のデプロイと同じタイミングで、API仕様もデプロイするようにします。そうすることでAPIポータルから探せるようになります。
 
-*ヒント:* *Open API 3.0/2.0* を調査するには、https://openapi-map.apihandyman.io/[Open API specification mind map] を使って探ってみたり、私たちの https://plugins.jetbrains.com/search?search=swagger+Monte[Swagger Plugin for IntelliJ IDEA] を使って最初のAPIを作ったりすることがよい方法です。既存のAPIを調査したり、検証/評価するには、 https://editor.swagger.io/[Swagger Editor] が良い出発点になるでしょう。
+*ヒント:* *Open API 3.0/2.0* を調査するには、 https://openapi-map.apihandyman.io/[Open API specification mind map] を使って探ってみたり、私たちの https://plugins.jetbrains.com/search?search=swagger+Monte[Swagger Plugin for IntelliJ IDEA] を使って最初のAPIを作ったりすることがよい方法です。既存のAPIを調査したり、検証/評価するには、 https://editor.swagger.io/[Swagger Editor] が良い出発点になるでしょう。
 
 *ヒント:* 私たちは https://graphql.org/[GraphQL] のガイドラインはまだ提供していません。私たちの技術評価軸であるZalando Tech Radarでは、汎用目的のピアトゥピアなマイクロサービス間のやり取りには、リソース指向のHTTP/REST APIのスタイル(と関連するツールやインフラサポート)に注力した方が良いと評価しています。RESTと比較してGraphQLには大きなメリットが無いが、いくつかの欠点があると私たちは考えます。ですが、GraphQLは特定ターゲットドメインの問題、特にフロントエンド(BFF)およびモバイルクライアントのバックエンドに多くの価値を提供できます。私たちは既にDXインタフェースフレームワークのAPIテクノとジーとしてGraphQLを既に利用しています。
 
@@ -49,7 +49,7 @@ API仕様に加えて、APIのユーザマニュアルも提供することは�
 * 境界値、エラー時の詳細、修正のヒント
 * アーキテクチャと主要な依存関係 (図やシーケンスがあるとよい)
 
-ユーザマニュアルはオンラインで公開されなければなりません。API仕様中の `\#/externalDocs/url` プロパティで書かれたリンクを、APIユーザマニュアルに含めるのを忘れないようにしましょう。
+ユーザマニュアルはオンラインで公開されなければなりません。API仕様中の `#/externalDocs/url` プロパティで書かれたリンクを、APIユーザマニュアルに含めるのを忘れないようにしましょう。
 
 [#103]
 == {MUST} APIはUS英語で書く

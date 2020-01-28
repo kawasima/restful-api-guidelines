@@ -74,7 +74,7 @@ APIはリソースを保護するために権限を定義しなければなり�
 ////
 
 権限名を定義し、権限をAPI仕様の先頭でセキュリティ定義として宣言したら、
-https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#securityRequirementObject[`セキュリティ`要求] を記述して、以下のように各API操作に割り当てます。
+https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#securityRequirementObject[`セキュリティ要求] を記述して、以下のように各API操作に割り当てます。
 
 [source,yaml]
 ----
