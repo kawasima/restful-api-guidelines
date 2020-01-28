@@ -28,5 +28,4 @@ jobs:
           command: npm install netlify-cli
       - run:
           name: deploy to netlify
-          command: node_modules/.bin/netlify deploy --auth="$netlify_token" --dir="dist" --site="ce58be82-b5e0-4e97-acb5-d3144d410eac"
-          --prod
+          command: node_modules/.bin/netlify deploy --auth="$netlify_token" --dir="dist" --site="ce58be82-b5e0-4e97-acb5-d3144d410eac" --prod
