@@ -8,7 +8,10 @@ jobs:
       - checkout
       - run:
           name: install asciidoctor
-          command: gem install asciidoctor:1.5.8 asciidoctor-diagram:1.5.19 asciidoctor-pdf:1.5.0.rc2 asciidoctor-epub3:1.5.0.alpha.11 epubcheck:3.0.1 coderay
+          command: gem install asciidoctor:1.5.8 asciidoctor-pdf-cjk asciidoctor-diagram:1.5.19 asciidoctor-pdf:1.5.0.rc2  asciidoctor-pdf-cjk-kai_gen_gothic asciidoctor-epub3:1.5.0.alpha.11 epubcheck:3.0.1 coderay
+      - run:
+          name: install font
+          command: asciidoctor-pdf-cjk-kai_gen_gothic-install
       - run:
           name: mkdir
           command: mkdir ./dist
@@ -26,3 +29,4 @@ jobs:
       - run:
           name: deploy to netlify
           command: node_modules/.bin/netlify deploy --auth="$netlify_token" --dir="dist" --site="ce58be82-b5e0-4e97-acb5-d3144d410eac"
+          --prod
