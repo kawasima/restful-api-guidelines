@@ -205,7 +205,7 @@ image::assets/api-zalando-small.jpg[API Guild Logo]
 
 別の形式: link:zalando-guidelines-ja.pdf[PDF], link:zalando-guidelines-ja.epub[EPUB3]
 
-License: CC-BY-SA 3.0 © Zalando SE 2018 & CC-BY-SA 3.0 © kawasima 2020
+License: CC-BY-SA 3.0 © Zalando SE 2020 & CC-BY-SA 3.0 © kawasima 2020
 
 toc::[]
 
