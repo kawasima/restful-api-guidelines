@@ -93,7 +93,7 @@ booleanの代わりに列挙型を使うことを強く奨めます。
 これはyes/no/unknownの値をもったterms_and_conditionsに置き換えることができます。
 
 [#123]
-== {MUST} `null` とプロパティ自体が無いことを同一セマンティクスで使わない
+== {MUST} `null` とプロパティ自体が無いことは同一セマンティクスとして使う
 
 Open API 3.x では、プロパティが無い(`{}`)かもしれないことと、`null` (`{"example":null}`)を表すのに、`required`  と `nullable`  を付けることができます。
 もし、あるプロパティが `required` でなく `nullable`  だと定義されていたら(<<required-nullable-row-2, 下表の2行目>>のように)、このルールは、双方を正確に同じ方法で扱えるようにしなければなりません。
