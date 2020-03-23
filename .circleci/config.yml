@@ -18,7 +18,7 @@ jobs:
       - run:
           command: asciidoctor -D dist -o index.html index.ja.adoc
       - run:
-          command: asciidoctor-pdf -r asciidoctor-pdf-cjk-kai_gen_gothic -D dist -a pdf-style=KaiGenGothicJP-theme.yml -a pdf-stylesdir=. -o zalando-guidelines-ja.pdf index.ja.adoc
+          command: asciidoctor-pdf -r asciidoctor-pdf-cjk-kai_gen_gothic -D dist -a pdf-style=KaiGenGothicJP-theme.yml -o zalando-guidelines-ja.pdf index.ja.adoc
       - run:
           command: asciidoctor-epub3 -D dist -o zalando-guidelines-ja.epub index.ja.adoc
       - run:

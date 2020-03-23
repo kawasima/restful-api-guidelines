@@ -123,7 +123,7 @@ Original-Message-ID
 もし非公開の内部APIもサポートする必要があるならば(例えばサービスが特定の運用サポート機能のために)、2つの異なるAPI仕様をメンテナンスし、<<219, API audience>>を提供することを推奨します。
 双方のAPIとも `/api` をベースパスとして使うべきではありません。
 
-私たちはAPIのベースパスを、デプロイ時の可変な設定の一部として考えています。したがって、この情報は、https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#server-object[server object] に定義されなければなりません。
+私たちはAPIのベースパスを、デプロイ時の可変な設定の一部として考えています。したがって、この情報は、 https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#server-object[server object] に定義されなければなりません。
 
 [#136]
 == {MUST} 末尾のスラッシュを避ける
@@ -144,3 +144,4 @@ Original-Message-ID
 * [[offset]]{offset}: 数値のオフセットによるページのスタート地点。<<pagination>> セクション参照。
 * [[cursor]]{cursor}: ページへのOpaqueポインタで、クライアントが検査したり構築したりすることない。通常は(暗号化)ページ位置、つまり最初または最後のページ要素の識別子、ページネーションの方向、およびコレクションを再作成するために適用されたクエリフィルタをエンコードする。<<pagination>> セクション参照。
 * [[limit]]{limit}: クライアントから1ページのエンティティ数を制限する数を与える。<<pagination>> セクション参照。
+
